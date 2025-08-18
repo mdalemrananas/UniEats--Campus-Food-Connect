@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="com.unieats.controllers.HomeController" 
+      style="-fx-background-color: #f5f5f5; -fx-padding: 0;" 
+      spacing="0">
+    
+    <!-- Header -->
+    <HBox style="-fx-background-color: #2c3e50; -fx-padding: 15 20;" alignment="CENTER_LEFT">
+        <Label text="UniEats" style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button style="-fx-background-color: transparent; -fx-padding: 5;" onAction="#handleProfileAction">
+            <graphic>
+                <ImageView fx:id="profileImage" fitWidth="30" fitHeight="30" preserveRatio="true" />
+            </graphic>
+        </Button>
+    </HBox>
+    
+    <!-- Main Content -->
+    <ScrollPane fitToWidth="true" style="-fx-background: #f5f5f5; -fx-padding: 0;">
+        <VBox style="-fx-padding: 20;" spacing="20">
+            <!-- Welcome Section -->
+            <VBox style="-fx-background-color: #e74c3c; -fx-background-radius: 15; -fx-padding: 20;" spacing="10">
+                <Label text="Welcome back!" style="-fx-text-fill: white; -fx-font-size: 20;"/>
+                <Label text="What would you like to eat today?" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 14;"/>
+            </VBox>
+            
+            <!-- Main Food Image -->
+            <VBox spacing="10" style="-fx-alignment: center;">
+                <ImageView fx:id="mainFoodImage" fitWidth="300" fitHeight="200" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 2);"/>
+                <Label text="Special Meal Deal" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+                <Label text="Delicious combo with drink and dessert" style="-fx-text-fill: #666; -fx-font-size: 14;"/>
+                <Button text="Order Now" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30; -fx-cursor: hand; -fx-background-radius: 20;" onAction="#handleOrderNow"/>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+    
+    <!-- Bottom Navigation -->
+    <HBox style="-fx-background-color: white; -fx-padding: 10 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);" spacing="0">
+        <VBox alignment="CENTER" style="-fx-padding: 5; -fx-spacing: 5; -fx-pref-width: 80;" onMouseClicked="#handleHomeAction">
+            <ImageView fx:id="homeIcon" fitWidth="24" fitHeight="24" preserveRatio="true"/>
+            <Label text="Home" style="-fx-font-size: 10; -fx-text-fill: #e74c3c;"/>
+        </VBox>
+    </HBox>
+</VBox>
