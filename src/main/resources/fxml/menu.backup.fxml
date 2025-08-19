@@ -19,31 +19,6 @@
             vbarPolicy="AS_NEEDED">
     
     <VBox spacing="0" style="-fx-background-color: #fafafa;">
-        
-        <!-- Top Status Bar -->
-        
-        
-        <!-- Location Bar
-        <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
-            <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-cursor: hand; -fx-background-color: #f8f9fa; -fx-background-radius: 12; -fx-padding: 8 12;">
-                <Text text="📍" style="-fx-font-size: 18px;"/>
-                <VBox spacing="2">
-                    <Label text="Location" style="-fx-font-size: 11px; -fx-text-fill: #6c757d;"/>
-                    <Label text="Al Safa Street, Al Wasi" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                </VBox>
-                <Text text="▼" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
-            </HBox>
-            <Region HBox.hgrow="ALWAYS"/>
-            <StackPane style="-fx-cursor: hand; -fx-background-color: #f8f9fa; -fx-background-radius: 12; -fx-padding: 8;">
-                <Text text="🛍️" style="-fx-font-size: 20px;"/>
-                <StackPane alignment="TOP_RIGHT" style="-fx-padding: 0 0 0 0;">
-                    <Circle radius="10" fill="#ff6b35"/>
-                    <Label text="2" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-                </StackPane>
-            </StackPane>
-        </HBox>
-        -->
-        
         <!-- Search and Filter Bar -->
         <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
             <HBox style="-fx-background-color: #f8f9fa; -fx-background-radius: 25; -fx-padding: 12 16; -fx-spacing: 8; -fx-pref-height: 48; -fx-alignment: center_left; -fx-pref-width: 240;">
@@ -159,12 +134,11 @@
                     
                     <HBox fx:id="foodSliderContainer" spacing="16" style="-fx-padding: 8;">
                         
-                        <!-- Food Item Card 1 -->
+                                        <!-- Food Item Card 1 -->
                         <VBox style="-fx-background-color: #ffffff; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0, 0, 4); -fx-cursor: hand; -fx-border-color: #f8f9fa; -fx-border-width: 1; -fx-border-radius: 20; -fx-min-width: 200; -fx-max-width: 200;">
                             <StackPane style="-fx-background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); -fx-background-radius: 20 20 0 0; -fx-pref-height: 120;">
                                 <FontIcon iconLiteral="fas-hamburger" iconSize="60" iconColor="#ff6b35" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 4);"/>
                                 <HBox alignment="CENTER_LEFT" style="-fx-alignment: top_left; -fx-padding: 12;">
-                                    <!--<StackPane style="-fx-background-color: rgba(0,0,0,0.8); -fx-background-radius: 12; -fx-padding: 4 8;">-->
                                     <StackPane>
                                         <VBox alignment="CENTER" spacing="2">
                                             <Text text="4.7" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-fill: black;"/>
@@ -316,7 +290,7 @@
 <!-- Food Item Card 4 -->
 <VBox style="-fx-background-color: #ffffff; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0, 0, 4); -fx-cursor: hand; -fx-border-color: #f8f9fa; -fx-border-width: 1; -fx-border-radius: 20; -fx-min-width: 200; -fx-max-width: 200;">
     <StackPane style="-fx-background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); -fx-background-radius: 20 20 0 0; -fx-pref-height: 120;">
-        <FontIcon iconLiteral="fas-utensils" iconSize="60" iconColor="#ff6b35" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 4);"/>
+        <FontIcon iconLiteral="fas-bowl-food" iconSize="60" iconColor="#ff6b35" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 4);"/>
         <HBox alignment="CENTER_LEFT" style="-fx-alignment: top_left; -fx-padding: 12;">
             <StackPane>
                 <VBox alignment="CENTER" spacing="2">
@@ -329,26 +303,12 @@
             </StackPane>
         </HBox>
     </StackPane>
-    <VBox spacing="6" style="-fx-padding: 12;">
-        <HBox alignment="CENTER_LEFT" spacing="6">
-            <HBox alignment="CENTER_LEFT" spacing="6">
-                <FontIcon iconLiteral="fas-utensils" iconSize="14" iconColor="#ff6b35"/>
-                <Label text="Noodle House" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-            </HBox>
-            <StackPane style="-fx-background-color: #2196f3; -fx-background-radius: 6; -fx-padding: 1 4;">
-                <Label text="POP" style="-fx-font-size: 6px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-            </StackPane>
-        </HBox>
-        <HBox spacing="4" alignment="CENTER_LEFT">
-            <HBox alignment="CENTER_LEFT" spacing="2">
-                <FontIcon iconLiteral="fas-clock" iconSize="10" iconColor="#6c757d"/>
-                <Text text="35 min" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-            </HBox>
-            <Text text="•" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-            <HBox alignment="CENTER_LEFT" spacing="2">
-                <FontIcon iconLiteral="fas-star" iconSize="10" iconColor="#6c757d"/>
-                <Text text="Medium" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-            </HBox>
+    <VBox spacing="8" style="-fx-padding: 16;">
+        <Label text="Veggie Delight" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+        <Label text="Healthy vegetable bowl with fresh ingredients" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-wrap-text: true;"/>
+        <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 8 0 0 0;">
+            <Label text="$12.99" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;"/>
+            <Region HBox.hgrow="ALWAYS"/>
         </HBox>
         <HBox alignment="CENTER_RIGHT" style="-fx-padding: 4 0 0 0;">
             <Button fx:id="addToCartButton4" text=" Add" 
@@ -361,10 +321,20 @@
     </VBox>
 </VBox>
 
-                        
+<!-- More Food Items Section -->
+<VBox style="-fx-padding: 20; -fx-spacing: 16; -fx-background-color: #ffffff; -fx-margin: 8 0 0 0;">
+    <HBox alignment="CENTER_LEFT" spacing="8">
+        <HBox alignment="CENTER_LEFT" spacing="8">
+            <FontIcon iconLiteral="fas-utensils" iconSize="18" iconColor="#2d3436"/>
+            <Label text="More Food Items" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+        </HBox>
+    </HBox>
+    <!-- More food items can be added here -->
+</VBox>
+
                     </HBox>
                 </ScrollPane>
-                
+
                 <!-- Right Navigation Button -->
                 <Button fx:id="rightSlideButton" 
                         style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 12; -fx-background-radius: 20; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 4, 0, 0, 2); -fx-min-width: 40; -fx-min-height: 40;">
@@ -374,7 +344,7 @@
                 </Button>
             </HBox>
         </VBox>
-        
+
         <!-- Bottom Navigation Bar -->
         <HBox alignment="CENTER" spacing="0" style="-fx-background-color: #ffffff; -fx-padding: 12 0; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);">
             <VBox alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 90;">

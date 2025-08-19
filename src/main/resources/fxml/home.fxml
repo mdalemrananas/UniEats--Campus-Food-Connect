@@ -6,6 +6,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.geometry.Insets?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" 
       fx:controller="com.unieats.controllers.HomeController" 
@@ -45,12 +46,20 @@
     <!-- Action Buttons -->
     <VBox alignment="CENTER" spacing="16" style="-fx-padding: 40 0 0 0;">
         <!-- Sign Up Button -->
-        <Button text="Sign Up" onAction="#handleSignUp" 
-                style="-fx-background-color: #4B5563; -fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold; -fx-padding: 15 0; -fx-cursor: hand; -fx-background-radius: 12; -fx-pref-width: 320;"/>
+        <Button text=" Sign Up" onAction="#handleSignUp" 
+                style="-fx-background-color: #4B5563; -fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold; -fx-padding: 15 0; -fx-cursor: hand; -fx-background-radius: 12; -fx-pref-width: 320;">
+            <graphic>
+                <FontIcon iconLiteral="fas-user-plus" iconSize="16" iconColor="white"/>
+            </graphic>
+        </Button>
         
         <!-- Sign In Button -->
-        <Button text="Sign In" onAction="#handleSignIn" 
-                style="-fx-background-color: #F3F4F6; -fx-text-fill: #4B5563; -fx-font-size: 16; -fx-font-weight: bold; -fx-padding: 15 0; -fx-cursor: hand; -fx-background-radius: 12; -fx-pref-width: 320;"/>
+        <Button text=" Sign In" onAction="#handleSignIn" 
+                style="-fx-background-color: #F3F4F6; -fx-text-fill: #4B5563; -fx-font-size: 16; -fx-font-weight: bold; -fx-padding: 15 0; -fx-cursor: hand; -fx-background-radius: 12; -fx-pref-width: 320;">
+            <graphic>
+                <FontIcon iconLiteral="fas-sign-in-alt" iconSize="16" iconColor="#4B5563"/>
+            </graphic>
+        </Button>
     </VBox>
     
     <!-- Bottom Decoration -->

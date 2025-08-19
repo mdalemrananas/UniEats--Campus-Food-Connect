@@ -5,6 +5,10 @@ module com.unieats {
     requires org.controlsfx.controls;
     requires java.sql;
     requires transitive javafx.graphics;
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.core;
+    requires org.kordamp.ikonli.fontawesome5;
+    requires org.kordamp.ikonli.material2;
 
     opens com.unieats to javafx.fxml;
     exports com.unieats;
