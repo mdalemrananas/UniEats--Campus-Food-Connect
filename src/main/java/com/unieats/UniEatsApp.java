@@ -6,15 +6,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.util.Objects;
 
 public class UniEatsApp extends Application {
     
-    // Mobile device dimensions (optimized for modern mobile)
-    private static final int APP_WIDTH = 360;
-    private static final int APP_HEIGHT = 800;
+    // Logical design size; kept small so it fits most screens and scales down only
+    private static final int APP_WIDTH = 320;
+    private static final int APP_HEIGHT = 560;
     
     @Override
     public void start(Stage primaryStage) {
@@ -22,22 +21,18 @@ public class UniEatsApp extends Application {
             // Load the main FXML file
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/home.fxml"));
             Parent root = loader.load();
-            
-            // Create and set the scene with a white background
-            Scene scene = new Scene(root, APP_WIDTH, APP_HEIGHT, Color.WHITE);
+
+            // Create responsive scene that scales the mobile layout for desktop/laptop
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, APP_WIDTH, APP_HEIGHT);
             
             // Set up the stage
             primaryStage.setTitle("UniEats");
             primaryStage.setScene(scene);
             
-            // Set fixed size to match mobile device dimensions
-            primaryStage.setMinWidth(APP_WIDTH);
-            primaryStage.setMaxWidth(APP_WIDTH);
-            primaryStage.setMinHeight(APP_HEIGHT);
-            primaryStage.setMaxHeight(APP_HEIGHT);
-            
-            // Remove window decorations for a more app-like experience
-            primaryStage.setResizable(false);
+            // Allow resizing – keep very small minimums to fit tiny displays
+            primaryStage.setResizable(true);
+            primaryStage.setMinWidth(280);
+            primaryStage.setMinHeight(480);
             
             // Try to set application icon (not critical if it fails)
             try {

@@ -3,7 +3,6 @@ package com.unieats.controllers;
 import com.unieats.DatabaseManager;
 import com.unieats.User;
 import com.unieats.util.PasswordUtil;
-import com.unieats.controllers.MenuController;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
@@ -61,9 +60,13 @@ public class SigninController {
         
         // Authentication successful
         showSuccess("Sign in successful! Welcome back, " + user.getFullName() + "!");
-        
-        // Navigate to menu page immediately
-        navigateToMenu();
+
+        // Route based on role
+        switch (user.getUserCategory().toLowerCase()) {
+            case "admin" -> navigateTo("/fxml/admin.fxml", "UniEats - Admin");
+            case "seller" -> navigateTo("/fxml/stall.fxml", "UniEats - Stall");
+            default -> navigateToMenu();
+        }
     }
     
     private boolean validateFields() {
@@ -117,8 +120,7 @@ public class SigninController {
             }
             
             if (stage != null) {
-                Scene scene = new Scene(root, 360, 800);
-                scene.setFill(Color.WHITE);
+                Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
                 
                 stage.setScene(scene);
                 stage.show();
@@ -146,8 +148,7 @@ public class SigninController {
             }
             
             if (stage != null) {
-                Scene scene = new Scene(root, 360, 800);
-                scene.setFill(Color.WHITE);
+                Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
                 
                 stage.setScene(scene);
                 stage.show();
@@ -158,6 +159,20 @@ public class SigninController {
         } catch (IOException e) {
             System.err.println("Error navigating to signup: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void navigateTo(String fxmlPath, String title) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+            Stage stage = (Stage) emailField.getScene().getWindow();
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setTitle(title);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            showError("Failed to navigate: " + e.getMessage());
         }
     }
     
@@ -195,8 +210,7 @@ public class SigninController {
             System.out.println("Current stage: " + stage);
             
             // Create and set the new scene
-            Scene scene = new Scene(root, 360, 800);
-            scene.setFill(Color.WHITE);
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
             
             // Set the new scene and show the stage
             stage.setScene(scene);

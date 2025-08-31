@@ -51,11 +51,10 @@
                 <TextField fx:id="searchField" promptText="Search for food, restaurants..." 
                          style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: #2d3436; -fx-prompt-text-fill: #6c757d; -fx-font-size: 14px; -fx-pref-height: 30; -fx-pref-width: 180;"/>
             </HBox>
-            <Button fx:id="filterButton" text="Filter" 
-                    style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 12 16; -fx-background-radius: 20; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 4, 0, 0, 2);"/>
-            <Button style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 12; -fx-background-radius: 20; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 4, 0, 0, 2);">
+            <Button fx:id="filterButton" text="Filter"/>
+            <Button>
                 <graphic>
-                    <FontIcon iconLiteral="fas-cog" iconSize="14" iconColor="white"/>
+                    <FontIcon iconLiteral="fas-cog" iconSize="14" iconColor="Black"/>
                 </graphic>
             </Button>
         </HBox>
@@ -78,9 +77,9 @@
             </HBox>
             <HBox alignment="CENTER_RIGHT" style="-fx-padding: 12 0 0 0;">
                 <Button fx:id="logoutButton" text=" Logout" 
-                        style="-fx-background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(231,76,60,0.3), 4, 0, 0, 2);">
+                        style="-fx-background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); -fx-text-fill: Red; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(231,76,60,0.3), 4, 0, 0, 2);">
                     <graphic>
-                        <FontIcon iconLiteral="fas-sign-out-alt" iconSize="12" iconColor="white"/>
+                        <FontIcon iconLiteral="fas-sign-out-alt" iconSize="12" iconColor="Red"/>
                     </graphic>
                 </Button>
             </HBox>
@@ -98,18 +97,25 @@
             </HBox>
             
             <HBox spacing="16" style="-fx-padding: 16 0 0 0;">
-                <VBox alignment="CENTER" spacing="8" style="-fx-cursor: hand;">
+                <VBox fx:id="foodCategoryButton" alignment="CENTER" spacing="8" style="-fx-cursor: hand;">
                     <StackPane style="-fx-background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); -fx-background-radius: 20; -fx-padding: 16; -fx-pref-width: 60; -fx-pref-height: 60; -fx-effect: dropshadow(gaussian, rgba(76,175,80,0.3), 6, 0, 0, 3);">
-                        <FontIcon iconLiteral="fas-pizza-slice" iconSize="28" iconColor="white"/>
+                        <FontIcon iconLiteral="fas-pizza-slice" iconSize="28" iconColor="Blue"/>
                     </StackPane>
                     <Label text="Food" style="-fx-text-fill: #636e72; -fx-font-size: 12px; -fx-font-weight: bold;"/>
                 </VBox>
                 
-                <VBox alignment="CENTER" spacing="8" style="-fx-cursor: hand;">
+                <VBox fx:id="storesCategoryButton" alignment="CENTER" spacing="8" style="-fx-cursor: hand;">
                     <StackPane style="-fx-background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%); -fx-background-radius: 20; -fx-padding: 16; -fx-pref-width: 60; -fx-pref-height: 60; -fx-effect: dropshadow(gaussian, rgba(33,150,243,0.3), 6, 0, 0, 3);">
-                        <FontIcon iconLiteral="fas-store" iconSize="28" iconColor="white"/>
+                        <FontIcon iconLiteral="fas-store" iconSize="28" iconColor="Blue"/>
                     </StackPane>
                     <Label text="Stores" style="-fx-text-fill: #636e72; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                </VBox>
+                
+                <VBox fx:id="reportButton" alignment="CENTER" spacing="8" style="-fx-cursor: hand;">
+                    <StackPane style="-fx-background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); -fx-background-radius: 20; -fx-padding: 16; -fx-pref-width: 60; -fx-pref-height: 60; -fx-effect: dropshadow(gaussian, rgba(231,76,60,0.3), 6, 0, 0, 3);">
+                        <FontIcon iconLiteral="fas-flag" iconSize="28" iconColor="white"/>
+                    </StackPane>
+                    <Label text="Report" style="-fx-text-fill: #636e72; -fx-font-size: 12px; -fx-font-weight: bold;"/>
                 </VBox>
                 
                 <!--<VBox alignment="CENTER" spacing="8" style="-fx-cursor: hand;">
@@ -395,7 +401,7 @@
                 </StackPane>
                 <Label text="Payment" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
             </VBox>
-            <VBox alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 90;">
+            <VBox fx:id="profileButton" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 90;">
                 <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
                     <FontIcon iconLiteral="fas-user" iconSize="20" iconColor="#6c757d"/>
                 </StackPane>

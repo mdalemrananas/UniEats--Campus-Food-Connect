@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.StallController"
+	alignment="TOP_LEFT" spacing="12" style="-fx-background-color: #ffffff; -fx-padding: 16;"
+	prefWidth="360" prefHeight="800">
+
+	<HBox alignment="CENTER_LEFT" spacing="8">
+		<Label text="Stall Dashboard" style="-fx-font-size: 18; -fx-font-weight: bold;" />
+		<Region HBox.hgrow="ALWAYS" />
+		<Button text="Back" onAction="#handleBack" />
+	</HBox>
+
+	<Separator />
+
+	<VBox spacing="10">
+		<Button text="Post Food Item" onAction="#handlePostItem" />
+		<Button text="Manage Orders" onAction="#handleManageOrders" />
+		<Button text="Inventory" onAction="#handleInventory" />
+		<Button text="Sales History" onAction="#handleSalesHistory" />
+	</VBox>
+
+</VBox>
+

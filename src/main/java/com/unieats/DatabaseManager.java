@@ -22,21 +22,122 @@ public class DatabaseManager {
     
     private void initializeDatabase() {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
-            // Create users table if it doesn't exist
-            String createTableSQL = """
-                CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    email TEXT UNIQUE NOT NULL,
-                    password TEXT NOT NULL,
-                    full_name TEXT NOT NULL,
-                    user_category TEXT NOT NULL CHECK(user_category IN ('student', 'seller')),
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """;
-            
+            // Create tables if they don't exist
             try (Statement stmt = conn.createStatement()) {
-                stmt.execute(createTableSQL);
+                // Users
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS users (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        email TEXT UNIQUE NOT NULL,
+                        password TEXT NOT NULL,
+                        full_name TEXT NOT NULL,
+                        user_category TEXT NOT NULL CHECK(user_category IN ('student', 'seller', 'admin')),
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    )
+                """);
+
+                // Shops (stall owners)
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS shops (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        owner_id INTEGER NOT NULL,
+                        shop_name TEXT NOT NULL,
+                        status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(owner_id) REFERENCES users(id)
+                    )
+                """);
+
+                // Food items
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS food_items (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        shop_id INTEGER NOT NULL,
+                        name TEXT NOT NULL,
+                        price REAL NOT NULL,
+                        points_multiplier REAL NOT NULL DEFAULT 1.0,
+                        stock INTEGER NOT NULL DEFAULT 0,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(shop_id) REFERENCES shops(id)
+                    )
+                """);
+
+                // Cart
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS cart (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        item_id INTEGER NOT NULL,
+                        quantity INTEGER NOT NULL DEFAULT 1,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(user_id) REFERENCES users(id),
+                        FOREIGN KEY(item_id) REFERENCES food_items(id)
+                    )
+                """);
+
+                // Orders
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS orders (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        shop_id INTEGER NOT NULL,
+                        total_price REAL NOT NULL,
+                        status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','preparing','delivered','cancelled','completed')),
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(user_id) REFERENCES users(id),
+                        FOREIGN KEY(shop_id) REFERENCES shops(id)
+                    )
+                """);
+
+                // Order items
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS order_items (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        order_id INTEGER NOT NULL,
+                        item_id INTEGER NOT NULL,
+                        quantity INTEGER NOT NULL,
+                        price REAL NOT NULL,
+                        FOREIGN KEY(order_id) REFERENCES orders(id),
+                        FOREIGN KEY(item_id) REFERENCES food_items(id)
+                    )
+                """);
+
+                // Reward points (shop-wise)
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS reward_points (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        shop_id INTEGER NOT NULL,
+                        points REAL NOT NULL DEFAULT 0,
+                        UNIQUE(user_id, shop_id),
+                        FOREIGN KEY(user_id) REFERENCES users(id),
+                        FOREIGN KEY(shop_id) REFERENCES shops(id)
+                    )
+                """);
+
+                // Reports (quality reports)
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS reports (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        shop_id INTEGER NOT NULL,
+                        item_id INTEGER,
+                        title TEXT NOT NULL,
+                        description TEXT NOT NULL,
+                        status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','reviewing','resolved','rejected')),
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(user_id) REFERENCES users(id),
+                        FOREIGN KEY(shop_id) REFERENCES shops(id),
+                        FOREIGN KEY(item_id) REFERENCES food_items(id)
+                    )
+                """);
+
                 System.out.println("Database initialized successfully");
             }
             

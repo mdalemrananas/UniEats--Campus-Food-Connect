@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.CartController"
+	alignment="TOP_LEFT" spacing="12" style="-fx-background-color: #ffffff; -fx-padding: 16;"
+	prefWidth="360" prefHeight="800">
+
+	<HBox alignment="CENTER_LEFT" spacing="8">
+		<Label text="Your Cart" style="-fx-font-size: 18; -fx-font-weight: bold;" />
+		<Region HBox.hgrow="ALWAYS" />
+		<Button text="Checkout" onAction="#handleCheckout" />
+	</HBox>
+
+	<TableView fx:id="cartTable" prefHeight="600">
+		<columns>
+			<TableColumn text="Item" fx:id="colName" prefWidth="150" />
+			<TableColumn text="Qty" fx:id="colQty" prefWidth="60" />
+			<TableColumn text="Price" fx:id="colPrice" prefWidth="80" />
+			<TableColumn text="Points" fx:id="colPoints" prefWidth="70" />
+		</columns>
+	</TableView>
+
+	<HBox spacing="8">
+		<Label text="Total:" />
+		<Label fx:id="totalLabel" text="$0.00" style="-fx-font-weight: bold;" />
+		<Region HBox.hgrow="ALWAYS" />
+		<Button text="Clear Cart" onAction="#handleClear" />
+	</HBox>
+
+</VBox>
+

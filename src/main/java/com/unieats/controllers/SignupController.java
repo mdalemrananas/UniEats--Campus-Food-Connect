@@ -34,7 +34,7 @@ public class SignupController {
     }
     
     private void setupUserCategoryComboBox() {
-        userCategoryComboBox.getItems().addAll("Student", "Seller");
+        userCategoryComboBox.getItems().addAll("Student", "Seller", "Admin");
         userCategoryComboBox.setValue("Student"); // Default selection
     }
     
@@ -182,8 +182,7 @@ public class SignupController {
             }
             
             if (stage != null) {
-                Scene scene = new Scene(root, 360, 800);
-                scene.setFill(Color.WHITE);
+                Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
                 
                 stage.setScene(scene);
                 stage.show();

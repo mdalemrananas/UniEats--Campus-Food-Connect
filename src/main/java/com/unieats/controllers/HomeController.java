@@ -8,7 +8,6 @@ import javafx.scene.image.ImageView;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.io.IOException;
 
@@ -66,9 +65,8 @@ public class HomeController {
             // Get the current stage
             Stage stage = (Stage) mainIllustration.getScene().getWindow();
             
-            // Create new scene with signup content
-            Scene scene = new Scene(root, 360, 800);
-            scene.setFill(Color.WHITE);
+            // Create new responsive scene with signup content
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
             
             // Set the new scene
             stage.setScene(scene);
@@ -87,9 +85,8 @@ public class HomeController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/signin.fxml"));
             Parent root = loader.load();
             
-            // Create new scene with signin content
-            Scene scene = new Scene(root, 360, 800);
-            scene.setFill(Color.WHITE);
+            // Create new responsive scene with signin content
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
             
             // Get current stage and set new scene
             Stage stage = (Stage) mainIllustration.getScene().getWindow();

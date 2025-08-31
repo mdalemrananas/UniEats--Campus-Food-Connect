@@ -2,10 +2,7 @@ package com.unieats.controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +14,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import com.unieats.User;
+import com.unieats.controllers.FoodItemsController;
+import com.unieats.controllers.ShopsController;
+import com.unieats.controllers.ReportController;
+import com.unieats.controllers.ProfileController;
 
 public class MenuController {
     
@@ -29,7 +30,12 @@ public class MenuController {
     @FXML private ScrollPane foodSliderPane;
     @FXML private HBox foodSliderContainer;
     @FXML private Button logoutButton;
+    @FXML private Button cartButton;
     @FXML private Label sessionTimeLabel;
+    @FXML private VBox foodCategoryButton;
+    @FXML private VBox storesCategoryButton;
+    @FXML private VBox reportButton;
+    @FXML private VBox profileButton;
     
     // Food item buttons
     @FXML private Button favoriteButton1;
@@ -49,7 +55,8 @@ public class MenuController {
     // Session management
     private LocalDateTime sessionStartTime;
     private Timeline sessionTimer;
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+    // formatter reserved for future use when persisting/formatting times
+    // private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
     
     @FXML
     public void initialize() {
@@ -86,6 +93,14 @@ public class MenuController {
         if (addToCartButton2 != null) addToCartButton2.setOnAction(e -> handleAddToCart(2));
         if (addToCartButton3 != null) addToCartButton3.setOnAction(e -> handleAddToCart(3));
         if (addToCartButton4 != null) addToCartButton4.setOnAction(e -> handleAddToCart(4));
+
+        if (cartButton != null) cartButton.setOnAction(e -> navigateToCart());
+        
+        // Category navigation
+        if (foodCategoryButton != null) foodCategoryButton.setOnMouseClicked(e -> navigateToFoodItems());
+        if (storesCategoryButton != null) storesCategoryButton.setOnMouseClicked(e -> navigateToShops());
+        if (reportButton != null) reportButton.setOnMouseClicked(e -> navigateToReport());
+        if (profileButton != null) profileButton.setOnMouseClicked(e -> navigateToProfile());
     }
     
     private void startSession() {
@@ -236,8 +251,8 @@ public class MenuController {
             // Get the current stage
             Stage stage = (Stage) logoutButton.getScene().getWindow();
             
-            // Create new scene and set it
-            Scene scene = new Scene(root);
+            // Create new responsive scene and set it
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
             stage.setScene(scene);
             stage.show();
             
@@ -317,8 +332,136 @@ public class MenuController {
     }
     
     private void handleAddToCart(int itemNumber) {
-        System.out.println("Add to cart button clicked for item " + itemNumber);
-        showAlert("Cart", "Added item " + itemNumber + " to cart!");
+        // Demo mapping: itemNumber 1..4 -> existing sample item ids (1..4)
+        int itemId = itemNumber; // adjust when loading items dynamically
+        int userId = currentUser != null ? currentUser.getId() : -1;
+        if (userId <= 0) { showAlert("Cart", "You must be signed in to add items to cart."); return; }
+        try {
+            new com.unieats.dao.CartDao().addToCart(userId, itemId, 1);
+            showAlert("Cart", "Added to cart!");
+        } catch (Exception ex) {
+            showAlert("Cart Error", ex.getMessage());
+        }
+    }
+
+    private void navigateToCart() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/cart.fxml"));
+            Parent root = loader.load();
+            com.unieats.controllers.CartController controller = loader.getController();
+            if (controller != null && currentUser != null) controller.setCurrentUserId(currentUser.getId());
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.setTitle("UniEats - Cart");
+            stage.show();
+        } catch (IOException e) {
+            showAlert("Navigation Error", e.getMessage());
+        }
+    }
+    
+    private void navigateToFoodItems() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/food_items.fxml"));
+            Parent root = loader.load();
+            
+            // Get the current stage
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            
+            // Create new responsive scene and set it
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.setTitle("UniEats - Food Items");
+            stage.show();
+            
+            // Set the current user in the food items controller
+            FoodItemsController foodItemsController = loader.getController();
+            if (foodItemsController != null) {
+                foodItemsController.setCurrentUser(currentUser);
+            }
+            
+        } catch (IOException e) {
+            System.err.println("Error navigating to food items: " + e.getMessage());
+            showAlert("Navigation Error", "Failed to navigate to food items: " + e.getMessage());
+        }
+    }
+    
+    private void navigateToShops() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/shops.fxml"));
+            Parent root = loader.load();
+            
+            // Get the current stage
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            
+            // Create new responsive scene and set it
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.setTitle("UniEats - Shops");
+            stage.show();
+            
+            // Set the current user in the shops controller
+            ShopsController shopsController = loader.getController();
+            if (shopsController != null) {
+                shopsController.setCurrentUser(currentUser);
+            }
+            
+        } catch (IOException e) {
+            System.err.println("Error navigating to shops: " + e.getMessage());
+            showAlert("Navigation Error", "Failed to navigate to shops: " + e.getMessage());
+        }
+    }
+    
+    private void navigateToReport() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/report.fxml"));
+            Parent root = loader.load();
+            
+            // Get the current stage
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            
+            // Create new responsive scene and set it
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.setTitle("UniEats - Submit Report");
+            stage.show();
+            
+            // Set the current user in the report controller
+            ReportController reportController = loader.getController();
+            if (reportController != null) {
+                reportController.setCurrentUser(currentUser);
+            }
+            
+        } catch (IOException e) {
+            System.err.println("Error navigating to report: " + e.getMessage());
+            showAlert("Navigation Error", "Failed to navigate to report: " + e.getMessage());
+        }
+    }
+    
+    private void navigateToProfile() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/profile.fxml"));
+            Parent root = loader.load();
+            
+            // Get the current stage
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            
+            // Create new responsive scene and set it
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.setTitle("UniEats - Profile");
+            stage.show();
+            
+            // Set the current user in the profile controller
+            ProfileController profileController = loader.getController();
+            if (profileController != null) {
+                profileController.setCurrentUser(currentUser);
+            }
+            
+        } catch (IOException e) {
+            System.err.println("Error navigating to profile: " + e.getMessage());
+            showAlert("Navigation Error", "Failed to navigate to profile: " + e.getMessage());
+        }
     }
     
     private void showAlert(String title, String content) {

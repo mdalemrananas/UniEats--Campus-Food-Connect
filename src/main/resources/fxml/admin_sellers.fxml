@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.AdminSellersController" spacing="8" visible="false" managed="false">
+    <HBox spacing="6" alignment="CENTER_LEFT">
+        <Label text="Sellers" style="-fx-font-size: 16; -fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <TextField fx:id="sellerSearchField" promptText="Search sellers..." />
+        <Button fx:id="refreshSellersButton" text="Refresh" />
+    </HBox>
+    <TableView fx:id="sellersTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="sellerIdColumn" text="ID" prefWidth="60" />
+            <TableColumn fx:id="sellerNameColumn" text="Shop" prefWidth="160" />
+            <TableColumn fx:id="sellerOwnerColumn" text="Owner ID" prefWidth="100" />
+            <TableColumn fx:id="sellerStatusColumn" text="Status" prefWidth="100" />
+        </columns>
+    </TableView>
+</VBox>
+
+
