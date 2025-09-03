@@ -3,7 +3,9 @@ package com.unieats;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DatabaseManager {
     private static final String DB_URL = "jdbc:sqlite:unieats.db";
@@ -138,12 +140,51 @@ public class DatabaseManager {
                     )
                 """);
 
+                // Ensure backward compatibility: add any missing columns in 'reports'
+                ensureReportsTableColumns(conn);
+
                 System.out.println("Database initialized successfully");
             }
             
         } catch (SQLException e) {
             System.err.println("Error initializing database: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Ensures the 'reports' table contains all expected columns.
+     * Adds missing columns using ALTER TABLE for databases created before these columns existed.
+     */
+    private void ensureReportsTableColumns(Connection conn) throws SQLException {
+        Set<String> columns = new HashSet<>();
+        try (Statement s = conn.createStatement(); ResultSet rs = s.executeQuery("PRAGMA table_info(reports)")) {
+            while (rs.next()) {
+                String name = rs.getString("name");
+                if (name != null) columns.add(name.toLowerCase());
+            }
+        }
+
+        try (Statement s = conn.createStatement()) {
+            // Note: When adding NOT NULL columns to existing tables, provide a DEFAULT value.
+            if (!columns.contains("item_id")) {
+                s.execute("ALTER TABLE reports ADD COLUMN item_id INTEGER");
+            }
+            if (!columns.contains("title")) {
+                s.execute("ALTER TABLE reports ADD COLUMN title TEXT DEFAULT ''");
+            }
+            if (!columns.contains("description")) {
+                s.execute("ALTER TABLE reports ADD COLUMN description TEXT DEFAULT ''");
+            }
+            if (!columns.contains("status")) {
+                s.execute("ALTER TABLE reports ADD COLUMN status TEXT NOT NULL DEFAULT 'open'");
+            }
+            if (!columns.contains("created_at")) {
+                s.execute("ALTER TABLE reports ADD COLUMN created_at TEXT DEFAULT CURRENT_TIMESTAMP");
+            }
+            if (!columns.contains("updated_at")) {
+                s.execute("ALTER TABLE reports ADD COLUMN updated_at TEXT DEFAULT CURRENT_TIMESTAMP");
+            }
         }
     }
     

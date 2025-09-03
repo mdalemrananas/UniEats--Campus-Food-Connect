@@ -32,15 +32,14 @@
             <!-- Report Type Selection -->
             <VBox spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
                 <Label text="Report Type" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                <fx:define>
+                    <ToggleGroup fx:id="reportTypeGroup"/>
+                </fx:define>
                 
                 <HBox spacing="12">
                     <RadioButton fx:id="shopReportRadio" text="Shop Report" selected="true" toggleGroup="$reportTypeGroup"/>
                     <RadioButton fx:id="foodItemReportRadio" text="Food Item Report" toggleGroup="$reportTypeGroup"/>
                 </HBox>
-                
-                <ToggleGroup fx:id="reportTypeGroup"/>
-                <shopReportRadio.toggleGroup="$reportTypeGroup"/>
-                <foodItemReportRadio.toggleGroup="$reportTypeGroup"/>
             </VBox>
 
             <!-- Shop Selection (for shop reports) -->

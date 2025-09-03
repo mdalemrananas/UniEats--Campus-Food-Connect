@@ -18,6 +18,9 @@ public class UniEatsApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
+            // Initialize database and run migrations
+            DatabaseManager.getInstance();
+
             // Load the main FXML file
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/home.fxml"));
             Parent root = loader.load();
