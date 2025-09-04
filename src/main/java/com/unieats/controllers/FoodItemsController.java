@@ -129,8 +129,29 @@ public class FoodItemsController {
         
         details.getChildren().addAll(header, info, actions);
         card.getChildren().addAll(imageContainer, details);
+        // Open details on click anywhere on the card
+        card.setOnMouseClicked(e -> openFoodDetails(foodItem, shop));
+        imageContainer.setOnMouseClicked(e -> openFoodDetails(foodItem, shop));
+        nameLabel.setOnMouseClicked(e -> openFoodDetails(foodItem, shop));
         
         foodItemsContainer.getChildren().add(card);
+    }
+
+    private void openFoodDetails(FoodItem foodItem, Shop shop) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/food_details.fxml"));
+            Parent root = loader.load();
+            FoodDetailsController controller = loader.getController();
+            controller.setData(currentUser, foodItem, shop);
+
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException ex) {
+            System.err.println("Error opening details: " + ex.getMessage());
+            showAlert("Error", "Failed to open food details: " + ex.getMessage());
+        }
     }
     
     private void showNoItemsMessage() {

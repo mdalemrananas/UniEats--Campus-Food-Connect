@@ -70,6 +70,19 @@ public class FoodItemDao {
 		}
 	}
 
+	public FoodItem getById(int id) {
+		String sql = "SELECT * FROM food_items WHERE id=?";
+		try (Connection conn = DriverManager.getConnection(DB_URL); PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, id);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) return map(rs);
+				return null;
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException("Failed to fetch food item by id", e);
+		}
+	}
+
 	private FoodItem map(ResultSet rs) throws SQLException {
 		FoodItem fi = new FoodItem(
 			rs.getInt("shop_id"),
@@ -79,6 +92,9 @@ public class FoodItemDao {
 			rs.getInt("stock")
 		);
 		fi.setId(rs.getInt("id"));
+		try { fi.setDescription(rs.getString("description")); } catch (SQLException ignored) {}
+		try { fi.setImages(rs.getString("images")); } catch (SQLException ignored) {}
+		try { fi.setDiscount(rs.getObject("discount") != null ? rs.getDouble("discount") : null); } catch (SQLException ignored) {}
 		try {
 			fi.setCreatedAt(LocalDateTime.parse(rs.getString("created_at")));
 			fi.setUpdatedAt(LocalDateTime.parse(rs.getString("updated_at")));
@@ -86,4 +102,3 @@ public class FoodItemDao {
 		return fi;
 	}
 }
-

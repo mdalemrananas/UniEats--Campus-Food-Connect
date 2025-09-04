@@ -14,6 +14,24 @@ public class DatabaseManager {
     private DatabaseManager() {
         initializeDatabase();
     }
+
+    /**
+     * Update only the profile picture path for a user.
+     */
+    public boolean updateUserProfilePicture(int userId, String profilePath) {
+        String sql = "UPDATE users SET profile_picture = ?, updated_at = ? WHERE id = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, profilePath);
+            pstmt.setString(2, LocalDateTime.now().toString());
+            pstmt.setInt(3, userId);
+            int affected = pstmt.executeUpdate();
+            return affected > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating profile picture: " + e.getMessage());
+            return false;
+        }
+    }
     
     public static DatabaseManager getInstance() {
         if (instance == null) {
@@ -33,6 +51,7 @@ public class DatabaseManager {
                         email TEXT UNIQUE NOT NULL,
                         password TEXT NOT NULL,
                         full_name TEXT NOT NULL,
+                        profile_picture TEXT DEFAULT NULL,
                         user_category TEXT NOT NULL CHECK(user_category IN ('student', 'seller', 'admin')),
                         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -131,6 +150,7 @@ public class DatabaseManager {
                         item_id INTEGER,
                         title TEXT NOT NULL,
                         description TEXT NOT NULL,
+                        attachments TEXT DEFAULT '[]',
                         status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','reviewing','resolved','rejected')),
                         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                         updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -140,7 +160,8 @@ public class DatabaseManager {
                     )
                 """);
 
-                // Ensure backward compatibility: add any missing columns in 'reports'
+                // Ensure backward compatibility: add any missing columns in 'users' and 'reports'
+                ensureUsersTableColumns(conn);
                 ensureReportsTableColumns(conn);
 
                 System.out.println("Database initialized successfully");
@@ -149,6 +170,25 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.err.println("Error initializing database: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Ensures the 'users' table contains all expected columns.
+     */
+    private void ensureUsersTableColumns(Connection conn) throws SQLException {
+        Set<String> columns = new HashSet<>();
+        try (Statement s = conn.createStatement(); ResultSet rs = s.executeQuery("PRAGMA table_info(users)")) {
+            while (rs.next()) {
+                String name = rs.getString("name");
+                if (name != null) columns.add(name.toLowerCase());
+            }
+        }
+
+        try (Statement s = conn.createStatement()) {
+            if (!columns.contains("profile_picture")) {
+                s.execute("ALTER TABLE users ADD COLUMN profile_picture TEXT DEFAULT NULL");
+            }
         }
     }
 
@@ -175,6 +215,9 @@ public class DatabaseManager {
             }
             if (!columns.contains("description")) {
                 s.execute("ALTER TABLE reports ADD COLUMN description TEXT DEFAULT ''");
+            }
+            if (!columns.contains("attachments")) {
+                s.execute("ALTER TABLE reports ADD COLUMN attachments TEXT DEFAULT '[]'");
             }
             if (!columns.contains("status")) {
                 s.execute("ALTER TABLE reports ADD COLUMN status TEXT NOT NULL DEFAULT 'open'");
@@ -245,6 +288,33 @@ public class DatabaseManager {
             e.printStackTrace();
         }
         
+        return null;
+    }
+
+    /**
+     * Get user by id (primary key)
+     * @param id the user id
+     * @return User object if found, null otherwise
+     */
+    public User getUserById(int id) {
+        String sql = "SELECT * FROM users WHERE id = ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToUser(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error getting user by id: " + e.getMessage());
+            e.printStackTrace();
+        }
+
         return null;
     }
     
@@ -328,6 +398,10 @@ public class DatabaseManager {
         );
         
         user.setId(rs.getInt("id"));
+        try {
+            String pic = rs.getString("profile_picture");
+            user.setProfilePicture(pic);
+        } catch (SQLException ignored) {}
         
         try {
             user.setCreatedAt(LocalDateTime.parse(rs.getString("created_at")));

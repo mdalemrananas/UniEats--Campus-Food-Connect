@@ -2,32 +2,84 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.CartController"
-	alignment="TOP_LEFT" spacing="12" style="-fx-background-color: #ffffff; -fx-padding: 16;"
-	prefWidth="360" prefHeight="800">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.CartController"
+            prefWidth="360" prefHeight="800" style="-fx-background-color: transparent;">
 
-	<HBox alignment="CENTER_LEFT" spacing="8">
-		<Label text="Your Cart" style="-fx-font-size: 18; -fx-font-weight: bold;" />
-		<Region HBox.hgrow="ALWAYS" />
-		<Button text="Checkout" onAction="#handleCheckout" />
-	</HBox>
+    <!-- Center content: header, list, totals -->
+    <center>
+        <VBox alignment="TOP_LEFT" spacing="12" style="-fx-padding: 16;">
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <Label text="Shopping Cart" style="-fx-font-size: 18; -fx-font-weight: bold;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button text="Clear" onAction="#handleClear" />
+            </HBox>
 
-	<TableView fx:id="cartTable" prefHeight="600">
-		<columns>
-			<TableColumn text="Item" fx:id="colName" prefWidth="150" />
-			<TableColumn text="Qty" fx:id="colQty" prefWidth="60" />
-			<TableColumn text="Price" fx:id="colPrice" prefWidth="80" />
-			<TableColumn text="Points" fx:id="colPoints" prefWidth="70" />
-		</columns>
-	</TableView>
+            <ListView fx:id="cartList" prefHeight="600"/>
 
-	<HBox spacing="8">
-		<Label text="Total:" />
-		<Label fx:id="totalLabel" text="$0.00" style="-fx-font-weight: bold;" />
-		<Region HBox.hgrow="ALWAYS" />
-		<Button text="Clear Cart" onAction="#handleClear" />
-	</HBox>
+            <VBox spacing="6">
+                <HBox>
+                    <Label text="Subtotal" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="subtotalLabel" />
+                </HBox>
+                <HBox>
+                    <Label text="TAX (2%)" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="taxLabel" />
+                </HBox>
+                <HBox>
+                    <Label text="Total" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="totalLabel" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+                </HBox>
+                <Button text="CHECKOUT" onAction="#handleCheckout"
+                        style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10;"/>
+            </VBox>
+        </VBox>
+    </center>
 
-</VBox>
+    <!-- Fixed bottom navigation bar (outside scroll) -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="0" style="-fx-background-color: #ffffff; -fx-padding: 12 0; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);">
+            <!-- Home -->
+            <VBox fx:id="navHome" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-home" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Home" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Orders -->
+            <VBox fx:id="navOrders" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-list-alt" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="My Orders" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Cart -->
+            <VBox fx:id="navCart" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Cart" style="-fx-font-size: 10px; -fx-text-fill: #6f42c1; -fx-font-weight: bold;"/>
+            </VBox>
+            <!-- Favourite -->
+            <VBox fx:id="navFav" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-heart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Favourite" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Profile -->
+            <VBox fx:id="navProfile" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-user" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Profile" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+        </HBox>
+    </bottom>
+
+</BorderPane>
 

@@ -33,10 +33,16 @@ public class MenuController {
     @FXML private Button logoutButton;
     @FXML private Button cartButton;
     @FXML private Label sessionTimeLabel;
+    @FXML private Label rewardPointsLabel;
     @FXML private VBox foodCategoryButton;
     @FXML private VBox storesCategoryButton;
     @FXML private VBox reportButton;
-    @FXML private VBox profileButton;
+    // Bottom nav items
+    @FXML private VBox navHome;
+    @FXML private VBox navOrders;
+    @FXML private VBox navCart;
+    @FXML private VBox navFav;
+    @FXML private VBox navProfile;
 
     // Food item buttons
     @FXML private Button favoriteButton1;
@@ -52,6 +58,7 @@ public class MenuController {
     private int currentCardIndex = 0;
     private final int totalCards = 4;
     private final double cardWidth = 216; // 200px card width + 16px spacing
+    private VBox currentActiveNav = null;
 
     // Session management
     private LocalDateTime sessionStartTime;
@@ -63,6 +70,8 @@ public class MenuController {
     public void initialize() {
         setupEventHandlers();
         startSession();
+        // Default active tab is Home
+        setActiveNav(navHome);
     }
 
     private void setupEventHandlers() {
@@ -104,7 +113,12 @@ public class MenuController {
             reportButton.setOnMouseClicked(e -> navigateToReport());
             reportButton.setStyle("-fx-cursor: hand;");
         }
-        if (profileButton != null) profileButton.setOnMouseClicked(e -> navigateToProfile());
+        // Bottom navigation handlers
+        if (navHome != null) navHome.setOnMouseClicked(e -> { setActiveNav(navHome); /* already on menu */ });
+        if (navOrders != null) navOrders.setOnMouseClicked(e -> { setActiveNav(navOrders); navigateToOrders(); });
+        if (navCart != null) navCart.setOnMouseClicked(e -> { setActiveNav(navCart); navigateToCart(); });
+        if (navFav != null) navFav.setOnMouseClicked(e -> { setActiveNav(navFav); navigateToFavorites(); });
+        if (navProfile != null) navProfile.setOnMouseClicked(e -> { setActiveNav(navProfile); navigateToProfile(); });
     }
 
     private void startSession() {
@@ -130,6 +144,23 @@ public class MenuController {
             String sessionTime = String.format("Session: %02d:%02d:%02d", hours, minutes, secs);
             sessionTimeLabel.setText(sessionTime);
         }
+    }
+
+    // Resolve current Stage from any available node to avoid NPE when optional controls are not present
+    private javafx.stage.Stage findStage() {
+        try {
+            if (logoutButton != null && logoutButton.getScene() != null) return (javafx.stage.Stage) logoutButton.getScene().getWindow();
+        } catch (Exception ignored) {}
+        try {
+            if (navProfile != null && navProfile.getScene() != null) return (javafx.stage.Stage) navProfile.getScene().getWindow();
+        } catch (Exception ignored) {}
+        try {
+            if (navHome != null && navHome.getScene() != null) return (javafx.stage.Stage) navHome.getScene().getWindow();
+        } catch (Exception ignored) {}
+        try {
+            if (cartButton != null && cartButton.getScene() != null) return (javafx.stage.Stage) cartButton.getScene().getWindow();
+        } catch (Exception ignored) {}
+        return null;
     }
 
     private void setupButtonHoverEffects() {
@@ -165,14 +196,30 @@ public class MenuController {
     public void setCurrentUser(User user) {
         this.currentUser = user;
         displayUserInfo();
+        loadRewardPoints();
     }
 
     private void displayUserInfo() {
-        if (currentUser != null && userNameLabel != null && userTypeLabel != null) {
-            userNameLabel.setText("Welcome, " + currentUser.getFullName());
+        if (currentUser != null && userNameLabel != null) {
+            userNameLabel.setText(currentUser.getFullName());
+        }
+        if (currentUser != null && userTypeLabel != null) {
             userTypeLabel.setText(currentUser.getUserCategory().toUpperCase());
         }
     }
+
+    private void loadRewardPoints() {
+        if (currentUser == null || rewardPointsLabel == null) return;
+        try {
+            double total = com.unieats.RewardService.getTotalPoints(currentUser.getId());
+            // Show as integer if it's a whole number
+            String text = (Math.floor(total) == total) ? String.valueOf((int) total) : String.valueOf(total);
+            rewardPointsLabel.setText(text);
+        } catch (Exception ex) {
+            System.err.println("Failed to load reward points: " + ex.getMessage());
+        }
+    }
+
 
     @FXML
     private void handleSearch() {
@@ -354,7 +401,11 @@ public class MenuController {
             Parent root = loader.load();
             com.unieats.controllers.CartController controller = loader.getController();
             if (controller != null && currentUser != null) controller.setCurrentUserId(currentUser.getId());
-            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            javafx.stage.Stage stage = findStage();
+            if (stage == null) {
+                showAlert("Navigation Error", "Unable to resolve current window to open Cart.");
+                return;
+            }
             Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
             stage.setScene(scene);
             stage.setTitle("UniEats - Cart");
@@ -364,13 +415,27 @@ public class MenuController {
         }
     }
 
+    private void navigateToOrders() {
+        // Placeholder until orders screen exists
+        showAlert("Orders", "Orders screen coming soon.");
+    }
+
+    private void navigateToFavorites() {
+        // Placeholder until favorites screen exists
+        showAlert("Favourite", "Favorites screen coming soon.");
+    }
+
     private void navigateToFoodItems() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/food_items.fxml"));
             Parent root = loader.load();
 
-            // Get the current stage
-            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            // Get the current stage safely
+            javafx.stage.Stage stage = findStage();
+            if (stage == null) {
+                showAlert("Navigation Error", "Unable to resolve current window to open Food Items.");
+                return;
+            }
 
             // Create new responsive scene and set it
             Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
@@ -395,8 +460,12 @@ public class MenuController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/shops.fxml"));
             Parent root = loader.load();
 
-            // Get the current stage
-            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            // Get the current stage safely
+            javafx.stage.Stage stage = findStage();
+            if (stage == null) {
+                showAlert("Navigation Error", "Unable to resolve current window to open Shops.");
+                return;
+            }
 
             // Create new responsive scene and set it
             Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
@@ -421,8 +490,12 @@ public class MenuController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/report.fxml"));
             Parent root = loader.load();
 
-            // Get the current stage
-            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            // Get the current stage safely
+            javafx.stage.Stage stage = findStage();
+            if (stage == null) {
+                showAlert("Navigation Error", "Unable to resolve current window to open Report screen.");
+                return;
+            }
 
             // Create new responsive scene and set it
             Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
@@ -448,8 +521,12 @@ public class MenuController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/profile.fxml"));
             Parent root = loader.load();
             
-            // Get the current stage
-            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            // Get the current stage safely
+            javafx.stage.Stage stage = findStage();
+            if (stage == null) {
+                showAlert("Navigation Error", "Unable to resolve current window to open Profile screen.");
+                return;
+            }
             
             // Create new responsive scene and set it
             Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
@@ -476,4 +553,39 @@ public class MenuController {
         alert.setContentText(content);
         alert.showAndWait();
     }
-} 
+
+    // --- Bottom Nav Active State Handling ---
+    private void setActiveNav(VBox active) {
+        currentActiveNav = active;
+        if (navHome != null) applyActive(navHome, navHome == active, "#2e7d32");
+        if (navOrders != null) applyActive(navOrders, navOrders == active, "#ff6b35");
+        if (navCart != null) applyActive(navCart, navCart == active, "#0d6efd");
+        if (navFav != null) applyActive(navFav, navFav == active, "#e63946");
+        if (navProfile != null) applyActive(navProfile, navProfile == active, "#6f42c1");
+    }
+
+    private void applyActive(VBox tab, boolean active, String colorHex) {
+        if (tab == null) return;
+        // children: [0] StackPane -> [0] FontIcon, [1] Label
+        if (tab.getChildren().size() < 2) return;
+        javafx.scene.layout.StackPane iconWrap = (javafx.scene.layout.StackPane) tab.getChildren().get(0);
+        javafx.scene.control.Label label = (javafx.scene.control.Label) tab.getChildren().get(1);
+
+        // Icon color
+        if (!iconWrap.getChildren().isEmpty() && iconWrap.getChildren().get(0) instanceof org.kordamp.ikonli.javafx.FontIcon) {
+            org.kordamp.ikonli.javafx.FontIcon icon = (org.kordamp.ikonli.javafx.FontIcon) iconWrap.getChildren().get(0);
+            icon.setIconColor(active ? javafx.scene.paint.Paint.valueOf(colorHex) : javafx.scene.paint.Paint.valueOf("#6c757d"));
+        }
+
+        // Background accent
+        String bg = active ? String.format("-fx-background-color: %s1A; -fx-background-radius: 12; -fx-padding: 8;", colorHex.replace("#",""))
+                           : "-fx-background-radius: 12; -fx-padding: 8;";
+        iconWrap.setStyle(bg);
+
+        // Label color
+        if (label != null) {
+            label.setStyle(active ? String.format("-fx-font-size: 10px; -fx-text-fill: %s; -fx-font-weight: bold;", colorHex)
+                          : "-fx-font-size: 10px; -fx-text-fill: #6c757d;");
+        }
+    }
+}

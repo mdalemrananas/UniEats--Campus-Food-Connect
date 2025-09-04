@@ -61,5 +61,22 @@ public class RewardService {
 			throw new RuntimeException("Failed to redeem points", e);
 		}
 	}
+
+	/**
+	 * Get total reward points across all shops for a user.
+	 */
+	public static double getTotalPoints(int userId) {
+		String sql = "SELECT COALESCE(SUM(points),0) FROM reward_points WHERE user_id=?";
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+		     PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, userId);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) return rs.getDouble(1);
+				return 0.0;
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException("Failed to get total points", e);
+		}
+	}
 }
 

@@ -65,10 +65,17 @@ public class ReportController {
                 foodItemSelectionBox.setVisible(false);
                 foodItemSelectionBox.setManaged(false);
             } else if (newValue == foodItemReportRadio) {
-                shopSelectionBox.setVisible(false);
-                shopSelectionBox.setManaged(false);
+                // Keep shop selection visible so a shop can be chosen for filtering items
+                shopSelectionBox.setVisible(true);
+                shopSelectionBox.setManaged(true);
                 foodItemSelectionBox.setVisible(true);
                 foodItemSelectionBox.setManaged(true);
+                // Load items if a shop is already selected
+                // If no shop selected yet, auto-select first approved shop
+                if (shopComboBox.getValue() == null && shopComboBox.getItems() != null && !shopComboBox.getItems().isEmpty()) {
+                    shopComboBox.getSelectionModel().selectFirst();
+                }
+                loadFoodItemsForShop();
             }
         });
         
@@ -115,6 +122,7 @@ public class ReportController {
                 List<FoodItem> foodItems = foodItemDao.listByShop(selectedShop.getId());
                 ObservableList<FoodItem> foodItemList = FXCollections.observableArrayList(foodItems);
                 foodItemComboBox.setItems(foodItemList);
+                System.out.println("Food items loaded for shop " + selectedShop.getId() + ": " + foodItemList.size());
                 
                 // Set cell factory for food item display
                 foodItemComboBox.setCellFactory(param -> new ListCell<FoodItem>() {
@@ -135,6 +143,10 @@ public class ReportController {
                 System.err.println("Error loading food items: " + e.getMessage());
                 showAlert("Error", "Failed to load food items: " + e.getMessage());
             }
+        } else {
+            // Clear items if no shop selected
+            foodItemComboBox.getItems().clear();
+            foodItemComboBox.setButtonCell(new ListCell<>());
         }
     }
     
@@ -236,11 +248,10 @@ public class ReportController {
             // Submit report
             String title = titleField.getText().trim();
             String description = descriptionField.getText().trim();
-            if (selectedImageFile != null) {
-                description += "\n\nImage attached: " + selectedImageFile.getName();
-            }
             
-            reportDao.submitReport(currentUser.getId(), shopId, itemId, title, description);
+            String attachmentsJson = buildAttachmentsJson(selectedImageFile);
+            
+            reportDao.submitReport(currentUser.getId(), shopId, itemId, title, description, attachmentsJson);
             
             showAlert("Success", "Your report has been submitted successfully. Our team will review it shortly.");
             
@@ -251,6 +262,13 @@ public class ReportController {
             System.err.println("Error submitting report: " + e.getMessage());
             showAlert("Error", "Failed to submit report: " + e.getMessage());
         }
+    }
+    
+    private String buildAttachmentsJson(File file) {
+        if (file == null) return "[]";
+        // Store absolute path as a single-element JSON array, escape backslashes for JSON
+        String path = file.getAbsolutePath().replace("\\", "\\\\");
+        return "[\"" + path + "\"]";
     }
     
     private void clearForm() {

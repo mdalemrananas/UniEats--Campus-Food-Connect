@@ -7,6 +7,7 @@ public class User {
     private String email;
     private String password;
     private String fullName;
+    private String profilePicture; // path or URI to profile picture
     private String userCategory; // 'student' or 'seller'
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -71,6 +72,14 @@ public class User {
         this.fullName = fullName;
     }
     
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
     public String getUserCategory() {
         return userCategory;
     }

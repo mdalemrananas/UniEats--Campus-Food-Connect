@@ -7,24 +7,27 @@
 <?import javafx.geometry.Insets?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<ScrollPane xmlns:fx="http://javafx.com/fxml" 
+<BorderPane xmlns:fx="http://javafx.com/fxml" 
             fx:controller="com.unieats.controllers.MenuController" 
-            style="-fx-background-color: #fafafa; -fx-background: transparent;"
+            style="-fx-background-color: transparent;"
             prefWidth="360" 
             prefHeight="800"
             maxWidth="360"
-            maxHeight="800"
-            fitToWidth="true"
-            hbarPolicy="NEVER"
-            vbarPolicy="AS_NEEDED">
-    
-    <VBox spacing="0" style="-fx-background-color: #fafafa;">
+            maxHeight="800">
+
+    <center>
+        <ScrollPane style="-fx-background-color: transparent; -fx-background: transparent;"
+                    fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    vbarPolicy="AS_NEEDED">
+            <content>
+                <VBox spacing="0" style="-fx-background-color: transparent;">
         
         <!-- Top Status Bar -->
         
         
         <!-- Location Bar
-        <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
+        <HBox alignment="CENTER_LEFT" style="-fx-background-color: transparent; -fx-padding: 16;">
             <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-cursor: hand; -fx-background-color: #f8f9fa; -fx-background-radius: 12; -fx-padding: 8 12;">
                 <Text text="📍" style="-fx-font-size: 18px;"/>
                 <VBox spacing="2">
@@ -44,49 +47,54 @@
         </HBox>
         -->
         
-        <!-- Search and Filter Bar -->
-        <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
-            <HBox style="-fx-background-color: #f8f9fa; -fx-background-radius: 25; -fx-padding: 12 16; -fx-spacing: 8; -fx-pref-height: 48; -fx-alignment: center_left; -fx-pref-width: 240;">
-                <FontIcon iconLiteral="fas-search" iconSize="16" iconColor="#6c757d"/>
-                <TextField fx:id="searchField" promptText="Search for food, restaurants..." 
-                         style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: #2d3436; -fx-prompt-text-fill: #6c757d; -fx-font-size: 14px; -fx-pref-height: 30; -fx-pref-width: 180;"/>
+        <!-- Header matching reference design -->
+        <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <FontIcon iconLiteral="fas-th-large" iconSize="18" iconColor="#2d3436"/>
+                <Label text="UniEats" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
             </HBox>
-            <Button fx:id="filterButton" text="Filter"/>
-            <Button>
-                <graphic>
-                    <FontIcon iconLiteral="fas-cog" iconSize="14" iconColor="Black"/>
-                </graphic>
-            </Button>
+            <Region HBox.hgrow="ALWAYS"/>
+            <HBox alignment="CENTER_RIGHT" spacing="8">
+                <StackPane style="-fx-background-color: #f8f9fa; -fx-background-radius: 16; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-bell" iconSize="14" iconColor="#2d3436"/>
+                </StackPane>
+            </HBox>
+        </HBox>
+
+        <!-- Welcome + Notification row -->
+        <HBox alignment="CENTER_LEFT" style="-fx-background-color: transparent; -fx-padding: 16 16 0 16;">
+            <VBox spacing="4">
+                <Label text="Good Morning" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
+                <HBox alignment="CENTER_LEFT" spacing="6">
+                    <Label fx:id="userNameLabel" text="Louis A." style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    <Label text="👋" style="-fx-font-size: 18px;"/>
+                </HBox>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <!-- Notification pill -->
+            <HBox alignment="CENTER" spacing="6">
+                <StackPane style="-fx-background-color: #eaf1ea; -fx-background-radius: 20; -fx-padding: 6;">
+                    <Label fx:id="rewardPointsLabel" text="6" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                </StackPane>
+                <StackPane style="-fx-background-color: #f0c54b; -fx-background-radius: 20; -fx-padding: 6;">
+                    <FontIcon iconLiteral="fas-coins" iconSize="14" iconColor="#ffffff"/>
+                </StackPane>
+            </HBox>
+        </HBox>
+
+        <!-- Search bar (single, rounded) -->
+        <HBox alignment="CENTER_LEFT" style="-fx-background-color: transparent; -fx-padding: 12 16 16 16;">
+            <HBox style="-fx-background-color: #f6f8f6; -fx-background-radius: 16; -fx-padding: 12 14; -fx-spacing: 8; -fx-alignment: center_left; -fx-pref-width: 328;">
+                <FontIcon iconLiteral="fas-search" iconSize="16" iconColor="#6c757d"/>
+                <TextField fx:id="searchField" promptText="Search beverages or foods" 
+                           style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: #2d3436; -fx-prompt-text-fill: #9aa0a6; -fx-font-size: 14px; -fx-pref-height: 30; -fx-pref-width: 280;"/>
+                <!-- Keep filterButton hidden to avoid controller errors if referenced -->
+                <Button fx:id="filterButton" visible="false" managed="false" />
+            </HBox>
         </HBox>
         
-        <!-- User Welcome Section -->
-        <VBox style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
-            <HBox alignment="CENTER_LEFT" spacing="12">
-            <!--<StackPane style="-fx-background-color: #ff6b35; -fx-background-radius: 20; -fx-padding: 8;">-->
-                <StackPane>
-                    <FontIcon iconLiteral="fas-hand-paper" iconSize="20" iconColor="#ff6b35"/>
-                </StackPane>
-                <VBox spacing="4">
-                    <Label fx:id="userNameLabel" text="Welcome, User" 
-                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                    <Label fx:id="userTypeLabel" text="STUDENT" 
-                           style="-fx-font-size: 12px; -fx-text-fill: #ff6b35; -fx-font-weight: bold; -fx-background-color: #fff5f0; -fx-background-radius: 8; -fx-padding: 4 8;"/>
-                    <Label fx:id="sessionTimeLabel" text="Session: 00:00:00" 
-                           style="-fx-font-size: 10px; -fx-text-fill: #6c757d; -fx-padding: 2 0 0 0;"/>
-                </VBox>
-            </HBox>
-            <HBox alignment="CENTER_RIGHT" style="-fx-padding: 12 0 0 0;">
-                <Button fx:id="logoutButton" text=" Logout" 
-                        style="-fx-background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); -fx-text-fill: Red; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(231,76,60,0.3), 4, 0, 0, 2);">
-                    <graphic>
-                        <FontIcon iconLiteral="fas-sign-out-alt" iconSize="12" iconColor="Red"/>
-                    </graphic>
-                </Button>
-            </HBox>
-        </VBox>
-        
         <!-- Categories Section -->
-        <VBox style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-margin: 8 0;">
+        <VBox style="-fx-padding: 20; -fx-background-color: transparent; -fx-margin: 8 0;">
             <HBox alignment="CENTER_LEFT" spacing="8">
                 <HBox alignment="CENTER_LEFT" spacing="8">
                     <FontIcon iconLiteral="fas-utensils" iconSize="18" iconColor="#2d3436"/>
@@ -113,7 +121,7 @@
                 
                 <VBox fx:id="reportButton" alignment="CENTER" spacing="8" style="-fx-cursor: hand;">
                     <StackPane style="-fx-background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); -fx-background-radius: 20; -fx-padding: 16; -fx-pref-width: 60; -fx-pref-height: 60; -fx-effect: dropshadow(gaussian, rgba(231,76,60,0.3), 6, 0, 0, 3);">
-                        <FontIcon iconLiteral="fas-flag" iconSize="28" iconColor="white"/>
+                        <FontIcon iconLiteral="fas-flag" iconSize="28" iconColor="Blue"/>
                     </StackPane>
                     <Label text="Report" style="-fx-text-fill: #636e72; -fx-font-size: 12px; -fx-font-weight: bold;"/>
                 </VBox>
@@ -135,7 +143,7 @@
         </VBox>
         
         <!-- Picks For You Section with Horizontal Slider -->
-        <VBox style="-fx-padding: 20; -fx-spacing: 16; -fx-background-color: #ffffff; -fx-margin: 8 0 0 0;">
+        <VBox style="-fx-padding: 20; -fx-spacing: 16; -fx-background-color: transparent; -fx-margin: 8 0 0 0;">
             <HBox alignment="CENTER_LEFT" spacing="8">
                 <HBox alignment="CENTER_LEFT" spacing="8">
                     <FontIcon iconLiteral="fas-star" iconSize="18" iconColor="#FFD700"/>
@@ -166,7 +174,7 @@
                     <HBox fx:id="foodSliderContainer" spacing="16" style="-fx-padding: 8;">
                         
                         <!-- Food Item Card 1 -->
-                        <VBox style="-fx-background-color: #ffffff; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0, 0, 4); -fx-cursor: hand; -fx-border-color: #f8f9fa; -fx-border-width: 1; -fx-border-radius: 20; -fx-min-width: 200; -fx-max-width: 200;">
+                        <VBox style="-fx-background-color: transparent; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0, 0, 4); -fx-cursor: hand; -fx-border-color: #f8f9fa; -fx-border-width: 1; -fx-border-radius: 20; -fx-min-width: 200; -fx-max-width: 200;">
                             <StackPane style="-fx-background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); -fx-background-radius: 20 20 0 0; -fx-pref-height: 120;">
                                 <FontIcon iconLiteral="fas-hamburger" iconSize="60" iconColor="#ff6b35" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 4);"/>
                                 <HBox alignment="CENTER_LEFT" style="-fx-alignment: top_left; -fx-padding: 12;">
@@ -381,33 +389,49 @@
             </HBox>
         </VBox>
         
-        <!-- Bottom Navigation Bar -->
+        <!-- Bottom Navigation Bar moved outside scroll (fixed) -->
+        </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+    
+    <bottom>
         <HBox alignment="CENTER" spacing="0" style="-fx-background-color: #ffffff; -fx-padding: 12 0; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);">
-            <VBox alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 90;">
-                <StackPane style="-fx-background-color: #fff5f0; -fx-background-radius: 12; -fx-padding: 8;">
-                    <FontIcon iconLiteral="fas-home" iconSize="20" iconColor="#ff6b35"/>
+            <!-- Home -->
+            <VBox fx:id="navHome" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-color: #e8f5e9; -fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-home" iconSize="20" iconColor="#2e7d32"/>
                 </StackPane>
-                <Label text="Home" style="-fx-font-size: 10px; -fx-text-fill: #ff6b35; -fx-font-weight: bold;"/>
+                <Label text="Home" style="-fx-font-size: 10px; -fx-text-fill: #2e7d32; -fx-font-weight: bold;"/>
             </VBox>
-            <VBox alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 90;">
+            <!-- Orders -->
+            <VBox fx:id="navOrders" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
                 <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
                     <FontIcon iconLiteral="fas-list-alt" iconSize="20" iconColor="#6c757d"/>
                 </StackPane>
-                <Label text="Orders" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+                <Label text="My Orders" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
             </VBox>
-            <VBox alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 90;">
+            <!-- Cart -->
+            <VBox fx:id="navCart" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
                 <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
-                    <FontIcon iconLiteral="fas-credit-card" iconSize="20" iconColor="#6c757d"/>
+                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="20" iconColor="#6c757d"/>
                 </StackPane>
-                <Label text="Payment" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+                <Label text="Cart" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
             </VBox>
-            <VBox fx:id="profileButton" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 90;">
+            <!-- Favourite -->
+            <VBox fx:id="navFav" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-heart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Favourite" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Profile -->
+            <VBox fx:id="navProfile" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
                 <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
                     <FontIcon iconLiteral="fas-user" iconSize="20" iconColor="#6c757d"/>
                 </StackPane>
                 <Label text="Profile" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
             </VBox>
         </HBox>
-        
-    </VBox>
-</ScrollPane>
+    </bottom>
+</BorderPane>

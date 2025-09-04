@@ -1,0 +1,77 @@
+/* UniEats Dark Theme */
+
+.root {
+  -fx-base: #121212;
+  -fx-background-color: #121212;
+  -fx-text-fill: #eaeaea;
+}
+
+BorderPane, VBox, HBox, StackPane {
+  -fx-background-color: transparent;
+}
+
+/* Cards / panels */
+.panel, .card, .container, .background-pane {
+  -fx-background-color: #1e1e1e;
+  -fx-background-radius: 12;
+  -fx-border-color: #2a2a2a;
+  -fx-border-radius: 12;
+}
+
+/* Generic control styles */
+.label {
+  -fx-text-fill: #eaeaea;
+}
+.text-field, .text-area {
+  -fx-background-color: #1e1e1e;
+  -fx-text-fill: #eaeaea;
+  -fx-prompt-text-fill: #9aa0a6;
+  -fx-background-radius: 12;
+  -fx-border-color: #2a2a2a;
+  -fx-border-radius: 12;
+}
+.button {
+  -fx-text-fill: #eaeaea;
+}
+
+/* Ikonli FontIcon default color in dark mode */
+.ikonli-font-icon {
+  -fx-icon-color: #eaeaea;
+}
+
+/* ScrollPane */
+.scroll-pane {
+  -fx-background: transparent;
+  -fx-background-color: transparent;
+}
+.scroll-pane > .viewport {
+  -fx-background-color: transparent;
+}
+.viewport {
+  -fx-background-color: transparent;
+}
+
+/* Common light backgrounds used inline in FXML */
+.light-surface {
+  -fx-background-color: #1e1e1e;
+}
+
+/* Header/search line accents in dark */
+.search-surface {
+  -fx-background-color: #1e1e1e;
+  -fx-border-color: #2a2a2a;
+}
+
+/* Bottom nav bar */
+#bottomNav, .bottom-bar {
+  -fx-background-color: #1a1a1a;
+  -fx-border-color: #2a2a2a;
+  -fx-border-width: 1 0 0 0;
+}
+
+/* Accent helpers */
+.accent-green { -fx-text-fill: #81c784; }
+.accent-blue { -fx-text-fill: #64b5f6; }
+.accent-orange { -fx-text-fill: #ffb74d; }
+.accent-red { -fx-text-fill: #e57373; }
+.accent-purple { -fx-text-fill: #ba68c8; }
