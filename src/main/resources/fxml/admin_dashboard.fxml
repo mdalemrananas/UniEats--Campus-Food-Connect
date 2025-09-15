@@ -21,11 +21,11 @@
             <Label fx:id="totalUsersLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
         </VBox>
         <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="4" style="-fx-background-color: #ffffff; -fx-border-color: #eeeeee; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">
-            <Label text="Active Sellers" />
+            <Label text="Active Shops" />
             <Label fx:id="activeSellersLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
         </VBox>
         <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" spacing="4" style="-fx-background-color: #ffffff; -fx-border-color: #eeeeee; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">
-            <Label text="Pending Seller Requests" />
+            <Label text="Pending Shop Requests" />
             <Label fx:id="pendingSellersLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
         </VBox>
         <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" spacing="4" style="-fx-background-color: #ffffff; -fx-border-color: #eeeeee; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">

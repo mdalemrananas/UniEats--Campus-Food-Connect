@@ -10,12 +10,13 @@
         <TextField fx:id="userSearchField" promptText="Search users..." />
         <Button fx:id="refreshUsersButton" text="Refresh" />
     </HBox>
-    <TableView fx:id="usersTable" VBox.vgrow="ALWAYS">
+    <TableView fx:id="usersTable" editable="true" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="userIdColumn" text="ID" prefWidth="60" />
             <TableColumn fx:id="userNameColumn" text="Name" prefWidth="140" />
             <TableColumn fx:id="userEmailColumn" text="Email" prefWidth="180" />
             <TableColumn fx:id="userCategoryColumn" text="Category" prefWidth="100" />
+            <TableColumn fx:id="userStatusColumn" text="Status" prefWidth="120" />
         </columns>
     </TableView>
 </VBox>
