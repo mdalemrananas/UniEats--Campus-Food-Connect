@@ -2,6 +2,8 @@ package com.unieats.controllers;
 
 import com.unieats.Shop;
 import com.unieats.User;
+import com.unieats.DatabaseManager;
+import com.unieats.dao.ShopDao;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,6 +19,7 @@ import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -66,6 +69,7 @@ public class AdminController {
 	@FXML private TableColumn<User, String> userNameColumn;
 	@FXML private TableColumn<User, String> userEmailColumn;
 	@FXML private TableColumn<User, String> userCategoryColumn;
+	@FXML private TableColumn<User, String> userStatusColumn;
 	@FXML private TextField userSearchField;
 
 	// Sellers table
@@ -85,6 +89,8 @@ public class AdminController {
 
 	private final ObservableList<User> allUsers = FXCollections.observableArrayList();
 	private final ObservableList<Shop> allSellers = FXCollections.observableArrayList();
+	private final DatabaseManager db = DatabaseManager.getInstance();
+	private final ShopDao shopDao = new ShopDao();
 
 	@FXML
 	private void initialize() {
@@ -92,7 +98,10 @@ public class AdminController {
 		loadChildPanes();
 
 		configureTables();
-		loadDummyData();
+		// Seed demo shops and reports once for easier testing
+		try { new com.unieats.dao.ReportDao().seedDemoReportsIfEmpty(); } catch (Exception ignored) {}
+		try { new ShopDao().seedDemoShopsIfEmpty(); } catch (Exception ignored) {}
+		loadDataFromDatabase();
 		populateDashboard();
 		populateCharts();
 		startAutoRefresh();
@@ -128,6 +137,7 @@ public class AdminController {
 				userNameColumn = uCtrl.getUserNameColumn();
 				userEmailColumn = uCtrl.getUserEmailColumn();
 				userCategoryColumn = uCtrl.getUserCategoryColumn();
+				userStatusColumn = uCtrl.getUserStatusColumn();
 			}
 
 			// Sellers
@@ -145,8 +155,13 @@ public class AdminController {
 			}
 
 			// Reports, Payments, Settings
-			reportsPane = FXMLLoader.load(getClass().getResource("/fxml/admin_reports.fxml"));
+			FXMLLoader rLoader = new FXMLLoader(getClass().getResource("/fxml/admin_reports.fxml"));
+			reportsPane = rLoader.load();
 			contentStack.getChildren().add(reportsPane);
+			AdminReportsController rCtrl = rLoader.getController();
+			if (rCtrl != null) {
+				rCtrl.setAdminController(this);
+			}
 			paymentsPane = FXMLLoader.load(getClass().getResource("/fxml/admin_payments.fxml"));
 			contentStack.getChildren().add(paymentsPane);
 			settingsPane = FXMLLoader.load(getClass().getResource("/fxml/admin_settings.fxml"));
@@ -166,11 +181,60 @@ public class AdminController {
 		if (userNameColumn != null) userNameColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getFullName()));
 		if (userEmailColumn != null) userEmailColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEmail()));
 		if (userCategoryColumn != null) userCategoryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getUserCategory()));
+		if (userStatusColumn != null) {
+			userStatusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStatus() == null ? "pending" : c.getValue().getStatus()));
+			userStatusColumn.setCellFactory(column -> new javafx.scene.control.TableCell<>() {
+				private final ChoiceBox<String> choice = new ChoiceBox<>(FXCollections.observableArrayList("approved","pending"));
+				{
+					choice.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> {
+						User u = getTableView().getItems().get(getIndex());
+						if (u != null && nv != null && !nv.equalsIgnoreCase(u.getStatus())) {
+							u.setStatus(nv);
+							db.updateUserStatus(u.getId(), nv);
+							populateDashboard();
+						}
+					});
+				}
+				@Override protected void updateItem(String item, boolean empty) {
+					super.updateItem(item, empty);
+					if (empty) { setGraphic(null); }
+					else {
+						User u = getTableView().getItems().get(getIndex());
+						choice.getSelectionModel().select(u.getStatus() == null ? "pending" : u.getStatus());
+						setGraphic(choice);
+					}
+				}
+			});
+		}
 
 		if (sellerIdColumn != null) sellerIdColumn.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getId()));
 		if (sellerNameColumn != null) sellerNameColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getShopName()));
 		if (sellerOwnerColumn != null) sellerOwnerColumn.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getOwnerId()));
-		if (sellerStatusColumn != null) sellerStatusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStatus()));
+		if (sellerStatusColumn != null) {
+			sellerStatusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStatus()));
+			sellerStatusColumn.setCellFactory(column -> new javafx.scene.control.TableCell<>() {
+				private final ChoiceBox<String> choice = new ChoiceBox<>(FXCollections.observableArrayList("approved","pending"));
+				{
+					choice.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> {
+						Shop s = getTableView().getItems().get(getIndex());
+						if (s != null && nv != null && !nv.equalsIgnoreCase(s.getStatus())) {
+							s.setStatus(nv);
+							shopDao.updateStatus(s.getId(), nv);
+							populateDashboard();
+						}
+					});
+				}
+				@Override protected void updateItem(String item, boolean empty) {
+					super.updateItem(item, empty);
+					if (empty) { setGraphic(null); }
+					else {
+						Shop s = getTableView().getItems().get(getIndex());
+						choice.getSelectionModel().select(s.getStatus());
+						setGraphic(choice);
+					}
+				}
+			});
+		}
 
 		if (usersTable != null) usersTable.setItems(allUsers);
 		if (sellersTable != null) sellersTable.setItems(allSellers);
@@ -209,44 +273,41 @@ public class AdminController {
 
 	private String safe(String v) { return v == null ? "" : v.toLowerCase(); }
 
-	private void loadDummyData() {
-		allUsers.clear();
-		for (int i = 1; i <= 25; i++) {
-			User u = new User("user" + i + "@mail.com", "pass", "User " + i, i % 5 == 0 ? "seller" : "student");
-			u.setId(i);
-			u.setCreatedAt(LocalDateTime.now().minusDays(random.nextInt(120)));
-			allUsers.add(u);
-		}
-
+	private void loadDataFromDatabase() {
+		allUsers.setAll(db.getAllUsers());
 		allSellers.clear();
-		for (int i = 1; i <= 10; i++) {
-			Shop s = new Shop(i, "Shop " + i, i % 3 == 0 ? "pending" : "active");
-			s.setId(i);
-			allSellers.add(s);
-		}
+		allSellers.addAll(shopDao.getApprovedShops());
+		allSellers.addAll(shopDao.getPendingShops());
 	}
 
-	private void populateDashboard() {
-		int totalUsers = allUsers.size();
-		long activeSellers = allSellers.stream().filter(s -> "active".equalsIgnoreCase(s.getStatus())).count();
-		int pendingSellers = (int) allSellers.stream().filter(s -> "pending".equalsIgnoreCase(s.getStatus())).count();
-		int pendingReports = 3 + random.nextInt(5);
+	public void populateDashboard() {
+		int activeUsers = db.countApprovedUsers();
+		int activeShops = db.countApprovedShops();
+		int pendingSellers = db.countPendingShops();
+		int pendingReports = db.countPendingReports();
 
-		if (totalUsersLabel != null) totalUsersLabel.setText(String.valueOf(totalUsers));
-		if (activeSellersLabel != null) activeSellersLabel.setText(String.valueOf(activeSellers));
+		if (totalUsersLabel != null) totalUsersLabel.setText(String.valueOf(activeUsers));
+		if (activeSellersLabel != null) activeSellersLabel.setText(String.valueOf(activeShops));
 		if (pendingSellersLabel != null) pendingSellersLabel.setText(String.valueOf(pendingSellers));
 		if (pendingReportsLabel != null) pendingReportsLabel.setText(String.valueOf(pendingReports));
 	}
 
 	private void populateCharts() {
-		// Complaints/Reports distribution pie (dummy)
+		// Complaints/Reports distribution pie (dummy with percentages)
 		if (complaintsPieChart != null) {
+			int quality = 30;
+			int lateDelivery = 25;
+			int expiredFood = 10;
+			int pricing = 15;
+			int others = 20;
+			int total = quality + lateDelivery + expiredFood + pricing + others;
+			
 			complaintsPieChart.setData(FXCollections.observableArrayList(
-				new PieChart.Data("Quality", 30),
-				new PieChart.Data("Late Delivery", 25),
-				new PieChart.Data("Expired Food", 10),
-				new PieChart.Data("Pricing", 15),
-				new PieChart.Data("Others", 20)
+				new PieChart.Data("Quality (" + String.format("%.0f", (quality * 100.0) / total) + "%)", quality),
+				new PieChart.Data("Late Delivery (" + String.format("%.0f", (lateDelivery * 100.0) / total) + "%)", lateDelivery),
+				new PieChart.Data("Expired Food (" + String.format("%.0f", (expiredFood * 100.0) / total) + "%)", expiredFood),
+				new PieChart.Data("Pricing (" + String.format("%.0f", (pricing * 100.0) / total) + "%)", pricing),
+				new PieChart.Data("Others (" + String.format("%.0f", (others * 100.0) / total) + "%)", others)
 			));
 		}
 
