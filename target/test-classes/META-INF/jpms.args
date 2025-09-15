@@ -1,0 +1,4 @@
+--patch-module
+com.unieats=_
+--add-reads
+com.unieats=ALL-UNNAMED

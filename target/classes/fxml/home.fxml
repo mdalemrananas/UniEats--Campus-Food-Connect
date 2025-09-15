@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.Insets?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="com.unieats.controllers.HomeController" 
+      alignment="CENTER" 
+      spacing="32" 
+      style="-fx-background-color: #ffffff; -fx-padding: 40 20 40 20;"
+      prefWidth="360" 
+      prefHeight="800">
+    
+    <!-- Skip Button (Top Right) -->
+    <HBox alignment="CENTER_RIGHT" style="-fx-padding: 0 0 20 0;">
+        <Button text="Skip" onAction="#handleSkip" 
+                style="-fx-background-color: transparent; -fx-text-fill: #9CA3AF; -fx-font-size: 16; -fx-padding: 0; -fx-cursor: hand; -fx-font-weight: bold;"/>
+    </HBox>
+    
+    <!-- Main Illustration -->
+    <VBox alignment="CENTER" spacing="0">
+        <ImageView fx:id="mainIllustration" fitWidth="280" fitHeight="280" preserveRatio="true"/>
+    </VBox>
+    
+    <!-- Content -->
+    <VBox alignment="CENTER" spacing="16" style="-fx-padding: 0 20;">
+        <Text text="Food for You" 
+              style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-alignment: center; -fx-fill: #1F2937;"/>
+        <Text text="We will help you to find the best food and drinks near you!" 
+              style="-fx-font-size: 16; -fx-text-alignment: center; -fx-fill: #9CA3AF; -fx-wrap-text: true;" 
+              wrappingWidth="300"/>
+    </VBox>
+    
+    <!-- Page Indicators -->
+    <HBox alignment="CENTER" spacing="8">
+        <Circle radius="6" fill="#E5E7EB"/>
+        <Circle radius="6" fill="#E5E7EB"/>
+        <Circle radius="6" fill="#4B5563"/>
+    </HBox>
+    
+    <!-- Action Buttons -->
+    <VBox alignment="CENTER" spacing="16" style="-fx-padding: 40 0 0 0;">
+        <!-- Sign Up Button -->
+        <Button text=" Sign Up" onAction="#handleSignUp" 
+                style="-fx-background-color: #4B5563; -fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold; -fx-padding: 15 0; -fx-cursor: hand; -fx-background-radius: 12; -fx-pref-width: 320;">
+            <graphic>
+                <FontIcon iconLiteral="fas-user-plus" iconSize="16" iconColor="white"/>
+            </graphic>
+        </Button>
+        
+        <!-- Sign In Button -->
+        <Button text=" Sign In" onAction="#handleSignIn" 
+                style="-fx-background-color: #F3F4F6; -fx-text-fill: #4B5563; -fx-font-size: 16; -fx-font-weight: bold; -fx-padding: 15 0; -fx-cursor: hand; -fx-background-radius: 12; -fx-pref-width: 320;">
+            <graphic>
+                <FontIcon iconLiteral="fas-sign-in-alt" iconSize="16" iconColor="#4B5563"/>
+            </graphic>
+        </Button>
+    </VBox>
+    
+    <!-- Bottom Decoration -->
+    <VBox alignment="CENTER" style="-fx-padding: 20 0 0 0;">
+        <Text text="By continuing, you agree to our Terms of Service and Privacy Policy" 
+              style="-fx-fill: #9CA3AF; -fx-font-size: 14; -fx-text-alignment: center; -fx-wrap-text: true;"
+              wrappingWidth="300"/>
+    </VBox>
+    
+</VBox>

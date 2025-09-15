@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="com.unieats.controllers.ProfileController" 
+      style="-fx-background-color: #fafafa;"
+      prefWidth="360" 
+      prefHeight="800"
+      maxWidth="360"
+      maxHeight="800"
+      spacing="0">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
+        <Button fx:id="backButton" style="-fx-background-color: transparent; -fx-padding: 8;">
+            <graphic>
+                <FontIcon iconLiteral="fas-arrow-left" iconSize="20" iconColor="#2d3436"/>
+            </graphic>
+        </Button>
+        <Label text="Profile" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 0 0 0 16;"/>
+    </HBox>
+
+    <!-- Profile Content -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+        <VBox spacing="20" style="-fx-padding: 20;">
+            
+            <!-- Profile Picture Section -->
+            <VBox alignment="CENTER" spacing="16" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                <StackPane style="-fx-background-color: transparent; -fx-pref-width: 120; -fx-pref-height: 120;">
+                    <StackPane style="-fx-background-color: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); -fx-background-radius: 60; -fx-pref-width: 120; -fx-pref-height: 120;" />
+                    <ImageView fx:id="profileImageView" fitWidth="110" fitHeight="110" preserveRatio="true"/>
+                    <FontIcon iconLiteral="fas-user" iconSize="50" iconColor="white"/>
+                </StackPane>
+                <VBox alignment="CENTER" spacing="4">
+                    <Label fx:id="profileNameLabel" text="User Name" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    <Label fx:id="profileEmailLabel" text="user@email.com" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                </VBox>
+            </VBox>
+
+            <!-- Profile Details -->
+            <VBox spacing="16" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                <Label text="Profile Information" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 0 0 16 0;"/>
+                
+                <!-- User ID -->
+                <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 12 0;">
+                    <StackPane style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 8;">
+                        <FontIcon iconLiteral="fas-id-card" iconSize="16" iconColor="#6c757d"/>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label text="User ID" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
+                        <Label fx:id="profileIdLabel" text="ID" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- User Category -->
+                <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 12 0;">
+                    <StackPane style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 8;">
+                        <FontIcon iconLiteral="fas-users" iconSize="16" iconColor="#6c757d"/>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label text="User Category" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
+                        <Label fx:id="profileCategoryLabel" text="Category" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Created Date -->
+                <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 12 0;">
+                    <StackPane style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 8;">
+                        <FontIcon iconLiteral="fas-calendar" iconSize="16" iconColor="#6c757d"/>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label text="Member Since" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
+                        <Label fx:id="profileCreatedLabel" text="Date" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Last Updated -->
+                <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 12 0;">
+                    <StackPane style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 8;">
+                        <FontIcon iconLiteral="fas-clock" iconSize="16" iconColor="#6c757d"/>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label text="Last Updated" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
+                        <Label fx:id="profileUpdatedLabel" text="Date" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Actions -->
+            <VBox spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                <Label text="Actions" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 0 0 16 0;"/>
+                
+                <Button fx:id="editProfileButton" text="Edit Profile" style="-fx-background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 12 24; -fx-background-radius: 12; -fx-cursor: hand;">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-edit" iconSize="14" iconColor="white"/>
+                    </graphic>
+                </Button>
+                
+                
+                <Button fx:id="changePasswordButton" text="Change Password" style="-fx-background-color: #f8f9fa; -fx-text-fill: #2d3436; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 12 24; -fx-background-radius: 12; -fx-cursor: hand; -fx-border-color: #e9ecef; -fx-border-width: 1;">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-lock" iconSize="14" iconColor="#6c757d"/>
+                    </graphic>
+                </Button>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+    
+    <!-- Bottom Navigation Bar -->
+    <HBox alignment="CENTER" spacing="0" style="-fx-background-color: #ffffff; -fx-padding: 12 0; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);">
+        <!-- Home -->
+        <VBox fx:id="navHome" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+            <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                <FontIcon iconLiteral="fas-home" iconSize="20" iconColor="#6c757d"/>
+            </StackPane>
+            <Label text="Home" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+        </VBox>
+        <!-- Orders -->
+        <VBox fx:id="navOrders" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+            <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                <FontIcon iconLiteral="fas-list-alt" iconSize="20" iconColor="#6c757d"/>
+            </StackPane>
+            <Label text="My Orders" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+        </VBox>
+        <!-- Cart -->
+        <VBox fx:id="navCart" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+            <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                <FontIcon iconLiteral="fas-shopping-cart" iconSize="20" iconColor="#6c757d"/>
+            </StackPane>
+            <Label text="Cart" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+        </VBox>
+        <!-- Favourite -->
+        <VBox fx:id="navFav" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+            <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                <FontIcon iconLiteral="fas-heart" iconSize="20" iconColor="#6c757d"/>
+            </StackPane>
+            <Label text="Favourite" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+        </VBox>
+        <!-- Profile (active) -->
+        <VBox fx:id="navProfile" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+            <StackPane style="-fx-background-color: #f3e8ff; -fx-background-radius: 12; -fx-padding: 8;">
+                <FontIcon iconLiteral="fas-user" iconSize="20" iconColor="#6f42c1"/>
+            </StackPane>
+            <Label text="Profile" style="-fx-font-size: 10px; -fx-text-fill: #6f42c1; -fx-font-weight: bold;"/>
+        </VBox>
+    </HBox>
+</VBox>

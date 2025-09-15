@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.AdminUsersController" spacing="8" visible="false" managed="false">
+    <HBox spacing="6" alignment="CENTER_LEFT">
+        <Label text="Users" style="-fx-font-size: 16; -fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <TextField fx:id="userSearchField" promptText="Search users..." />
+        <Button fx:id="refreshUsersButton" text="Refresh" />
+    </HBox>
+    <TableView fx:id="usersTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="userIdColumn" text="ID" prefWidth="60" />
+            <TableColumn fx:id="userNameColumn" text="Name" prefWidth="140" />
+            <TableColumn fx:id="userEmailColumn" text="Email" prefWidth="180" />
+            <TableColumn fx:id="userCategoryColumn" text="Category" prefWidth="100" />
+        </columns>
+    </TableView>
+</VBox>
+
+
