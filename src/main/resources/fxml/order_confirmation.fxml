@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.OrderConfirmationController"
+            prefWidth="360" prefHeight="800" style="-fx-background-color: #f8f9fa;">
+
+    <!-- Center content -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox alignment="CENTER" spacing="24" style="-fx-padding: 32 16;">
+                
+                <!-- Success Icon -->
+                <VBox alignment="CENTER" spacing="16">
+                    <StackPane style="-fx-background-color: #4caf50; -fx-background-radius: 50; -fx-padding: 20;">
+                        <FontIcon iconLiteral="fas-check" iconSize="32" iconColor="white"/>
+                    </StackPane>
+                    <Label text="Order Confirmed!" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    <Label text="Thank you for your order. We'll start preparing it right away!" 
+                           style="-fx-font-size: 14px; -fx-text-fill: #6c757d; -fx-wrap-text: true; -fx-text-alignment: center;"/>
+                </VBox>
+
+                <!-- Order Details -->
+                <VBox spacing="16" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+                    <Label text="Order Details" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <VBox spacing="12">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Order ID:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="orderIdLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Shop:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="shopNameLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Total Amount:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="totalAmountLabel" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;"/>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Status:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="statusLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #4caf50;"/>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Order Time:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="orderTimeLabel" style="-fx-font-size: 14px; -fx-text-fill: #2d3436;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- Order Items -->
+                <VBox spacing="16" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+                    <Label text="Order Items" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <ListView fx:id="orderItemsList" prefHeight="200" style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
+                </VBox>
+
+                <!-- Estimated Delivery -->
+                <VBox spacing="12" style="-fx-background-color: #fff3e0; -fx-background-radius: 12; -fx-padding: 16; -fx-border-color: #ff9800; -fx-border-radius: 12; -fx-border-width: 1;">
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <FontIcon iconLiteral="fas-clock" iconSize="16" iconColor="#ff9800"/>
+                        <Label text="Estimated Delivery Time" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #e65100;"/>
+                    </HBox>
+                    <Label fx:id="estimatedDeliveryLabel" text="25-35 minutes" style="-fx-font-size: 14px; -fx-text-fill: #e65100;"/>
+                    <Label text="We'll notify you when your order is ready for pickup or delivery." 
+                           style="-fx-font-size: 12px; -fx-text-fill: #e65100; -fx-wrap-text: true;"/>
+                </VBox>
+
+                <!-- What's Next -->
+                <VBox spacing="12" style="-fx-background-color: #e8f5e8; -fx-background-radius: 12; -fx-padding: 16; -fx-border-color: #4caf50; -fx-border-radius: 12; -fx-border-width: 1;">
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <FontIcon iconLiteral="fas-info-circle" iconSize="16" iconColor="#4caf50"/>
+                        <Label text="What's Next?" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;"/>
+                    </HBox>
+                    <VBox spacing="8">
+                        <Label text="1. We'll start preparing your order" style="-fx-font-size: 14px; -fx-text-fill: #2e7d32;"/>
+                        <Label text="2. You'll receive updates on the progress" style="-fx-font-size: 14px; -fx-text-fill: #2e7d32;"/>
+                        <Label text="3. Your order will be ready for pickup/delivery" style="-fx-font-size: 14px; -fx-text-fill: #2e7d32;"/>
+                    </VBox>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- Bottom action buttons -->
+    <bottom>
+        <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 16; -fx-border-color: #e9ecef; -fx-border-width: 1 0 0 0;">
+            <Button fx:id="viewOrderButton" text="View Order Details" 
+                    style="-fx-background-color: #2196f3; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 16; -fx-cursor: hand;"
+                    onAction="#handleViewOrder"/>
+            <Button fx:id="continueShoppingButton" text="Continue Shopping" 
+                    style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 16; -fx-cursor: hand;"
+                    onAction="#handleContinueShopping"/>
+        </VBox>
+    </bottom>
+
+</BorderPane>

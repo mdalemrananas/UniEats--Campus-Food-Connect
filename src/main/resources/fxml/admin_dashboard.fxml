@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.AdminDashboardController" spacing="10" fillWidth="true">
+    <!-- KPI cards laid out 2 per row -->
+    <GridPane hgap="8" vgap="8">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="50" />
+            <ColumnConstraints percentWidth="50" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+        </rowConstraints>
+
+        <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" spacing="4" style="-fx-background-color: #ffffff; -fx-border-color: #eeeeee; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">
+            <Label text="Total Users" />
+            <Label fx:id="totalUsersLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
+        </VBox>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="4" style="-fx-background-color: #ffffff; -fx-border-color: #eeeeee; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">
+            <Label text="Active Sellers" />
+            <Label fx:id="activeSellersLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
+        </VBox>
+        <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" spacing="4" style="-fx-background-color: #ffffff; -fx-border-color: #eeeeee; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">
+            <Label text="Pending Seller Requests" />
+            <Label fx:id="pendingSellersLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
+        </VBox>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" spacing="4" style="-fx-background-color: #ffffff; -fx-border-color: #eeeeee; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">
+            <Label text="Pending Reports" />
+            <Label fx:id="pendingReportsLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
+        </VBox>
+    </GridPane>
+
+    <!-- Reports Distribution Pie Chart -->
+    <VBox spacing="6">
+        <Label text="Reports Distribution" />
+        <PieChart fx:id="complaintsPieChart" prefHeight="240" />
+    </VBox>
+
+    <!-- Growth chart for Users & Orders -->
+    <VBox spacing="6">
+        <Label text="User &amp; Order Growth Over Time" />
+        <LineChart fx:id="growthChart" prefHeight="260">
+            <xAxis>
+                <CategoryAxis label="Time" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="Count" />
+            </yAxis>
+        </LineChart>
+    </VBox>
+</VBox>
+
+
