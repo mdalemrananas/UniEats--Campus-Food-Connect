@@ -19,6 +19,11 @@ import com.unieats.User;
 import com.unieats.DatabaseManager;
 import com.unieats.util.PasswordUtil;
 import org.kordamp.ikonli.javafx.FontIcon;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 public class ProfileController {
     
@@ -56,9 +61,9 @@ public class ProfileController {
         changePasswordButton.setOnAction(e -> handleChangePassword());
         // Bottom navigation wiring
         if (navHome != null) navHome.setOnMouseClicked(e -> { setActiveNav(navHome); navigateToMenu(); });
-        if (navOrders != null) navOrders.setOnMouseClicked(e -> { setActiveNav(navOrders); showAlert("Orders", "Orders screen coming soon."); });
+        if (navOrders != null) navOrders.setOnMouseClicked(e -> { setActiveNav(navOrders); navigateToOrders(); });
         if (navCart != null) navCart.setOnMouseClicked(e -> { setActiveNav(navCart); navigateToCart(); });
-        if (navFav != null) navFav.setOnMouseClicked(e -> { setActiveNav(navFav); showAlert("Favourite", "Favorites screen coming soon."); });
+        if (navFav != null) navFav.setOnMouseClicked(e -> { setActiveNav(navFav); navigateToFavourites(); });
         if (navProfile != null) navProfile.setOnMouseClicked(e -> setActiveNav(navProfile));
     }
     
@@ -87,9 +92,34 @@ public class ProfileController {
                 String path = currentUser.getProfilePicture();
                 if (path != null && !path.isEmpty()) {
                     try {
-                        File f = new File(path);
-                        Image img = f.exists() ? new Image(f.toURI().toString(), 110, 110, true, true) : new Image(path, 110, 110, true, true);
-                        profileImageView.setImage(img);
+                        // First try to load as a resource (for packaged JAR)
+                        String resourcePath = path.startsWith("images/") ? "/" + path : "/" + path;
+                        try {
+                            // Try to load as resource first
+                            Image img = new Image(getClass().getResourceAsStream(resourcePath), 110, 110, true, true);
+                            profileImageView.setImage(img);
+                        } catch (Exception e) {
+                            // If resource loading fails, try as file path
+                            try {
+                                File f = new File(path);
+                                if (f.exists()) {
+                                    Image img = new Image(f.toURI().toString(), 110, 110, true, true);
+                                    profileImageView.setImage(img);
+                                } else {
+                                    // Try to find in the resources directory
+                                    String userDir = System.getProperty("user.dir");
+                                    Path imagePath = Paths.get(userDir, "src", "main", "resources", path);
+                                    if (Files.exists(imagePath)) {
+                                        Image img = new Image(imagePath.toUri().toString(), 110, 110, true, true);
+                                        profileImageView.setImage(img);
+                                    } else {
+                                        profileImageView.setImage(null);
+                                    }
+                                }
+                            } catch (Exception ex) {
+                                profileImageView.setImage(null);
+                            }
+                        }
                     } catch (Exception ignored) {
                         profileImageView.setImage(null);
                     }
@@ -156,9 +186,28 @@ public class ProfileController {
         String existingPic = currentUser.getProfilePicture();
         if (existingPic != null && !existingPic.isEmpty()) {
             try {
-                File ef = new File(existingPic);
-                Image ei = ef.exists() ? new Image(ef.toURI().toString(), 80, 80, true, true) : new Image(existingPic, 80, 80, true, true);
-                preview.setImage(ei);
+                // Try to load as resource first
+                String resourcePath = existingPic.startsWith("images/") ? "/" + existingPic : "/" + existingPic;
+                try {
+                    preview.setImage(new Image(getClass().getResourceAsStream(resourcePath), 80, 80, true, true));
+                } catch (Exception e) {
+                    // If resource loading fails, try as file path
+                    try {
+                        File ef = new File(existingPic);
+                        if (ef.exists()) {
+                            preview.setImage(new Image(ef.toURI().toString(), 80, 80, true, true));
+                        } else {
+                            // Try to find in the resources directory
+                            String userDir = System.getProperty("user.dir");
+                            Path imagePath = Paths.get(userDir, "src", "main", "resources", existingPic);
+                            if (Files.exists(imagePath)) {
+                                preview.setImage(new Image(imagePath.toUri().toString(), 80, 80, true, true));
+                            }
+                        }
+                    } catch (Exception ex) {
+                        // Ignore and leave preview as is
+                    }
+                }
             } catch (Exception ignored) { }
         }
         Button choosePicBtn = new Button("Choose...");
@@ -224,13 +273,42 @@ public class ProfileController {
                 String newPic = selectedPicPath[0];
                 String oldPic = existingPic;
                 if ((newPic != null && !newPic.isEmpty()) && (oldPic == null || !newPic.equals(oldPic))) {
-                    boolean picOk = dbManager.updateUserProfilePicture(currentUser.getId(), newPic);
-                    if (!picOk) {
+                    try {
+                        // Get the resources directory path
+                        String userDir = System.getProperty("user.dir");
+                        Path targetDir = Paths.get(userDir, "src", "main", "resources", "images");
+                        
+                        // Create the target directory if it doesn't exist
+                        Files.createDirectories(targetDir);
+                        
+                        // Generate a unique filename
+                        String originalFilename = new File(newPic).getName();
+                        String fileExtension = "";
+                        int lastDot = originalFilename.lastIndexOf('.');
+                        if (lastDot > 0) {
+                            fileExtension = originalFilename.substring(lastDot);
+                        }
+                        String newFilename = "profile_" + currentUser.getId() + "_" + UUID.randomUUID().toString() + fileExtension;
+                        
+                        // Copy the file to the target directory
+                        Path sourcePath = Paths.get(newPic);
+                        Path targetPath = targetDir.resolve(newFilename);
+                        Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                        
+                        // Update the user's profile picture path
+                        String relativePath = "images/" + newFilename;
+                        boolean picOk = dbManager.updateUserProfilePicture(currentUser.getId(), relativePath);
+                        if (!picOk) {
+                            ev.consume();
+                            showAlert("Update Failed", "Profile updated but picture change failed.");
+                            return;
+                        }
+                        currentUser.setProfilePicture(relativePath);
+                    } catch (Exception ex) {
                         ev.consume();
-                        showAlert("Update Failed", "Profile updated but picture change failed.");
+                        showAlert("Error", "Failed to save profile picture: " + ex.getMessage());
                         return;
                     }
-                    currentUser.setProfilePicture(newPic);
                 }
             } catch (Exception ex) {
                 ev.consume();
@@ -394,4 +472,36 @@ public class ProfileController {
             showAlert("Navigation Error", e.getMessage());
         }
     }
+
+	private void navigateToOrders() {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/my_orders.fxml"));
+			Parent root = loader.load();
+			MyOrdersController controller = loader.getController();
+			if (controller != null && currentUser != null) controller.setCurrentUser(currentUser);
+			Stage stage = (Stage) backButton.getScene().getWindow();
+			Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+			stage.setScene(scene);
+			stage.setTitle("UniEats - My Orders");
+			stage.show();
+		} catch (IOException e) {
+			showAlert("Navigation Error", e.getMessage());
+		}
+	}
+
+	private void navigateToFavourites() {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/wishlist.fxml"));
+			Parent root = loader.load();
+			WishlistController controller = loader.getController();
+			if (controller != null && currentUser != null) controller.setCurrentUser(currentUser);
+			Stage stage = (Stage) backButton.getScene().getWindow();
+			Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+			stage.setScene(scene);
+			stage.setTitle("UniEats - Favourites");
+			stage.show();
+		} catch (IOException e) {
+			showAlert("Navigation Error", e.getMessage());
+		}
+	}
 }

@@ -128,9 +128,9 @@ public class CartController {
 
     private void wireBottomNav() {
         if (navHome != null) navHome.setOnMouseClicked(e -> navigateTo("/fxml/menu.fxml", "UniEats - Menu"));
-        if (navOrders != null) navOrders.setOnMouseClicked(e -> info("Orders screen coming soon."));
+        if (navOrders != null) navOrders.setOnMouseClicked(e -> navigateTo("/fxml/my_orders.fxml", "UniEats - My Orders"));
         if (navCart != null) navCart.setOnMouseClicked(e -> {/* already here */});
-        if (navFav != null) navFav.setOnMouseClicked(e -> info("Favorites screen coming soon."));
+        if (navFav != null) navFav.setOnMouseClicked(e -> navigateTo("/fxml/wishlist.fxml", "UniEats - Favourites"));
         if (navProfile != null) navProfile.setOnMouseClicked(e -> navigateTo("/fxml/profile.fxml", "UniEats - Profile"));
     }
 
@@ -187,6 +187,10 @@ public class CartController {
                 if (user != null) mc.setCurrentUser(user);
             } else if (controller instanceof com.unieats.controllers.ProfileController pc) {
                 if (user != null) pc.setCurrentUser(user);
+            } else if (controller instanceof com.unieats.controllers.WishlistController wc) {
+                if (user != null) wc.setCurrentUser(user);
+            } else if (controller instanceof com.unieats.controllers.MyOrdersController oc) {
+                if (user != null) oc.setCurrentUser(user);
             }
         } catch (Exception ex) {
             info("Navigation error: " + ex.getMessage());
@@ -244,16 +248,31 @@ public class CartController {
         boolean multiShop = items.stream().anyMatch(i -> i.shopId != shopId);
         if (multiShop) { info("Please checkout items from one shop at a time."); return; }
 
-        double totalPrice = items.stream().mapToDouble(i -> i.price * i.quantity).sum();
-        int orderId = orderDao.createOrder(currentUserId, shopId, totalPrice, "pending");
-        for (CartItemView i : items) {
-            orderDao.addOrderItem(orderId, i.itemId, i.quantity, i.price);
-            // Points accrual: multiplier x quantity
-            RewardService.addPoints(currentUserId, shopId, i.pointsMultiplier * i.quantity);
+        // Navigate to checkout page
+        navigateToCheckout();
+    }
+
+    private void navigateToCheckout() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/checkout.fxml"));
+            Parent root = loader.load();
+            CheckoutController controller = loader.getController();
+            if (controller != null) {
+                User user = currentUserId > 0 ? DatabaseManager.getInstance().getUserById(currentUserId) : null;
+                if (user != null) controller.setCurrentUser(user);
+            }
+
+            Stage stage = findStage();
+            if (stage == null) { info("Unable to resolve current window."); return; }
+
+            Scene newScene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            copyCurrentStyles(newScene);
+            stage.setScene(newScene);
+            stage.setTitle("UniEats - Checkout");
+            stage.show();
+        } catch (Exception ex) {
+            info("Navigation error: " + ex.getMessage());
         }
-        cartDao.clearCart(currentUserId);
-        refresh();
-        info("Checkout completed. Points updated for shop.");
     }
 
     @FXML

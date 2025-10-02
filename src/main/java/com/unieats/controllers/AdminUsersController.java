@@ -15,7 +15,6 @@ public class AdminUsersController {
 	@FXML private TableColumn<User, String> userNameColumn;
 	@FXML private TableColumn<User, String> userEmailColumn;
 	@FXML private TableColumn<User, String> userCategoryColumn;
-	@FXML private TableColumn<User, String> userStatusColumn;
 
 	public TextField getUserSearchField() { return userSearchField; }
 	public Button getRefreshUsersButton() { return refreshUsersButton; }
@@ -24,5 +23,4 @@ public class AdminUsersController {
 	public TableColumn<User, String> getUserNameColumn() { return userNameColumn; }
 	public TableColumn<User, String> getUserEmailColumn() { return userEmailColumn; }
 	public TableColumn<User, String> getUserCategoryColumn() { return userCategoryColumn; }
-	public TableColumn<User, String> getUserStatusColumn() { return userStatusColumn; }
 }

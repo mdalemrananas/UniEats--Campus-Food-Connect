@@ -77,6 +77,10 @@ public class ShopDao {
 		}
 	}
 
+	public Shop getShopById(int id) {
+		return findById(id);
+	}
+
 	private Shop map(ResultSet rs) throws SQLException {
 		Shop s = new Shop(rs.getInt("owner_id"), rs.getString("shop_name"), rs.getString("status"));
 		s.setId(rs.getInt("id"));

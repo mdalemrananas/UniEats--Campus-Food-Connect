@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="com.unieats.controllers.SigninController" 
+      alignment="TOP_CENTER" 
+      spacing="16" 
+      style="-fx-background-color: #ffffff; -fx-padding: 20 16;"
+      prefWidth="360" 
+      prefHeight="800"
+      maxWidth="360"
+      maxHeight="800">
+    
+    <!-- Header -->
+    <VBox alignment="CENTER" spacing="6" style="-fx-padding: 0 0 16 0;">
+        <Text text="Welcome Back" 
+              style="-fx-font-size: 24; -fx-font-weight: bold; -fx-fill: #1F2937;"/>
+        <Text text="Sign in to your UniEats account" 
+              style="-fx-font-size: 14; -fx-fill: #6B7280; -fx-text-alignment: center; -fx-wrap-text: true;"
+              wrappingWidth="320"/>
+    </VBox>
+    
+    <!-- Back Button -->
+    <HBox alignment="CENTER_LEFT" style="-fx-padding: 0 0 8 0;">
+        <Button text=" Back" onAction="#handleBack" 
+                style="-fx-background-color: transparent; -fx-text-fill: #4B5563; -fx-font-size: 14; -fx-padding: 6 12; -fx-cursor: hand; -fx-font-weight: bold;">
+            <graphic>
+                <FontIcon iconLiteral="fas-arrow-left" iconSize="14" iconColor="#4B5563"/>
+            </graphic>
+        </Button>
+    </HBox>
+    
+    <!-- Error/Success Label -->
+    <Label fx:id="errorLabel" 
+           style="-fx-font-size: 13; -fx-text-alignment: center; -fx-wrap-text: true; -fx-pref-width: 320;"
+           visible="false"/>
+    
+    <!-- Form Fields -->
+    <VBox alignment="CENTER" spacing="12" style="-fx-padding: 16 0;">
+        
+        <!-- Email -->
+        <VBox alignment="CENTER_LEFT" spacing="3">
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <FontIcon iconLiteral="fas-envelope" iconSize="13" iconColor="#374151"/>
+                <Label text="Email *" style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #374151;"/>
+            </HBox>
+            <TextField fx:id="emailField" 
+                       promptText="Enter your email address"
+                       style="-fx-pref-width: 320; -fx-pref-height: 44; -fx-font-size: 15; -fx-padding: 10 14; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #d1d5db; -fx-border-width: 1;"/>
+        </VBox>
+        
+        <!-- Password -->
+        <VBox alignment="CENTER_LEFT" spacing="3">
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <FontIcon iconLiteral="fas-lock" iconSize="13" iconColor="#374151"/>
+                <Label text="Password *" style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #374151;"/>
+            </HBox>
+            <PasswordField fx:id="passwordField" 
+                           promptText="Enter your password"
+                           style="-fx-pref-width: 320; -fx-pref-height: 44; -fx-font-size: 15; -fx-padding: 10 14; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #d1d5db; -fx-border-width: 1;"/>
+        </VBox>
+        
+    </VBox>
+    
+    <!-- Action Buttons -->
+    <VBox alignment="CENTER" spacing="10" style="-fx-padding: 16 0;">
+        <!-- Sign In Button -->
+        <Button text=" Sign In" onAction="#handleSignIn" 
+                style="-fx-background-color: #4B5563; -fx-text-fill: white; -fx-font-size: 15; -fx-font-weight: bold; -fx-padding: 14 0; -fx-cursor: hand; -fx-background-radius: 10; -fx-pref-width: 320;">
+            <graphic>
+                <FontIcon iconLiteral="fas-sign-in-alt" iconSize="15" iconColor="white"/>
+            </graphic>
+        </Button>
+        
+        <!-- Clear Button -->
+        <Button text=" Clear Form" onAction="#handleClear" 
+                style="-fx-background-color: #F3F4F6; -fx-text-fill: #4B5563; -fx-font-size: 15; -fx-font-weight: bold; -fx-padding: 14 0; -fx-cursor: hand; -fx-background-radius: 10; -fx-pref-width: 320;">
+            <graphic>
+                <FontIcon iconLiteral="fas-eraser" iconSize="15" iconColor="#4B5563"/>
+            </graphic>
+        </Button>
+    </VBox>
+    
+    <!-- Forgot Password Link -->
+    <VBox alignment="CENTER" style="-fx-padding: 16 0 0 0;">
+        <Text text="Forgot your password?" 
+              style="-fx-fill: #4B5563; -fx-font-size: 14; -fx-font-weight: bold; -fx-cursor: hand; -fx-underline: true;"/>
+    </VBox>
+    
+    <!-- Don't have account -->
+    <VBox alignment="CENTER" style="-fx-padding: 16 0 0 0;">
+        <HBox alignment="CENTER" spacing="4">
+            <Text text="Don't have an account? " 
+                  style="-fx-fill: #6B7280; -fx-font-size: 14;"/>
+            <Text text="Sign Up" 
+                  style="-fx-fill: #4B5563; -fx-font-size: 14; -fx-font-weight: bold; -fx-cursor: hand; -fx-underline: true;"
+                  onMouseClicked="#handleSignUp"/>
+        </HBox>
+    </VBox>
+    
+</VBox> 

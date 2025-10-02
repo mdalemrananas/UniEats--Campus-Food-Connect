@@ -12,6 +12,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.io.IOException;
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import com.unieats.Shop;
 import com.unieats.FoodItem;
@@ -249,9 +254,24 @@ public class ReportController {
             String title = titleField.getText().trim();
             String description = descriptionField.getText().trim();
             
-            String attachmentsJson = buildAttachmentsJson(selectedImageFile);
+            // Submit report and get the report ID
+            int reportId = reportDao.submitReport(currentUser.getId(), shopId, itemId, title, description, "[]");
             
-            reportDao.submitReport(currentUser.getId(), shopId, itemId, title, description, attachmentsJson);
+            // Handle file attachments if any
+            if (selectedImageFile != null) {
+                try {
+                    String relativePath = com.unieats.util.ReportFileManager.saveAttachment(selectedImageFile, reportId);
+                    List<String> attachments = new ArrayList<>();
+                    attachments.add(relativePath);
+                    String attachmentsJson = com.unieats.util.ReportFileManager.buildAttachmentsJson(attachments);
+                    
+                    // Update the report with attachment paths
+                    updateReportAttachments(reportId, attachmentsJson);
+                } catch (Exception e) {
+                    System.err.println("Failed to save attachment: " + e.getMessage());
+                    showAlert("Warning", "Report submitted but attachment could not be saved: " + e.getMessage());
+                }
+            }
             
             showAlert("Success", "Your report has been submitted successfully. Our team will review it shortly.");
             
@@ -281,6 +301,18 @@ public class ReportController {
         shopReportRadio.setSelected(true);
     }
     
+    private void updateReportAttachments(int reportId, String attachmentsJson) {
+        String sql = "UPDATE reports SET attachments = ? WHERE id = ?";
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:unieats.db");
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, attachmentsJson);
+            ps.setInt(2, reportId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Failed to update report attachments: " + e.getMessage());
+        }
+    }
+
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
