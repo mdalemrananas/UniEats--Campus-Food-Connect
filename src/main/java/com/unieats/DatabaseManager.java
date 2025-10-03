@@ -1,6 +1,11 @@
 package com.unieats;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,6 +15,7 @@ import java.util.Set;
 public class DatabaseManager {
     private static final String DB_URL = "jdbc:sqlite:unieats.db";
     private static DatabaseManager instance;
+    private static User currentUser;
     
     private DatabaseManager() {
         initializeDatabase();
@@ -40,6 +46,22 @@ public class DatabaseManager {
         return instance;
     }
     
+    /**
+     * Gets the currently logged-in user
+     * @return the current User object, or null if no user is logged in
+     */
+    public static User getCurrentUser() {
+        return currentUser;
+    }
+    
+    /**
+     * Sets the currently logged-in user
+     * @param user the User object to set as current user
+     */
+    public static void setCurrentUser(User user) {
+        currentUser = user;
+    }
+    
     private void initializeDatabase() {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             // Create tables if they don't exist
@@ -52,7 +74,7 @@ public class DatabaseManager {
                         password TEXT NOT NULL,
                         full_name TEXT NOT NULL,
                         profile_picture TEXT DEFAULT NULL,
-                        user_category TEXT NOT NULL CHECK(user_category IN ('student', 'seller', 'admin')),
+                        user_category TEXT NOT NULL CHECK(user_category IN ('student', 'seller')),
                         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
                     )
@@ -89,6 +111,20 @@ public class DatabaseManager {
                 // Cart
                 stmt.execute("""
                     CREATE TABLE IF NOT EXISTS cart (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        item_id INTEGER NOT NULL,
+                        quantity INTEGER NOT NULL DEFAULT 1,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(user_id) REFERENCES users(id),
+                        FOREIGN KEY(item_id) REFERENCES food_items(id)
+                    )
+                """);
+
+                // Wishlist
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS wishlist (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         user_id INTEGER NOT NULL,
                         item_id INTEGER NOT NULL,
@@ -160,9 +196,61 @@ public class DatabaseManager {
                     )
                 """);
 
+                // Reviews (shared for shops or food items)
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS reviews (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        shop_id INTEGER,
+                        food_item_id INTEGER,
+                        rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),
+                        comment TEXT,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(user_id) REFERENCES users(id),
+                        FOREIGN KEY(shop_id) REFERENCES shops(id),
+                        FOREIGN KEY(food_item_id) REFERENCES food_items(id),
+                        CHECK ((shop_id IS NOT NULL AND food_item_id IS NULL) OR (shop_id IS NULL AND food_item_id IS NOT NULL))
+                    )
+                """);
+
+                // Payments
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS payments (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        order_id INTEGER NOT NULL,
+                        payment_method TEXT NOT NULL CHECK(payment_method IN ('card', 'cash', 'digital_wallet') OR payment_method LIKE 'digital_wallet_%'),
+                        amount REAL NOT NULL,
+                        status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'completed', 'failed', 'refunded')),
+                        transaction_id TEXT,
+                        payment_details TEXT,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(order_id) REFERENCES orders(id)
+                    )
+                """);
+
+                // Order status history
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS order_status_history (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        order_id INTEGER NOT NULL,
+                        status TEXT NOT NULL,
+                        notes TEXT,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(order_id) REFERENCES orders(id)
+                    )
+                """);
+
                 // Ensure backward compatibility: add any missing columns in 'users' and 'reports'
                 ensureUsersTableColumns(conn);
                 ensureReportsTableColumns(conn);
+                
+                // Update payments table constraint if needed
+                updatePaymentsTableConstraint(conn);
+                
+                // Initialize reports directory
+                com.unieats.util.ReportFileManager.initializeDirectories();
 
                 System.out.println("Database initialized successfully");
             }
@@ -189,6 +277,47 @@ public class DatabaseManager {
             if (!columns.contains("profile_picture")) {
                 s.execute("ALTER TABLE users ADD COLUMN profile_picture TEXT DEFAULT NULL");
             }
+        }
+    }
+
+    /**
+     * Updates the payments table constraint to allow digital_wallet_* payment methods
+     */
+    private void updatePaymentsTableConstraint(Connection conn) throws SQLException {
+        try {
+            // Check if the table exists and has the old constraint
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery("PRAGMA table_info(payments)")) {
+                
+                boolean tableExists = false;
+                while (rs.next()) {
+                    tableExists = true;
+                    break;
+                }
+                
+                if (tableExists) {
+                    System.out.println("Updating payments table constraint...");
+                    // Drop and recreate the payments table with updated constraint
+                    stmt.execute("DROP TABLE payments");
+                    stmt.execute("""
+                        CREATE TABLE payments (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            order_id INTEGER NOT NULL,
+                            payment_method TEXT NOT NULL CHECK(payment_method IN ('card', 'cash', 'digital_wallet') OR payment_method LIKE 'digital_wallet_%'),
+                            amount REAL NOT NULL,
+                            status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'completed', 'failed', 'refunded')),
+                            transaction_id TEXT,
+                            payment_details TEXT,
+                            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                            FOREIGN KEY(order_id) REFERENCES orders(id)
+                        )
+                    """);
+                    System.out.println("Payments table constraint updated successfully");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Warning: Could not update payments table constraint: " + e.getMessage());
         }
     }
 
@@ -237,26 +366,111 @@ public class DatabaseManager {
      * @return true if successful, false otherwise
      */
     public boolean createUser(User user) {
-        String sql = "INSERT INTO users (email, password, full_name, user_category, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(DB_URL);
+            conn.setAutoCommit(false); // Start transaction
+            
+            // Insert user
+            String userSql = "INSERT INTO users (email, password, full_name, user_category, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(userSql)) {
+                
+                pstmt.setString(1, user.getEmail());
+                pstmt.setString(2, user.getPassword());
+                pstmt.setString(3, user.getFullName());
+                pstmt.setString(4, user.getUserCategory());
+                
+                String timestamp = LocalDateTime.now().toString();
+                pstmt.setString(5, timestamp);
+                pstmt.setString(6, timestamp);
+                
+                int affectedRows = pstmt.executeUpdate();
+                
+                if (affectedRows == 0) {
+                    conn.rollback();
+                    return false;
+                }
+                
+                // Get the last inserted row ID
+                int userId;
+                try (Statement stmt = conn.createStatement();
+                     ResultSet rs = stmt.executeQuery("SELECT last_insert_rowid()")) {
+                    if (!rs.next()) {
+                        conn.rollback();
+                        return false;
+                    }
+                    userId = rs.getInt(1);
+                }
+                
+                // If user is a seller, create a shop with default name
+                if ("seller".equalsIgnoreCase(user.getUserCategory())) {
+                    String shopName = user.getFullName() + "'s Shop";
+                    
+                    // Insert shop in the same transaction
+                    String shopSql = "INSERT INTO shops (owner_id, shop_name, status, created_at, updated_at) VALUES (?, ?, 'pending', ?, ?)";
+                    try (PreparedStatement shopStmt = conn.prepareStatement(shopSql)) {
+                        shopStmt.setInt(1, userId);
+                        shopStmt.setString(2, shopName);
+                        shopStmt.setString(3, timestamp);
+                        shopStmt.setString(4, timestamp);
+                        
+                        int shopRows = shopStmt.executeUpdate();
+                        if (shopRows == 0) {
+                            conn.rollback();
+                            return false;
+                        }
+                    }
+                }
+                
+                conn.commit(); // Commit the transaction
+                return true;
+            }
+            
+        } catch (SQLException e) {
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException ex) {
+                System.err.println("Error rolling back transaction: " + ex.getMessage());
+            }
+            System.err.println("Error in createUser: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing connection: " + e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Create a new shop for a seller
+     * @param ownerId The ID of the shop owner (user)
+     * @param shopName The name of the shop
+     * @return true if successful, false otherwise
+     * @deprecated Use the transaction-based approach in createUser instead
+     */
+    @Deprecated
+    public boolean createShop(int ownerId, String shopName) {
+        String sql = "INSERT INTO shops (owner_id, shop_name, status, created_at, updated_at) VALUES (?, ?, 'pending', ?, ?)";
         
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
-            pstmt.setString(1, user.getEmail());
-            pstmt.setString(2, user.getPassword());
-            pstmt.setString(3, user.getFullName());
-            pstmt.setString(4, user.getUserCategory());
+            pstmt.setInt(1, ownerId);
+            pstmt.setString(2, shopName);
             
             // Use simple string format for timestamps
             String timestamp = LocalDateTime.now().toString();
-            pstmt.setString(5, timestamp);
-            pstmt.setString(6, timestamp);
+            pstmt.setString(3, timestamp);
+            pstmt.setString(4, timestamp);
             
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
             
         } catch (SQLException e) {
-            System.err.println("Error creating user: " + e.getMessage());
+            System.err.println("Error creating shop: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -385,19 +599,46 @@ public class DatabaseManager {
     
 
     
+    /**
+     * Get the shop status for a seller
+     * @param userId The ID of the user (seller)
+     * @return The shop status ('pending', 'approved', 'rejected'), or null if user is not a seller or has no shop
+     */
+    public String getShopStatus(int userId) {
+        String sql = "SELECT status FROM shops WHERE owner_id = ?";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, userId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("status");
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error getting shop status: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return null; // User is not a seller or has no shop
+    }
+    
     public boolean isEmailExists(String email) {
         return getUserByEmail(email) != null;
     }
     
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         User user = new User(
+            rs.getInt("id"),
             rs.getString("email"),
             rs.getString("password"),
             rs.getString("full_name"),
             rs.getString("user_category")
         );
         
-        user.setId(rs.getInt("id"));
         try {
             String pic = rs.getString("profile_picture");
             user.setProfilePicture(pic);

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.MyOrdersController"
+            prefWidth="360" prefHeight="800" style="-fx-background-color: #f8f9fa;">
+
+    <!-- Top header -->
+    <top>
+        <VBox style="-fx-background-color: white; -fx-border-color: #e9ecef; -fx-border-width: 0 0 1 0;">
+            <!-- Header with back button and title -->
+            <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 16;">
+                <Button fx:id="backButton" onAction="#handleBack" style="-fx-background-color: transparent; -fx-padding: 8;">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-arrow-left" iconSize="18" iconColor="#6c757d"/>
+                    </graphic>
+                </Button>
+                <Label text="My Orders" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+            </HBox>
+            
+            <!-- Navigation tabs -->
+            <HBox alignment="CENTER" spacing="0" style="-fx-padding: 0 16 16 16;">
+                <Button fx:id="currentOrdersTab" text="Current Orders" 
+                        style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8 0 0 8; -fx-padding: 12 24; -fx-cursor: hand;"
+                        onAction="#handleCurrentOrdersTab"/>
+                <Button fx:id="orderHistoryTab" text="Order History" 
+                        style="-fx-background-color: #e9ecef; -fx-text-fill: #6c757d; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 0 8 8 0; -fx-padding: 12 24; -fx-cursor: hand;"
+                        onAction="#handleOrderHistoryTab"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Center content -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox fx:id="contentContainer" spacing="16" style="-fx-padding: 16;">
+                
+                <!-- Current Orders Section -->
+                <VBox fx:id="currentOrdersSection" spacing="12">
+                    <Label text="Active Orders" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    <ListView fx:id="currentOrdersList" prefHeight="400" style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
+                </VBox>
+
+                <!-- Order History Section -->
+                <VBox fx:id="orderHistorySection" spacing="12" visible="false">
+                    <Label text="Order History" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    <ListView fx:id="orderHistoryList" prefHeight="400" style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
+                </VBox>
+
+                <!-- Empty state for current orders -->
+                <VBox fx:id="currentOrdersEmpty" alignment="CENTER" spacing="16" style="-fx-padding: 40 20;">
+                    <FontIcon iconLiteral="fas-shopping-bag" iconSize="48" iconColor="#e9ecef"/>
+                    <Label text="No Active Orders" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #6c757d;"/>
+                    <Label text="Your current orders will appear here" style="-fx-font-size: 14px; -fx-text-fill: #adb5bd;"/>
+                </VBox>
+
+                <!-- Empty state for order history -->
+                <VBox fx:id="orderHistoryEmpty" alignment="CENTER" spacing="16" style="-fx-padding: 40 20;" visible="false">
+                    <FontIcon iconLiteral="fas-history" iconSize="48" iconColor="#e9ecef"/>
+                    <Label text="No Order History" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #6c757d;"/>
+                    <Label text="Your completed orders will appear here" style="-fx-font-size: 14px; -fx-text-fill: #adb5bd;"/>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- Bottom navigation -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="0" style="-fx-background-color: #ffffff; -fx-padding: 12 0; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);">
+            <!-- Home -->
+            <VBox fx:id="navHome" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-home" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Home" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Orders -->
+            <VBox fx:id="navOrders" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-color: #e8f5e9; -fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-list-alt" iconSize="20" iconColor="#2e7d32"/>
+                </StackPane>
+                <Label text="My Orders" style="-fx-font-size: 10px; -fx-text-fill: #2e7d32; -fx-font-weight: bold;"/>
+            </VBox>
+            <!-- Cart -->
+            <VBox fx:id="navCart" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Cart" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Favourite -->
+            <VBox fx:id="navFav" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-heart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Favourite" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Profile -->
+            <VBox fx:id="navProfile" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-user" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Profile" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+        </HBox>
+    </bottom>
+
+</BorderPane>

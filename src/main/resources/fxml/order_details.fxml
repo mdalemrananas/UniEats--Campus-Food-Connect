@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.OrderDetailsController"
+            prefWidth="360" prefHeight="800" style="-fx-background-color: #f8f9fa;">
+
+    <!-- Top header -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-background-color: white; -fx-padding: 16; -fx-border-color: #e9ecef; -fx-border-width: 0 0 1 0;">
+            <Button fx:id="backButton" onAction="#handleBack" style="-fx-background-color: transparent; -fx-padding: 8;">
+                <graphic>
+                    <FontIcon iconLiteral="fas-arrow-left" iconSize="18" iconColor="#6c757d"/>
+                </graphic>
+            </Button>
+            <Label text="Order Details" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+        </HBox>
+    </top>
+
+    <!-- Center content -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox spacing="16" style="-fx-padding: 16;">
+                
+                <!-- Order Status -->
+                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <FontIcon fx:id="statusIcon" iconLiteral="fas-clock" iconSize="20" iconColor="#ff9800"/>
+                        <Label fx:id="statusLabel" text="Preparing" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    </HBox>
+                    <Label fx:id="statusDescriptionLabel" text="Your order is being prepared" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                </VBox>
+
+                <!-- Order Information -->
+                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+                    <Label text="Order Information" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <VBox spacing="8">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Order ID:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="orderIdLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Shop:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="shopNameLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Order Time:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="orderTimeLabel" style="-fx-font-size: 14px; -fx-text-fill: #2d3436;"/>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Total Amount:" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="totalAmountLabel" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- Order Items -->
+                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+                    <Label text="Order Items" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <ListView fx:id="orderItemsList" prefHeight="200" style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
+                </VBox>
+
+                <!-- Payment Information -->
+                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+                    <Label text="Payment Information" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <VBox spacing="8">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Payment Method:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="paymentMethodLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Payment Status:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="paymentStatusLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #4caf50;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- Bottom action buttons -->
+    <bottom>
+        <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 16; -fx-border-color: #e9ecef; -fx-border-width: 1 0 0 0;">
+            <Button fx:id="backToMenuButton" text="Back to Menu" 
+                    style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 16; -fx-cursor: hand;"
+                    onAction="#handleBackToMenu"/>
+        </VBox>
+    </bottom>
+
+</BorderPane>

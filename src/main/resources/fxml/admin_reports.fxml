@@ -4,16 +4,14 @@
 <?import javafx.scene.layout.*?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.AdminReportsController" spacing="8" visible="false" managed="false">
-    <Label text="Reports" style="-fx-font-size: 16; -fx-font-weight: bold;" />
-    <TableView fx:id="reportsTable" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="reportIdColumn" text="ID" prefWidth="60" />
-            <TableColumn fx:id="reportUserColumn" text="User" prefWidth="80" />
-            <TableColumn fx:id="reportShopColumn" text="Shop" prefWidth="80" />
-            <TableColumn fx:id="reportDescColumn" text="Description" prefWidth="240" />
-            <TableColumn fx:id="reportStatusColumn" text="Status" prefWidth="120" />
-        </columns>
-    </TableView>
+    <HBox spacing="6" alignment="CENTER_LEFT">
+        <Label text="Reports" style="-fx-font-size: 16; -fx-font-weight: bold;" />
+    </HBox>
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+        <content>
+            <FlowPane fx:id="reportsFlow" hgap="10" vgap="10" prefWrapLength="320" stylesheets="@../css/styles.css" styleClass="cards-flow" />
+        </content>
+    </ScrollPane>
 </VBox>
 
 

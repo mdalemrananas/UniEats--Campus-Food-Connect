@@ -1,24 +1,31 @@
 package com.unieats.controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 import javafx.util.Duration;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.ArrayList;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.scene.layout.Region;
+import javafx.scene.shape.Circle;
 import com.unieats.User;
-import com.unieats.controllers.FoodItemsController;
-import com.unieats.controllers.ShopsController;
-import com.unieats.controllers.ReportController;
-import com.unieats.controllers.ProfileController;
-import com.unieats.util.ResponsiveSceneFactory;
+import com.unieats.FoodItem;
+import com.unieats.Shop;
+import com.unieats.dao.FoodItemDao;
+import com.unieats.dao.ShopDao;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 public class MenuController {
 
@@ -43,6 +50,18 @@ public class MenuController {
     @FXML private VBox navCart;
     @FXML private VBox navFav;
     @FXML private VBox navProfile;
+    @FXML private VBox foodItemsContainer; // Container for the food items
+    @FXML private HBox pageIndicators; // Container for page indicators
+    @FXML private ProgressIndicator loadingIndicator; // Loading indicator
+    
+    private final FoodItemDao foodItemDao = new FoodItemDao();
+    private final ShopDao shopDao = new ShopDao();
+    private static final int ITEMS_PER_PAGE = 1; // Show one item at a time
+    private static final int AUTO_SWITCH_DELAY = 4; // seconds
+    private Timeline carouselTimeline;
+    private int currentPage = 0;
+    private int totalPages = 0;
+    private List<FoodItem> allFoodItems = new ArrayList<>();
 
     // Food item buttons
     @FXML private Button favoriteButton1;
@@ -58,7 +77,6 @@ public class MenuController {
     private int currentCardIndex = 0;
     private final int totalCards = 4;
     private final double cardWidth = 216; // 200px card width + 16px spacing
-    private VBox currentActiveNav = null;
 
     // Session management
     private LocalDateTime sessionStartTime;
@@ -72,6 +90,9 @@ public class MenuController {
         startSession();
         // Default active tab is Home
         setActiveNav(navHome);
+        
+        // Load random food items
+        loadRandomFoodItems();
     }
 
     private void setupEventHandlers() {
@@ -79,11 +100,17 @@ public class MenuController {
         searchField.setOnAction(e -> handleSearch());
 
         // Filter functionality
-        filterButton.setOnAction(e -> handleFilter());
+        if (filterButton != null) {
+            filterButton.setOnAction(e -> handleFilter());
+        }
 
-        // Sliding functionality
-        leftSlideButton.setOnAction(e -> slideLeft());
-        rightSlideButton.setOnAction(e -> slideRight());
+        // Sliding functionality - make buttons optional
+        if (leftSlideButton != null) {
+            leftSlideButton.setOnAction(e -> slideLeft());
+        }
+        if (rightSlideButton != null) {
+            rightSlideButton.setOnAction(e -> slideRight());
+        }
 
         // Logout functionality
         if (logoutButton != null) {
@@ -317,6 +344,7 @@ public class MenuController {
 
     @FXML
     private void slideLeft() {
+        if (foodSliderContainer == null) return;
         if (currentCardIndex > 0) {
             currentCardIndex--;
             updateSliderPosition();
@@ -326,6 +354,7 @@ public class MenuController {
 
     @FXML
     private void slideRight() {
+        if (foodSliderContainer == null) return;
         if (currentCardIndex < totalCards - 1) {
             currentCardIndex++;
             updateSliderPosition();
@@ -334,53 +363,69 @@ public class MenuController {
     }
 
     private void updateSliderPosition() {
-        if (foodSliderPane != null) {
-            // Calculate the exact position for the current card
-            double maxScroll = foodSliderContainer.getWidth() - foodSliderPane.getWidth();
-            double targetScroll = currentCardIndex * cardWidth;
+        if (foodSliderPane != null && foodSliderContainer != null) {
+            try {
+                // Calculate the exact position for the current card
+                double maxScroll = foodSliderContainer.getWidth() - foodSliderPane.getWidth();
+                if (maxScroll <= 0) return; // Prevent division by zero or negative values
+                
+                double targetScroll = currentCardIndex * cardWidth;
 
-            // Ensure we don't scroll beyond the available content
-            targetScroll = Math.min(targetScroll, maxScroll);
-            targetScroll = Math.max(0, targetScroll);
+                // Ensure we don't scroll beyond the available content
+                targetScroll = Math.min(targetScroll, maxScroll);
+                targetScroll = Math.max(0, targetScroll);
 
-            // Set the scroll position
-            foodSliderPane.setHvalue(targetScroll / maxScroll);
+                // Set the scroll position
+                foodSliderPane.setHvalue(targetScroll / maxScroll);
 
-            // Update button states
-            updateNavigationButtons();
+                // Update button states
+                if (leftSlideButton != null && rightSlideButton != null) {
+                    updateNavigationButtons();
+                }
+            } catch (Exception e) {
+                System.err.println("Error updating slider position: " + e.getMessage());
+            }
         }
     }
 
     private void updateNavigationButtons() {
-        // Disable left button if at first card
-        if (leftSlideButton != null) {
-            leftSlideButton.setDisable(currentCardIndex == 0);
-            if (currentCardIndex == 0) {
-                leftSlideButton.setOpacity(0.5);
-                leftSlideButton.setStyle("-fx-background-color: #cccccc; -fx-text-fill: #666666; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 12; -fx-background-radius: 20; -fx-cursor: default; -fx-effect: none; -fx-min-width: 40; -fx-min-height: 40;");
-            } else {
-                leftSlideButton.setOpacity(1.0);
-                leftSlideButton.setStyle("-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 12; -fx-background-radius: 20; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 4, 0, 0, 2); -fx-min-width: 40; -fx-min-height: 40;");
-            }
+        // Return early if navigation buttons are not available
+        if (leftSlideButton == null || rightSlideButton == null) {
+            return;
+        }
+        
+        // Update left button state
+        leftSlideButton.setDisable(currentCardIndex == 0);
+        if (currentCardIndex == 0) {
+            leftSlideButton.setOpacity(0.5);
+            leftSlideButton.setStyle("-fx-background-color: #cccccc; -fx-text-fill: #666666; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 12; -fx-background-radius: 20; -fx-cursor: default; -fx-effect: none; -fx-min-width: 40; -fx-min-height: 40;");
+        } else {
+            leftSlideButton.setOpacity(1.0);
+            leftSlideButton.setStyle("-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 12; -fx-background-radius: 20; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 4, 0, 0, 2); -fx-min-width: 40; -fx-min-height: 40;");
         }
 
-        // Disable right button if at last card
-        if (rightSlideButton != null) {
-            rightSlideButton.setDisable(currentCardIndex == totalCards - 1);
-            if (currentCardIndex == totalCards - 1) {
+        // Update right button state
+        rightSlideButton.setDisable(currentCardIndex == totalCards - 1);
+        if (currentCardIndex == totalCards - 1) {
                 rightSlideButton.setOpacity(0.5);
                 rightSlideButton.setStyle("-fx-background-color: #cccccc; -fx-text-fill: #666666; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 12; -fx-background-radius: 20; -fx-cursor: default; -fx-effect: none; -fx-min-width: 40; -fx-min-height: 40;");
             } else {
                 rightSlideButton.setOpacity(1.0);
                 rightSlideButton.setStyle("-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 12; -fx-background-radius: 20; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 4, 0, 0, 2); -fx-min-width: 40; -fx-min-height: 40;");
             }
-        }
     }
 
     private void handleFavorite(int itemNumber) {
-        System.out.println("Favorite button clicked for item " + itemNumber);
-        showAlert("Favorite", "Added item " + itemNumber + " to favorites!");
-    }
+		int userId = currentUser != null ? currentUser.getId() : -1;
+		if (userId <= 0) { showAlert("Favourite", "You must be signed in to save favorites."); return; }
+		int itemId = itemNumber; // TODO: map UI card to actual item id when dynamic loading
+		try {
+			new com.unieats.dao.WishlistDao().addToWishlist(userId, itemId, 1);
+			showAlert("Favourite", "Saved to favourites!");
+		} catch (Exception ex) {
+			showAlert("Favourite Error", ex.getMessage());
+		}
+	}
 
     private void handleAddToCart(int itemNumber) {
         // Demo mapping: itemNumber 1..4 -> existing sample item ids (1..4)
@@ -391,7 +436,11 @@ public class MenuController {
             new com.unieats.dao.CartDao().addToCart(userId, itemId, 1);
             showAlert("Cart", "Added to cart!");
         } catch (Exception ex) {
-            showAlert("Cart Error", ex.getMessage());
+            if (ex.getMessage().contains("same shop")) {
+                showAlert("Shop Restriction", ex.getMessage() + "\n\nWould you like to clear your cart and add this item?", true, itemId);
+            } else {
+                showAlert("Cart Error", ex.getMessage());
+            }
         }
     }
 
@@ -416,15 +465,439 @@ public class MenuController {
     }
 
     private void navigateToOrders() {
-        // Placeholder until orders screen exists
-        showAlert("Orders", "Orders screen coming soon.");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/my_orders.fxml"));
+            Parent root = loader.load();
+            com.unieats.controllers.MyOrdersController controller = loader.getController();
+            if (controller != null && currentUser != null) {
+                controller.setCurrentUser(currentUser);
+            }
+            
+            Stage stage = findStage();
+            if (stage == null) {
+                showAlert("Navigation Error", "Unable to resolve current window to open My Orders.");
+                return;
+            }
+            
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.setTitle("UniEats - My Orders");
+            stage.show();
+        } catch (IOException e) {
+            showAlert("Navigation Error", "Failed to load My Orders page: " + e.getMessage());
+        }
     }
 
     private void navigateToFavorites() {
-        // Placeholder until favorites screen exists
-        showAlert("Favourite", "Favorites screen coming soon.");
-    }
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/wishlist.fxml"));
+			Parent root = loader.load();
+			com.unieats.controllers.WishlistController controller = loader.getController();
+			if (controller != null && currentUser != null) controller.setCurrentUser(currentUser);
+			Stage stage = findStage();
+			if (stage == null) { showAlert("Navigation Error", "Unable to resolve current window to open Favourites."); return; }
+			Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+			stage.setScene(scene);
+			stage.setTitle("UniEats - Favourites");
+			stage.show();
+		} catch (IOException e) {
+			showAlert("Navigation Error", e.getMessage());
+		}
+	}
 
+    @FXML
+    private void handleSeeAllClick(javafx.scene.input.MouseEvent event) {
+        navigateToFoodItems();
+    }
+    
+    @FXML
+    private void showPreviousItem() {
+        if (totalPages <= 1) return;
+        int prevPage = (currentPage - 1 + totalPages) % totalPages;
+        showPage(prevPage);
+        updatePageIndicators();
+        resetCarouselTimer();
+    }
+    
+    @FXML
+    private void showNextItem() {
+        if (totalPages <= 1) return;
+        int nextPage = (currentPage + 1) % totalPages;
+        showPage(nextPage);
+        updatePageIndicators();
+        resetCarouselTimer();
+    }
+    
+    private void startCarousel() {
+        if (totalPages <= 1) return; // No need for carousel with one page
+        
+        stopCarousel();
+        
+        carouselTimeline = new Timeline(
+            new KeyFrame(Duration.seconds(AUTO_SWITCH_DELAY), e -> {
+                showNextItem();
+            })
+        );
+        carouselTimeline.setCycleCount(Timeline.INDEFINITE);
+        carouselTimeline.play();
+        
+        // Initialize page indicators
+        updatePageIndicators();
+    }
+    
+    private void stopCarousel() {
+        if (carouselTimeline != null) {
+            carouselTimeline.stop();
+            carouselTimeline = null;
+        }
+    }
+    
+    private void resetCarouselTimer() {
+        if (carouselTimeline != null) {
+            stopCarousel();
+            startCarousel();
+        }
+    }
+    
+    private void updatePageIndicators() {
+        if (pageIndicators == null || totalPages <= 1) return;
+        
+        pageIndicators.getChildren().clear();
+        
+        for (int i = 0; i < totalPages; i++) {
+            Circle indicator = new Circle(4);
+            indicator.setFill(i == currentPage ? javafx.scene.paint.Color.web("#ff6b35") : javafx.scene.paint.Color.web("#e0e0e0"));
+            indicator.setStyle("-fx-cursor: hand;");
+            
+            final int pageIndex = i;
+            indicator.setOnMouseClicked(e -> {
+                showPage(pageIndex);
+                updatePageIndicators();
+                resetCarouselTimer();
+            });
+            
+            pageIndicators.getChildren().add(indicator);
+            
+            // Add spacing between indicators
+            if (i < totalPages - 1) {
+                Region spacer = new Region();
+                spacer.setPrefWidth(8);
+                pageIndicators.getChildren().add(spacer);
+            }
+        }
+    }
+    
+    private void loadRandomFoodItems() {
+        try {
+            // Show loading indicator
+            loadingIndicator.setVisible(true);
+            foodItemsContainer.setVisible(false);
+            
+            // Load food items in a background thread
+            new Thread(() -> {
+                try {
+                    // Get random food items from the database
+                    allFoodItems = foodItemDao.getRandomItems(10); // Load items for carousel
+                    totalPages = (int) Math.ceil((double) allFoodItems.size() / ITEMS_PER_PAGE);
+                    
+                    // Update UI on JavaFX Application Thread
+                    Platform.runLater(() -> {
+                        loadingIndicator.setVisible(false);
+                        foodItemsContainer.setVisible(true);
+                        showPage(0);
+                        startCarousel();
+                    });
+                } catch (Exception e) {
+                    Platform.runLater(() -> {
+                        loadingIndicator.setVisible(false);
+                        showAlert("Error", "Failed to load food items: " + e.getMessage());
+                    });
+                }
+            }).start();
+        } catch (Exception e) {
+            loadingIndicator.setVisible(false);
+            showAlert("Error", "Failed to load food items: " + e.getMessage());
+        }
+    }
+    
+    private void showPage(int page) {
+        if (allFoodItems == null || allFoodItems.isEmpty() || page < 0 || page >= totalPages) {
+            return;
+        }
+        
+        currentPage = page;
+        foodItemsContainer.getChildren().clear();
+        
+        int itemIndex = page; // Since we're showing one item per page
+        if (itemIndex < allFoodItems.size()) {
+            FoodItem item = allFoodItems.get(itemIndex);
+            VBox card = createFoodCard(item);
+            foodItemsContainer.getChildren().add(card);
+        }
+        
+        // Update page indicators
+        updatePageIndicators();
+    }
+    
+    
+    private VBox createFoodCard(FoodItem item) {
+        VBox card = new VBox();
+        card.getStyleClass().add("food-card");
+        card.setStyle(
+            "-fx-background-color: white; " +
+            "-fx-background-radius: 16; " +
+            "-fx-padding: 16; " +
+            "-fx-spacing: 12; " +
+            "-fx-min-width: 248; " +
+            "-fx-pref-width: 248; " +
+            "-fx-max-width: 248; " +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"
+        );
+        card.setAlignment(javafx.geometry.Pos.TOP_CENTER);
+        card.setFillWidth(true);
+        
+        // Food image container with fixed dimensions and shadow
+        StackPane imageContainer = new StackPane();
+        imageContainer.setStyle(
+            "-fx-background-color: #f8f9fa; " +
+            "-fx-background-radius: 12; " +
+            "-fx-min-width: 216; " +
+            "-fx-pref-width: 216; " +
+            "-fx-max-width: 216; " +
+            "-fx-min-height: 130; " +
+            "-fx-pref-height: 130; " +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 2);"
+        );
+        imageContainer.setAlignment(javafx.geometry.Pos.CENTER);
+        
+        // Food image
+        ImageView foodImage = new ImageView();
+        try {
+            // Try to load the food image, fallback to placeholder if not found
+            Image img = new Image(getClass().getResourceAsStream("/images/food_placeholder.jpg"));
+            foodImage.setImage(img);
+            foodImage.setFitWidth(216);
+            foodImage.setFitHeight(130);
+            foodImage.setPreserveRatio(true);
+            foodImage.setSmooth(true);
+            foodImage.setStyle(
+                "-fx-background-radius: 12; " +
+                "-fx-cursor: hand;"
+            );
+            foodImage.fitWidthProperty().bind(imageContainer.widthProperty().subtract(2));
+            
+            // Add click handler to open food details
+            foodImage.setOnMouseClicked(e -> navigateToFoodDetails(item.getId()));
+            
+            imageContainer.getChildren().add(foodImage);
+        } catch (Exception e) {
+            // If image loading fails, show a placeholder icon
+            System.err.println("Could not load food image: " + e.getMessage());
+            FontIcon foodIcon = new FontIcon("fas-utensils");
+            foodIcon.setIconSize(32);
+            foodIcon.setIconColor(javafx.scene.paint.Color.web("#adb5bd"));
+            imageContainer.getChildren().add(foodIcon);
+        }
+        
+        // Food name and shop name
+        VBox nameBox = new VBox(4);
+        nameBox.setStyle("-fx-padding: 8 0 0 0; -fx-alignment: center-left;");
+        
+        // Food name
+        Label nameLabel = new Label(item.getName());
+        nameLabel.setStyle(
+            "-fx-font-size: 18px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-text-fill: #2d3436; " +
+            "-fx-wrap-text: true;"
+        );
+        nameLabel.setMaxWidth(248);
+        
+        // Shop name
+        Label shopLabel = new Label();
+        try {
+            Shop shop = shopDao.findById(item.getShopId());
+            if (shop != null) {
+                shopLabel.setText("from " + shop.getShopName());
+            }
+        } catch (Exception e) {
+            System.err.println("Error fetching shop name: " + e.getMessage());
+        }
+        shopLabel.setStyle(
+            "-fx-font-size: 13px; " +
+            "-fx-text-fill: #6c757d;"
+        );
+        
+        nameBox.getChildren().addAll(nameLabel, shopLabel);
+        
+        // Info row (Price, Stock, Points)
+        HBox infoRow = new HBox();
+        infoRow.setSpacing(12);
+        infoRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        infoRow.setStyle("-fx-padding: 4 0 12 0;");
+        
+        // Price
+        Label priceLabel = new Label(String.format("$%.2f", item.getPrice()));
+        priceLabel.setStyle(
+            "-fx-font-size: 18px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-text-fill: #ff6b35;"
+        );
+        
+        // Stock
+        Label stockLabel = new Label("• " + (item.getStock() > 0 ? item.getStock() + " in stock" : "Out of stock"));
+        stockLabel.setStyle(
+            "-fx-font-size: 13px; " +
+            "-fx-text-fill: #6c757d;"
+        );
+        
+        // Points
+        HBox pointsContainer = new HBox(4);
+        pointsContainer.setAlignment(javafx.geometry.Pos.CENTER);
+        
+        FontIcon starIcon = new FontIcon("fas-star");
+        starIcon.setIconSize(12);
+        starIcon.setIconColor(javafx.scene.paint.Color.web("#ffc107"));
+        
+        Label pointsLabel = new Label(item.getPointsMultiplier() + "x");
+        pointsLabel.setStyle(
+            "-fx-font-size: 13px; " +
+            "-fx-text-fill: #6c757d; " +
+            "-fx-font-weight: bold;"
+        );
+        
+        pointsContainer.getChildren().addAll(starIcon, pointsLabel);
+        
+        infoRow.getChildren().addAll(priceLabel, stockLabel, pointsContainer);
+        
+        // Button row
+        HBox buttonRow = new HBox();
+        buttonRow.setSpacing(12);
+        buttonRow.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+        buttonRow.setMinWidth(216);
+        buttonRow.setMaxWidth(216);
+        
+        // Favorite button
+        Button favoriteButton = new Button("");
+        FontIcon heartIcon = new FontIcon();
+        heartIcon.setIconSize(18);
+        heartIcon.setIconColor(javafx.scene.paint.Color.web("#e74c3c"));
+        favoriteButton.setGraphic(heartIcon);
+        favoriteButton.setStyle(
+            "-fx-background-color: #f8f9fa; " +
+            "-fx-background-radius: 12; " +
+            "-fx-padding: 8; " +
+            "-fx-cursor: hand; " +
+            "-fx-min-width: 40; " +
+            "-fx-min-height: 40;"
+        );
+        updateHeartIcon(heartIcon, item.getId());
+        favoriteButton.setOnAction(e -> toggleWishlist(item.getId(), heartIcon));
+        
+        // Add to Cart button (shows Carted if already in cart)
+        Button addToCartButton = new Button();
+        styleCartButton(addToCartButton);
+        updateCartButton(addToCartButton, item.getId());
+        addToCartButton.setOnAction(e -> {
+            if (isInCart(item.getId())) {
+                navigateToCart();
+            } else {
+                handleAddToCart(item.getId());
+                updateCartButton(addToCartButton, item.getId());
+            }
+        });
+        
+        buttonRow.getChildren().addAll(favoriteButton, addToCartButton);
+        
+        // Add all elements to card
+        VBox.setVgrow(buttonRow, Priority.ALWAYS);
+        VBox.setVgrow(infoRow, Priority.ALWAYS);
+        
+        // Create a container for the card content to ensure proper sizing
+        VBox cardContent = new VBox(imageContainer, nameBox, infoRow, buttonRow);
+        cardContent.setSpacing(12);
+        cardContent.setAlignment(javafx.geometry.Pos.TOP_CENTER);
+        cardContent.setFillWidth(true);
+        
+        // Add the content to the card
+        card.getChildren().add(cardContent);
+        
+        // Add click handler to open food details when clicking on the card
+        card.setOnMouseClicked(e -> {
+            if (e.getTarget() == card || e.getTarget() == nameLabel || e.getTarget() == shopLabel) {
+                navigateToFoodDetails(item.getId());
+            }
+        });
+        
+        // Add hover effect
+        card.setOnMouseEntered(e -> {
+            card.setStyle(card.getStyle().replace(
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);",
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 12, 0, 0, 4);"
+            ));
+            card.setTranslateY(-2);
+        });
+        card.setOnMouseExited(e -> {
+            card.setStyle(card.getStyle().replace(
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 12, 0, 0, 4);", 
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"
+            ));
+            card.setTranslateY(0);
+        });
+        
+        // Add ripple effect
+        card.setOnMousePressed(e -> {
+            card.setOpacity(0.9);
+        });
+        card.setOnMouseReleased(e -> {
+            card.setOpacity(1.0);
+        });
+        
+        return card;
+    }
+    
+    private String getFoodIcon(String foodName) {
+        // Map food names to appropriate icons
+        if (foodName == null) return "fas-utensils";
+        
+        foodName = foodName.toLowerCase();
+        if (foodName.contains("pizza")) return "fas-pizza-slice";
+        if (foodName.contains("burger") || foodName.contains("hamburger")) return "fas-hamburger";
+        if (foodName.contains("chicken")) return "fas-drumstick-bite";
+        if (foodName.contains("salad")) return "fas-leaf";
+        if (foodName.contains("sushi")) return "fas-fish";
+        if (foodName.contains("pasta")) return "fas-pasta";
+        if (foodName.contains("coffee") || foodName.contains("tea")) return "fas-coffee";
+        if (foodName.contains("ice cream") || foodName.contains("dessert")) return "fas-ice-cream";
+        
+        return "fas-utensils"; // default icon
+    }
+    
+    private void navigateToFoodDetails(int foodId) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/food_details.fxml"));
+            Parent root = loader.load();
+            
+            // Pass the food ID to the details controller if the controller supports it
+            Object controller = loader.getController();
+            try {
+                // Use reflection to call setFoodItem if it exists
+                controller.getClass().getMethod("setFoodItem", int.class).invoke(controller, foodId);
+            } catch (Exception ex) {
+                // If the controller doesn't have setFoodItem, just log it
+                System.out.println("Food details controller doesn't support setFoodItem");
+            }
+            
+            // Get the current stage and set the new scene
+            Stage stage = (Stage) foodItemsContainer.getScene().getWindow();
+            stage.setScene(new Scene(root, 360, 800));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to load food details: " + e.getMessage());
+        }
+    }
+    
     private void navigateToFoodItems() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/food_items.fxml"));
@@ -554,14 +1027,39 @@ public class MenuController {
         alert.showAndWait();
     }
 
+    private void showAlert(String title, String content, boolean isConfirmation, int itemId) {
+        if (isConfirmation) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(content);
+            alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+            
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.YES) {
+                    // Clear cart and add the new item
+                    try {
+                        new com.unieats.dao.CartDao().clearCart(currentUser.getId());
+                        new com.unieats.dao.CartDao().addToCart(currentUser.getId(), itemId, 1);
+                        showAlert("Cart", "Cart cleared and item added!");
+                    } catch (Exception ex) {
+                        showAlert("Cart Error", "Failed to clear cart and add item: " + ex.getMessage());
+                    }
+                }
+            });
+        } else {
+            showAlert(title, content);
+        }
+    }
+
     // --- Bottom Nav Active State Handling ---
     private void setActiveNav(VBox active) {
-        currentActiveNav = active;
-        if (navHome != null) applyActive(navHome, navHome == active, "#2e7d32");
-        if (navOrders != null) applyActive(navOrders, navOrders == active, "#ff6b35");
-        if (navCart != null) applyActive(navCart, navCart == active, "#0d6efd");
-        if (navFav != null) applyActive(navFav, navFav == active, "#e63946");
-        if (navProfile != null) applyActive(navProfile, navProfile == active, "#6f42c1");
+        VBox[] navItems = {navHome, navOrders, navCart, navFav, navProfile};
+        for (VBox navItem : navItems) {
+            if (navItem != null) {
+                applyActive(navItem, navItem == active, "#ff6b35");
+            }
+        }
     }
 
     private void applyActive(VBox tab, boolean active, String colorHex) {
@@ -587,5 +1085,42 @@ public class MenuController {
             label.setStyle(active ? String.format("-fx-font-size: 10px; -fx-text-fill: %s; -fx-font-weight: bold;", colorHex)
                           : "-fx-font-size: 10px; -fx-text-fill: #6c757d;");
         }
+    }
+
+    private void updateHeartIcon(org.kordamp.ikonli.javafx.FontIcon heartIcon, int itemId) {
+        try {
+            int userId = currentUser != null ? currentUser.getId() : -1;
+            boolean liked = userId > 0 && new com.unieats.dao.WishlistDao().isInWishlist(userId, itemId);
+            heartIcon.setIconLiteral(liked ? "fas-heart" : "far-heart");
+        } catch (Exception ignored) {}
+    }
+
+    private void toggleWishlist(int itemId, org.kordamp.ikonli.javafx.FontIcon heartIcon) {
+        int userId = currentUser != null ? currentUser.getId() : -1;
+        if (userId <= 0) { showAlert("Favourite", "You must be signed in to save favourites."); return; }
+        com.unieats.dao.WishlistDao dao = new com.unieats.dao.WishlistDao();
+        boolean liked = dao.isInWishlist(userId, itemId);
+        if (liked) dao.removeFromWishlist(userId, itemId); else dao.addToWishlist(userId, itemId, 1);
+        updateHeartIcon(heartIcon, itemId);
+    }
+
+    private boolean isInCart(int itemId) {
+        int userId = currentUser != null ? currentUser.getId() : -1;
+        if (userId <= 0) return false;
+        return new com.unieats.dao.CartDao().isInCart(userId, itemId);
+    }
+
+    private void updateCartButton(Button btn, int itemId) {
+        boolean carted = isInCart(itemId);
+        btn.setText(carted ? "Carted" : "Add to Cart");
+        btn.setStyle(carted ?
+            "-fx-background-color: #e9ecef; -fx-background-radius: 12; -fx-padding: 10 24; -fx-text-fill: #6c757d; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;" :
+            "-fx-background-color: #ff6b35; -fx-background-radius: 12; -fx-padding: 10 24; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;");
+    }
+
+    private void styleCartButton(Button btn) {
+        btn.setOnMouseEntered(e -> btn.setStyle(btn.getStyle() + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 4, 0, 0, 1);"));
+        btn.setOnMouseExited(e -> btn.setStyle(btn.getStyle().replace(
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 4, 0, 0, 1);", "")));
     }
 }

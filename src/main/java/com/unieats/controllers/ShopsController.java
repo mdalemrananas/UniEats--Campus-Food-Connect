@@ -115,11 +115,11 @@ public class ShopsController {
         viewMenuButton.setStyle("-fx-background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 12; -fx-cursor: hand;");
         viewMenuButton.setOnAction(e -> handleViewMenu(shop));
         
-        Button contactButton = new Button("Contact");
-        contactButton.setStyle("-fx-background-color: #f8f9fa; -fx-text-fill: #2d3436; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 12; -fx-cursor: hand; -fx-border-color: #e9ecef; -fx-border-width: 1;");
-        contactButton.setOnAction(e -> handleContact(shop));
+        Button detailsButton = new Button("Details");
+        detailsButton.setStyle("-fx-background-color: #f8f9fa; -fx-text-fill: #2d3436; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 12; -fx-cursor: hand; -fx-border-color: #e9ecef; -fx-border-width: 1;");
+        detailsButton.setOnAction(e -> openShopDetails(shop));
         
-        actions.getChildren().addAll(contactButton, viewMenuButton);
+        actions.getChildren().addAll(detailsButton, viewMenuButton);
         
         card.getChildren().addAll(header, details, actions);
         shopsContainer.getChildren().add(card);
@@ -210,6 +210,22 @@ public class ShopsController {
     
     private void handleContact(Shop shop) {
         showAlert("Contact", "Contact information for " + shop.getShopName() + " will be displayed here.");
+    }
+
+    private void openShopDetails(Shop shop) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/shop_details.fxml"));
+            Parent root = loader.load();
+            ShopDetailsController controller = loader.getController();
+            if (controller != null) controller.setData(currentUser, shop);
+
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            showAlert("Navigation Error", "Failed to open shop details: " + e.getMessage());
+        }
     }
     
     private void showAlert(String title, String content) {
