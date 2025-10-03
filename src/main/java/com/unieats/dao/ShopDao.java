@@ -64,6 +64,17 @@ public class ShopDao {
 		}
 	}
 
+	public List<Shop> listAll() {
+		String sql = "SELECT * FROM shops ORDER BY created_at DESC";
+		List<Shop> shops = new ArrayList<>();
+		try (Connection conn = DriverManager.getConnection(DB_URL); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+			while (rs.next()) shops.add(map(rs));
+			return shops;
+		} catch (SQLException e) {
+			throw new RuntimeException("Failed to list all shops", e);
+		}
+	}
+
 	public Shop findById(int id) {
 		String sql = "SELECT * FROM shops WHERE id=?";
 		try (Connection conn = DriverManager.getConnection(DB_URL); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -75,6 +86,10 @@ public class ShopDao {
 		} catch (SQLException e) {
 			throw new RuntimeException("Failed to find shop", e);
 		}
+	}
+
+	public Shop getShopById(int id) {
+		return findById(id);
 	}
 
 	private Shop map(ResultSet rs) throws SQLException {

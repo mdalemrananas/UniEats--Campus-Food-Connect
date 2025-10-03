@@ -1,0 +1,228 @@
+/* UniEats Dashboard Theme (Teal + Light Gray) */
+
+/* Colors & Theme */
+:root {
+    /* primary teal */
+    --color-teal-600: #0f9d8f;
+    --color-teal-500: #13b5a6;
+    --color-teal-400: #3fc6bb;
+    --color-teal-300: #7adad2;
+
+    /* grays */
+    --color-gray-900: #1f2a37;
+    --color-gray-700: #374151;
+    --color-gray-500: #6b7280;
+    --color-gray-300: #d1d5db;
+    --color-gray-200: #e5e7eb;
+    --color-gray-100: #f3f4f6;
+    --color-white: #ffffff;
+}
+
+.root {
+    -fx-background-color: var(--color-gray-100);
+    -fx-font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -fx-text-fill: var(--color-gray-900);
+}
+
+/* Card Styles */
+.card {
+    -fx-background-color: var(--color-white);
+    -fx-background-radius: 16;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(31,41,55,0.08), 10, 0.1, 0, 2);
+}
+
+/* User Header */
+.header {
+    -fx-padding: 16 16 8 16;
+}
+
+.avatar-container {
+    -fx-background-color: linear-gradient(135deg, var(--color-teal-600), var(--color-teal-500));
+    -fx-background-radius: 16px;
+    -fx-padding: 3px;
+    -fx-effect: dropshadow(gaussian, rgba(19,181,166,0.3), 10, 0.2, 0, 3);
+}
+
+.avatar-bg {
+    -fx-background-color: var(--color-white);
+    -fx-background-radius: 14px;
+    -fx-padding: 4px;
+}
+
+.user-avatar {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 1);
+}
+
+.user-name {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: var(--color-gray-900);
+}
+
+.user-location {
+    -fx-text-fill: var(--color-gray-500);
+    -fx-font-size: 13px;
+}
+
+.user-category {
+    -fx-text-fill: var(--color-teal-500);
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-background-color: rgba(19, 181, 166, 0.1);
+    -fx-background-radius: 10px;
+    -fx-padding: 2px 8px;
+    -fx-max-width: 80px;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+/* Main Teal Card */
+.card-teal {
+    -fx-background-color: linear-gradient(to bottom, var(--color-teal-600), var(--color-teal-500));
+    -fx-background-radius: 18;
+    -fx-padding: 18;
+    -fx-text-fill: var(--color-white);
+    -fx-effect: dropshadow(gaussian, rgba(19,181,166,0.25), 16, 0.2, 0, 6);
+}
+
+.title-text {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: var(--color-gray-900);
+}
+
+.subtitle-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: var(--color-gray-500);
+}
+
+.big-number {
+    -fx-font-size: 40px;
+    -fx-font-weight: 800;
+    -fx-text-fill: var(--color-white);
+}
+
+.small-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(255,255,255,0.85);
+}
+
+/* Progress Bar */
+.progress-bar > .track {
+    -fx-background-color: rgba(255,255,255,0.35);
+    -fx-background-radius: 8;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: linear-gradient(to right, var(--color-teal-300) 0%, var(--color-teal-400) 100%);
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(19,181,166,0.3), 5, 0.5, 0, 1);
+}
+
+/* Segmented Toggle */
+.segmented {
+    -fx-background-color: var(--color-gray-200);
+    -fx-background-radius: 14;
+    -fx-padding: 3;
+}
+
+.segmented .toggle-button {
+    -fx-background-radius: 10;
+    -fx-background-color: transparent;
+    -fx-text-fill: var(--color-gray-700);
+    -fx-font-size: 12px;
+    -fx-padding: 6 10 6 10;
+    -fx-cursor: hand;
+}
+
+.segmented .toggle-button:selected {
+    -fx-background-color: var(--color-white);
+    -fx-text-fill: var(--color-teal-600);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 6, 0.2, 0, 1);
+}
+
+/* Charts */
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+    -fx-stroke: rgba(31,41,55,0.08);
+}
+
+.chart-title {
+    -fx-font-size: 14px;
+    -fx-text-fill: var(--color-gray-900);
+}
+
+.default-color0.chart-bar { 
+    -fx-bar-fill: var(--color-teal-600);
+    -fx-background-radius: 4 4 0 0;
+}
+
+.default-color1.chart-bar { 
+    -fx-bar-fill: #cbd5e1;
+    -fx-background-radius: 4 4 0 0;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+    -fx-background-color: var(--color-white);
+    -fx-padding: 8 12 10 12;
+    -fx-background-radius: 16 16 0 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 12, 0.2, 0, -1);
+}
+
+.nav-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 12;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+}
+
+.nav-item .label {
+    -fx-text-fill: var(--color-gray-500);
+}
+
+.nav-active .label {
+    -fx-text-fill: var(--color-teal-600);
+    -fx-font-weight: bold;
+}
+
+/* Icon Button */
+.icon-btn {
+    -fx-background-color: var(--color-white);
+    -fx-background-radius: 10;
+    -fx-padding: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0.2, 0, 1);
+    -fx-cursor: hand;
+}
+
+.icon-btn:hover {
+    -fx-background-color: var(--color-gray-100);
+}
+
+.icon-btn:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.96); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.card.animated {
+    -fx-opacity: 1;
+    -fx-translate-y: 0;
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-transition: all 0.3s ease-out;
+}

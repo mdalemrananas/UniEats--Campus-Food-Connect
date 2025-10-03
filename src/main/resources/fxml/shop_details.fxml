@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.ShopDetailsController"
+      style="-fx-background-color: #fafafa;" prefWidth="360" prefHeight="800" spacing="0">
+
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
+        <Button fx:id="backButton" style="-fx-background-color: transparent; -fx-padding: 8;">
+            <graphic>
+                <FontIcon iconLiteral="fas-arrow-left" iconSize="20" iconColor="#2d3436"/>
+            </graphic>
+        </Button>
+        <Label text="Shop Details" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 0 0 0 16;"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+        <VBox spacing="16" style="-fx-padding: 20;">
+            <VBox spacing="8" style="-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                <Label fx:id="shopNameLabel" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label fx:id="avgStarsLabel" text="★★★★★" style="-fx-font-size: 14px; -fx-text-fill: #ffb703;"/>
+                    <Label fx:id="avgRatingLabel" text="0.0" style="-fx-font-size: 14px; -fx-text-fill: #2d3436;"/>
+                    <Label fx:id="reviewsCountLabel" text="(0 reviews)" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
+                </HBox>
+                <Label fx:id="detailsLabel" wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #2d3436;"/>
+                <HBox alignment="CENTER_RIGHT">
+                    <Button fx:id="viewMenuButton" text="View Menu" style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 16;"/>
+                </HBox>
+            </VBox>
+
+            <VBox spacing="8" style="-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                <Label text="Reviews" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                <ListView fx:id="reviewsList" prefHeight="240" style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
+            </VBox>
+
+            <VBox spacing="8" style="-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                <Label text="Write a Review" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label text="Rating:"/>
+                    <ComboBox fx:id="ratingCombo" prefWidth="120"/>
+                </HBox>
+                <TextArea fx:id="commentField" promptText="Share your experience..." prefRowCount="3" wrapText="true"/>
+                <HBox alignment="CENTER_RIGHT">
+                    <Button fx:id="submitReviewButton" text="Submit Review" style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 16;"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+</VBox>

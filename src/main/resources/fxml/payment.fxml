@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.PaymentController"
+            prefWidth="360" prefHeight="800" style="-fx-background-color: #f8f9fa;">
+
+    <!-- Top header -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-background-color: white; -fx-padding: 16; -fx-border-color: #e9ecef; -fx-border-width: 0 0 1 0;">
+            <Button fx:id="backButton" onAction="#handleBack" style="-fx-background-color: transparent; -fx-padding: 8;">
+                <graphic>
+                    <FontIcon iconLiteral="fas-arrow-left" iconSize="18" iconColor="#6c757d"/>
+                </graphic>
+            </Button>
+            <Label text="Payment" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+        </HBox>
+    </top>
+
+    <!-- Center content -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox spacing="16" style="-fx-padding: 16;">
+                
+                <!-- Order Summary -->
+                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+                    <Label text="Order Summary" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Order ID:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="orderIdLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    </HBox>
+                    
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Total Amount:" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="totalAmountLabel" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Payment Method Selection -->
+                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+                    <Label text="Select Payment Method" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <VBox spacing="8">
+                        <RadioButton fx:id="cardPayment" text="Credit/Debit Card" selected="true" style="-fx-font-size: 14px;"/>
+                        <RadioButton fx:id="cashPayment" text="Cash on Delivery" style="-fx-font-size: 14px;"/>
+                        <RadioButton fx:id="walletPayment" text="Digital Wallet" style="-fx-font-size: 14px;"/>
+                    </VBox>
+                </VBox>
+
+                <!-- Card Payment Details -->
+                <VBox fx:id="cardPaymentDetails" spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+                    <Label text="Card Details" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <VBox spacing="8">
+                        <Label text="Card Number" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <TextField fx:id="cardNumberField" promptText="1234 5678 9012 3456" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 12;"/>
+                        
+                        <HBox spacing="8">
+                            <VBox HBox.hgrow="ALWAYS" spacing="8">
+                                <Label text="Expiry Date" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                                <TextField fx:id="expiryField" promptText="MM/YY" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 12;"/>
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS" spacing="8">
+                                <Label text="CVV" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                                <TextField fx:id="cvvField" promptText="123" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 12;"/>
+                            </VBox>
+                        </HBox>
+                        
+                        <Label text="Cardholder Name" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <TextField fx:id="cardholderNameField" promptText="Enter cardholder name" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 12;"/>
+                    </VBox>
+                </VBox>
+
+                <!-- Digital Wallet Details -->
+                <VBox fx:id="walletPaymentDetails" spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);" visible="false">
+                    <Label text="Digital Wallet" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <VBox spacing="8">
+                        <Label text="Wallet Type" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <ComboBox fx:id="walletTypeCombo" promptText="Select wallet" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 12;"/>
+                        
+                        <Label text="Wallet ID/Email" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <TextField fx:id="walletIdField" promptText="Enter wallet ID or email" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 12;"/>
+                    </VBox>
+                </VBox>
+
+                <!-- Cash on Delivery Info -->
+                <VBox fx:id="cashPaymentDetails" spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);" visible="false">
+                    <Label text="Cash on Delivery" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    <Label text="Please have the exact amount ready when the delivery arrives." style="-fx-font-size: 14px; -fx-text-fill: #6c757d; -fx-wrap-text: true;"/>
+                </VBox>
+
+                <!-- Security Notice -->
+                <VBox spacing="8" style="-fx-background-color: #e3f2fd; -fx-background-radius: 8; -fx-padding: 12; -fx-border-color: #2196f3; -fx-border-radius: 8; -fx-border-width: 1;">
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <FontIcon iconLiteral="fas-shield-alt" iconSize="16" iconColor="#2196f3"/>
+                        <Label text="Secure Payment" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1976d2;"/>
+                    </HBox>
+                    <Label text="Your payment information is encrypted and secure. We never store your card details." style="-fx-font-size: 12px; -fx-text-fill: #1976d2; -fx-wrap-text: true;"/>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- Bottom action buttons -->
+    <bottom>
+        <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 16; -fx-border-color: #e9ecef; -fx-border-width: 1 0 0 0;">
+            <Button fx:id="processPaymentButton" text="Process Payment" 
+                    style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 16; -fx-cursor: hand;"
+                    onAction="#handleProcessPayment"/>
+        </VBox>
+    </bottom>
+
+</BorderPane>

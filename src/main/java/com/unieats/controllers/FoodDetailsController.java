@@ -4,13 +4,14 @@ import com.unieats.FoodItem;
 import com.unieats.Shop;
 import com.unieats.User;
 import com.unieats.dao.CartDao;
+import com.unieats.dao.ReviewDao;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
@@ -18,6 +19,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class FoodDetailsController {
 
@@ -34,8 +36,19 @@ public class FoodDetailsController {
     @FXML private Label stockLabel;
     @FXML private Label descriptionLabel;
 
-    @FXML private Button addToCartButton;
+    @FXML private Label avgStarsLabel;
+    @FXML private Label avgRatingLabel;
+    @FXML private Label reviewsCountLabel;
+    @FXML private ListView<String> reviewsList;
+    @FXML private ComboBox<Integer> ratingCombo;
+    @FXML private TextArea commentField;
+    @FXML private Button submitReviewButton;
 
+    @FXML private Button addToCartButton;
+    @FXML private Button favButton;
+    @FXML private FontIcon favIcon;
+
+    private final ReviewDao reviewDao = new ReviewDao();
     private User currentUser;
     private FoodItem foodItem;
     private Shop shop;
@@ -44,6 +57,14 @@ public class FoodDetailsController {
     public void initialize() {
         backButton.setOnAction(e -> handleBack());
         addToCartButton.setOnAction(e -> handleAddToCart());
+        if (favButton != null) favButton.setOnAction(e -> handleToggleFavourite());
+        if (ratingCombo != null) {
+            ratingCombo.setItems(FXCollections.observableArrayList(1,2,3,4,5));
+            ratingCombo.getSelectionModel().select(4);
+        }
+        if (submitReviewButton != null) {
+            submitReviewButton.setOnAction(e -> handleSubmitReview());
+        }
     }
 
     public void setData(User user, FoodItem item, Shop shop) {
@@ -51,6 +72,7 @@ public class FoodDetailsController {
         this.foodItem = item;
         this.shop = shop;
         populate();
+        loadReviews();
     }
 
     private void populate() {
@@ -87,6 +109,58 @@ public class FoodDetailsController {
             }
         }
         placeholderIcon.setVisible(!imageLoaded);
+        // Initialize favourite icon state
+        updateFavouriteIcon();
+    }
+
+    private void updateFavouriteIcon() {
+        try {
+            int userId = currentUser != null ? currentUser.getId() : -1;
+            boolean liked = userId > 0 && new com.unieats.dao.WishlistDao().isInWishlist(userId, foodItem.getId());
+            if (favIcon != null) {
+                favIcon.setIconLiteral(liked ? "fas-heart" : "far-heart");
+                favIcon.setIconColor(javafx.scene.paint.Color.web("#e74c3c"));
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private void handleToggleFavourite() {
+        if (currentUser == null) { showAlert("Favourite", "Please sign in to save favourites."); return; }
+        var dao = new com.unieats.dao.WishlistDao();
+        boolean liked = dao.isInWishlist(currentUser.getId(), foodItem.getId());
+        if (liked) dao.removeFromWishlist(currentUser.getId(), foodItem.getId()); else dao.addToWishlist(currentUser.getId(), foodItem.getId(), 1);
+        updateFavouriteIcon();
+    }
+
+    private void loadReviews() {
+        if (foodItem == null) return;
+        try {
+            double avg = reviewDao.getAverageRatingForFood(foodItem.getId());
+            List<ReviewDao.Review> items = reviewDao.listReviewsForFood(foodItem.getId(), 50);
+            avgRatingLabel.setText(String.format("%.1f", avg));
+            reviewsCountLabel.setText("(" + items.size() + " reviews)");
+            avgStarsLabel.setText(buildStars(avg));
+
+            ObservableList<String> list = FXCollections.observableArrayList();
+            for (ReviewDao.Review r : items) {
+                String stars = buildStars(r.rating());
+                String who = r.userName() != null ? r.userName() : ("User #" + r.userId());
+                String line = stars + "  •  " + who + (r.comment() == null || r.comment().isEmpty() ? "" : (" — " + r.comment()));
+                list.add(line);
+            }
+            reviewsList.setItems(list);
+        } catch (Exception e) {
+            // Silent fail to avoid breaking UI
+        }
+    }
+
+    private String buildStars(double rating) {
+        int full = (int)Math.round(rating);
+        full = Math.max(0, Math.min(5, full));
+        StringBuilder sb = new StringBuilder();
+        for (int i=0;i<full;i++) sb.append('★');
+        for (int i=full;i<5;i++) sb.append('☆');
+        return sb.toString();
     }
 
     private String extractFirstImagePath(String images) {
@@ -132,7 +206,27 @@ public class FoodDetailsController {
             new CartDao().addToCart(currentUser.getId(), foodItem.getId(), 1);
             showAlert("Cart", "Added " + foodItem.getName() + " to cart!");
         } catch (Exception ex) {
-            showAlert("Cart Error", ex.getMessage());
+            if (ex.getMessage().contains("same shop")) {
+                showAlert("Shop Restriction", ex.getMessage() + "\n\nWould you like to clear your cart and add this item?", true, foodItem.getId());
+            } else {
+                showAlert("Cart Error", ex.getMessage());
+            }
+        }
+    }
+
+    private void handleSubmitReview() {
+        if (currentUser == null) { showAlert("Reviews", "Please sign in to write a review."); return; }
+        Integer rating = ratingCombo.getValue();
+        if (rating == null) { showAlert("Reviews", "Please select a rating."); return; }
+        String comment = commentField.getText() != null ? commentField.getText().trim() : "";
+        try {
+            reviewDao.addFoodReview(currentUser.getId(), foodItem.getId(), rating, comment);
+            commentField.clear();
+            ratingCombo.getSelectionModel().select(4);
+            loadReviews();
+            showAlert("Reviews", "Thank you for your review!");
+        } catch (Exception e) {
+            showAlert("Reviews", "Failed to submit review: " + e.getMessage());
         }
     }
 
@@ -142,5 +236,29 @@ public class FoodDetailsController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private void showAlert(String title, String content, boolean isConfirmation, int itemId) {
+        if (isConfirmation) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(content);
+            alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+            
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.YES) {
+                    try {
+                        new CartDao().clearCart(currentUser.getId());
+                        new CartDao().addToCart(currentUser.getId(), itemId, 1);
+                        showAlert("Cart", "Cart cleared and item added!");
+                    } catch (Exception ex) {
+                        showAlert("Cart Error", "Failed to clear cart and add item: " + ex.getMessage());
+                    }
+                }
+            });
+        } else {
+            showAlert(title, content);
+        }
     }
 }

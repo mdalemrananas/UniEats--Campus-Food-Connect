@@ -19,12 +19,18 @@ public class User {
     }
 
     // Constructor with required fields
-    public User(String email, String password, String fullName, String userCategory) {
+    public User(int id, String email, String password, String fullName, String userCategory) {
         this();
+        this.id = id;
         this.email = email;
         this.password = password;
         this.fullName = fullName;
         this.userCategory = userCategory != null ? userCategory.toLowerCase() : "student";
+    }
+
+    // For backward compatibility
+    public User(String email, String password, String fullName, String userCategory) {
+        this(0, email, password, fullName, userCategory);
     }
 
     // Constructor with all fields

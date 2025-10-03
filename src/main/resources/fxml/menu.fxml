@@ -16,12 +16,11 @@
             maxHeight="800">
 
     <center>
-        <ScrollPane style="-fx-background-color: transparent; -fx-background: transparent;"
+        <ScrollPane style="-fx-background: transparent; -fx-background-color: transparent; -fx-padding: 0; -fx-fit-to-width: true;"
                     fitToWidth="true"
                     hbarPolicy="NEVER"
                     vbarPolicy="AS_NEEDED">
-            <content>
-                <VBox spacing="0" style="-fx-background-color: transparent;">
+            <VBox fx:id="menuContainer" style="-fx-background-color: #f8f9fa; -fx-min-width: 360;" spacing="0">
         
         <!-- Top Status Bar -->
         
@@ -142,256 +141,57 @@
             </HBox>
         </VBox>
         
-        <!-- Picks For You Section with Horizontal Slider -->
-        <VBox style="-fx-padding: 20; -fx-spacing: 16; -fx-background-color: transparent; -fx-margin: 8 0 0 0;">
-            <HBox alignment="CENTER_LEFT" spacing="8">
-                <HBox alignment="CENTER_LEFT" spacing="8">
-                    <FontIcon iconLiteral="fas-star" iconSize="18" iconColor="#FFD700"/>
-                    <Label text="Picks For You" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                </HBox>
+        <!-- Picks For You Section -->
+        <VBox style="-fx-padding: 20 0; -fx-spacing: 12; -fx-background-color: transparent; -fx-min-width: 360;">
+            <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 0 20 0 20; -fx-min-width: 320;">
+                <FontIcon iconLiteral="fas-star" iconSize="18" iconColor="#FFD700"/>
+                <Label text="Picks For You" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="See all ➡️" style="-fx-text-fill: #ff6b35; -fx-background-color: transparent; -fx-padding: 0; -fx-font-size: 12px; -fx-cursor: hand; -fx-font-weight: bold;"/>
+                <Label text="See All" style="-fx-text-fill: #ff6b35; -fx-font-size: 14px; -fx-cursor: hand; -fx-padding: 4 8;" onMouseClicked="#handleSeeAllClick">
+                    <userData>
+                        <fx:reference source="foodCategoryButton"/>
+                    </userData>
+                </Label>
             </HBox>
             
-            <!-- Horizontal Slider Container -->
-            <HBox alignment="CENTER" spacing="8" style="-fx-padding: 8 0;">
-                <!-- Left Navigation Button -->
-                <Button fx:id="leftSlideButton" 
-                        style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 12; -fx-background-radius: 20; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 4, 0, 0, 2); -fx-min-width: 40; -fx-min-height: 40;">
-                    <graphic>
-                        <FontIcon iconLiteral="fas-chevron-left" iconSize="16" iconColor="white"/>
-                    </graphic>
-                </Button>
-                
-                <!-- ScrollPane for Horizontal Scrolling -->
-                <ScrollPane fx:id="foodSliderPane" 
-                           style="-fx-background-color: transparent; -fx-background: transparent; -fx-pref-height: 280; -fx-pref-width: 280;"
-                           hbarPolicy="NEVER"
-                           vbarPolicy="NEVER"
-                           fitToHeight="true"
-                           pannable="false">
+            <!-- Food Items Carousel -->
+            <VBox style="-fx-padding: 0 0 20 0; -fx-spacing: 16; -fx-min-width: 360; -fx-alignment: center;" GridPane.halignment="CENTER">
+                <HBox alignment="CENTER" spacing="0" style="-fx-alignment: center;">
+                    <!-- Left Navigation Button -->
+                    <Button onAction="#showPreviousItem" style="-fx-background-color: transparent; -fx-padding: 8; -fx-cursor: hand;" focusTraversable="false">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-chevron-left" iconSize="24" iconColor="#2d3436"/>
+                        </graphic>
+                    </Button>
                     
-                    <HBox fx:id="foodSliderContainer" spacing="16" style="-fx-padding: 8;">
-                        
-                        <!-- Food Item Card 1 -->
-                        <VBox style="-fx-background-color: transparent; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0, 0, 4); -fx-cursor: hand; -fx-border-color: #f8f9fa; -fx-border-width: 1; -fx-border-radius: 20; -fx-min-width: 200; -fx-max-width: 200;">
-                            <StackPane style="-fx-background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); -fx-background-radius: 20 20 0 0; -fx-pref-height: 120;">
-                                <FontIcon iconLiteral="fas-hamburger" iconSize="60" iconColor="#ff6b35" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 4);"/>
-                                <HBox alignment="CENTER_LEFT" style="-fx-alignment: top_left; -fx-padding: 12;">
-                                    <!--<StackPane style="-fx-background-color: rgba(0,0,0,0.8); -fx-background-radius: 12; -fx-padding: 4 8;">-->
-                                    <StackPane>
-                                        <VBox alignment="CENTER" spacing="2">
-                                            <Text text="4.7" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-fill: black;"/>
-                                            <HBox alignment="CENTER" spacing="4">
-                                                <FontIcon iconLiteral="fas-star" iconSize="15" iconColor="#FFD700"/>
-                                                <Text text="(2.3k)" style="-fx-font-size: 15px; -fx-fill: black;"/>
-                                            </HBox>
-                                        </VBox>
-                                    </StackPane>
-
-                                </HBox>
-                                <HBox alignment="CENTER_RIGHT" style="-fx-alignment: top_right; -fx-padding: 12;">
-                                    <Button fx:id="favoriteButton1" 
-                                            style="-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 16; -fx-padding: 6; -fx-cursor: hand; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);">
-                                        <graphic>
-                                            <FontIcon iconLiteral="fas-heart" iconSize="14" iconColor="#e74c3c"/>
-                                        </graphic>
-                                    </Button>
-                                </HBox>
-                            </StackPane>
-                            <VBox spacing="6" style="-fx-padding: 12;">
-                                <HBox alignment="CENTER_LEFT" spacing="6">
-                                    <HBox alignment="CENTER_LEFT" spacing="6">
-                                        <FontIcon iconLiteral="fas-hamburger" iconSize="14" iconColor="#ff6b35"/>
-                                        <Label text="Taco Bell" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                                    </HBox>
-                                    <StackPane style="-fx-background-color: #4caf50; -fx-background-radius: 6; -fx-padding: 1 4;">
-                                        <Label text="TOP" style="-fx-font-size: 6px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-                                    </StackPane>
-                                </HBox>
-                                <HBox spacing="4" alignment="CENTER_LEFT">
-                                    <HBox alignment="CENTER_LEFT" spacing="2">
-                                        <FontIcon iconLiteral="fas-clock" iconSize="10" iconColor="#6c757d"/>
-                                        <Text text="25 min" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-                                    </HBox>
-                                    <Text text="•" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-                                    <HBox alignment="CENTER_LEFT" spacing="2">
-                                        <FontIcon iconLiteral="fas-star" iconSize="10" iconColor="#6c757d"/>
-                                        <Text text="Easy" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-                                    </HBox>
-                                </HBox>
-                                <HBox alignment="CENTER_RIGHT" style="-fx-padding: 4 0 0 0;">
-                                    <Button fx:id="addToCartButton1" text=" Add" 
-                                            style="-fx-background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12; -fx-background-radius: 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 4, 0, 0, 2);">
-                                        <graphic>
-                                            <FontIcon iconLiteral="fas-shopping-cart" iconSize="11" iconColor="white"/>
-                                        </graphic>
-                                    </Button>
-                                </HBox>
-                            </VBox>
+                    <!-- Carousel Viewport - Single Item -->
+                    <StackPane style="-fx-min-width: 300; -fx-max-width: 300; -fx-min-height: 300;">
+                        <VBox fx:id="foodItemsContainer" 
+                              spacing="16"
+                              style="-fx-min-width: 300; -fx-min-height: 300;"
+                              alignment="CENTER">
+                            <!-- Single food item will be added here -->
                         </VBox>
                         
-                        <!-- Food Item Card 2 -->
-<VBox style="-fx-background-color: #ffffff; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0, 0, 4); -fx-cursor: hand; -fx-border-color: #f8f9fa; -fx-border-width: 1; -fx-border-radius: 20; -fx-min-width: 200; -fx-max-width: 200;">
-    <StackPane style="-fx-background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); -fx-background-radius: 20 20 0 0; -fx-pref-height: 120;">
-        <FontIcon iconLiteral="fas-pizza-slice" iconSize="60" iconColor="#ff6b35" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 4);"/>
-        <HBox alignment="CENTER_LEFT" style="-fx-alignment: top_left; -fx-padding: 12;">
-            <StackPane>
-                <VBox alignment="CENTER" spacing="2">
-                    <Text text="4.5" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-fill: black;"/>
-                    <HBox alignment="CENTER" spacing="4">
-                        <FontIcon iconLiteral="fas-star" iconSize="15" iconColor="#FFD700"/>
-                        <Text text="(1.2k)" style="-fx-font-size: 15px; -fx-fill: black;"/>
-                    </HBox>
-                </VBox>
-            </StackPane>
-        </HBox>
-    </StackPane>
-    <VBox spacing="6" style="-fx-padding: 12;">
-        <HBox alignment="CENTER_LEFT" spacing="6">
-            <HBox alignment="CENTER_LEFT" spacing="6">
-                <FontIcon iconLiteral="fas-pizza-slice" iconSize="14" iconColor="#ff6b35"/>
-                <Label text="Pizza Hut" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-            </HBox>
-            <StackPane style="-fx-background-color: #ff9800; -fx-background-radius: 6; -fx-padding: 1 4;">
-                <Label text="HOT" style="-fx-font-size: 6px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-            </StackPane>
-        </HBox>
-        <HBox spacing="4" alignment="CENTER_LEFT">
-            <HBox alignment="CENTER_LEFT" spacing="2">
-                <FontIcon iconLiteral="fas-clock" iconSize="10" iconColor="#6c757d"/>
-                <Text text="30 min" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-            </HBox>
-            <Text text="•" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-            <HBox alignment="CENTER_LEFT" spacing="2">
-                <FontIcon iconLiteral="fas-star" iconSize="10" iconColor="#6c757d"/>
-                <Text text="Medium" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-            </HBox>
-        </HBox>
-        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 4 0 0 0;">
-            <Button fx:id="addToCartButton2" text=" Add" 
-                    style="-fx-background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12; -fx-background-radius: 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 4, 0, 0, 2);">
-                <graphic>
-                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="11" iconColor="white"/>
-                </graphic>
-            </Button>
-        </HBox>
-    </VBox>
-</VBox>
-
-<!-- Food Item Card 3 -->
-<VBox style="-fx-background-color: #ffffff; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0, 0, 4); -fx-cursor: hand; -fx-border-color: #f8f9fa; -fx-border-width: 1; -fx-border-radius: 20; -fx-min-width: 200; -fx-max-width: 200;">
-    <StackPane style="-fx-background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); -fx-background-radius: 20 20 0 0; -fx-pref-height: 120;">
-        <FontIcon iconLiteral="fas-hamburger" iconSize="60" iconColor="#ff6b35" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 4);"/>
-        <HBox alignment="CENTER_LEFT" style="-fx-alignment: top_left; -fx-padding: 12;">
-            <StackPane>
-                <VBox alignment="CENTER" spacing="2">
-                    <Text text="4.3" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-fill: black;"/>
-                    <HBox alignment="CENTER" spacing="4">
-                        <FontIcon iconLiteral="fas-star" iconSize="15" iconColor="#FFD700"/>
-                        <Text text="(856)" style="-fx-font-size: 15px; -fx-fill: black;"/>
-                    </HBox>
-                </VBox>
-            </StackPane>
-        </HBox>
-    </StackPane>
-    <VBox spacing="6" style="-fx-padding: 12;">
-        <HBox alignment="CENTER_LEFT" spacing="6">
-            <HBox alignment="CENTER_LEFT" spacing="6">
-                <FontIcon iconLiteral="fas-hamburger" iconSize="14" iconColor="#ff6b35"/>
-                <Label text="Burger King" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-            </HBox>
-            <StackPane style="-fx-background-color: #e91e63; -fx-background-radius: 6; -fx-padding: 1 4;">
-                <Label text="NEW" style="-fx-font-size: 6px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-            </StackPane>
-        </HBox>
-        <HBox spacing="4" alignment="CENTER_LEFT">
-            <HBox alignment="CENTER_LEFT" spacing="2">
-                <FontIcon iconLiteral="fas-clock" iconSize="10" iconColor="#6c757d"/>
-                <Text text="20 min" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-            </HBox>
-            <Text text="•" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-            <HBox alignment="CENTER_LEFT" spacing="2">
-                <FontIcon iconLiteral="fas-star" iconSize="10" iconColor="#6c757d"/>
-                <Text text="Easy" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-            </HBox>
-        </HBox>
-        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 4 0 0 0;">
-            <Button fx:id="addToCartButton3" text=" Add" 
-                    style="-fx-background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12; -fx-background-radius: 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 4, 0, 0, 2);">
-                <graphic>
-                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="11" iconColor="white"/>
-                </graphic>
-            </Button>
-        </HBox>
-    </VBox>
-</VBox>
-
-<!-- Food Item Card 4 -->
-<VBox style="-fx-background-color: #ffffff; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0, 0, 4); -fx-cursor: hand; -fx-border-color: #f8f9fa; -fx-border-width: 1; -fx-border-radius: 20; -fx-min-width: 200; -fx-max-width: 200;">
-    <StackPane style="-fx-background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); -fx-background-radius: 20 20 0 0; -fx-pref-height: 120;">
-        <FontIcon iconLiteral="fas-utensils" iconSize="60" iconColor="#ff6b35" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 4);"/>
-        <HBox alignment="CENTER_LEFT" style="-fx-alignment: top_left; -fx-padding: 12;">
-            <StackPane>
-                <VBox alignment="CENTER" spacing="2">
-                    <Text text="4.8" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-fill: black;"/>
-                    <HBox alignment="CENTER" spacing="4">
-                        <FontIcon iconLiteral="fas-star" iconSize="15" iconColor="#FFD700"/>
-                        <Text text="(1.5k)" style="-fx-font-size: 15px; -fx-fill: black;"/>
-                    </HBox>
-                </VBox>
-            </StackPane>
-        </HBox>
-    </StackPane>
-    <VBox spacing="6" style="-fx-padding: 12;">
-        <HBox alignment="CENTER_LEFT" spacing="6">
-            <HBox alignment="CENTER_LEFT" spacing="6">
-                <FontIcon iconLiteral="fas-utensils" iconSize="14" iconColor="#ff6b35"/>
-                <Label text="Noodle House" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-            </HBox>
-            <StackPane style="-fx-background-color: #2196f3; -fx-background-radius: 6; -fx-padding: 1 4;">
-                <Label text="POP" style="-fx-font-size: 6px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-            </StackPane>
-        </HBox>
-        <HBox spacing="4" alignment="CENTER_LEFT">
-            <HBox alignment="CENTER_LEFT" spacing="2">
-                <FontIcon iconLiteral="fas-clock" iconSize="10" iconColor="#6c757d"/>
-                <Text text="35 min" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-            </HBox>
-            <Text text="•" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-            <HBox alignment="CENTER_LEFT" spacing="2">
-                <FontIcon iconLiteral="fas-star" iconSize="10" iconColor="#6c757d"/>
-                <Text text="Medium" style="-fx-fill: #6c757d; -fx-font-size: 10px;"/>
-            </HBox>
-        </HBox>
-        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 4 0 0 0;">
-            <Button fx:id="addToCartButton4" text=" Add" 
-                    style="-fx-background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12; -fx-background-radius: 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 4, 0, 0, 2);">
-                <graphic>
-                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="11" iconColor="white"/>
-                </graphic>
-            </Button>
-        </HBox>
-    </VBox>
-</VBox>
-
-                        
-                    </HBox>
-                </ScrollPane>
+                        <!-- Loading Indicator -->
+                        <ProgressIndicator fx:id="loadingIndicator" visible="false" progress="-1" style="-fx-progress-color: #ff6b35;"/>
+                    </StackPane>
+                    
+                    <!-- Right Navigation Button -->
+                    <Button onAction="#showNextItem" style="-fx-background-color: transparent; -fx-padding: 8; -fx-cursor: hand;" focusTraversable="false">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-chevron-right" iconSize="24" iconColor="#2d3436"/>
+                        </graphic>
+                    </Button>
+                </HBox>
                 
-                <!-- Right Navigation Button -->
-                <Button fx:id="rightSlideButton" 
-                        style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 12; -fx-background-radius: 20; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 4, 0, 0, 2); -fx-min-width: 40; -fx-min-height: 40;">
-                    <graphic>
-                        <FontIcon iconLiteral="fas-chevron-right" iconSize="16" iconColor="white"/>
-                    </graphic>
-                </Button>
-            </HBox>
+                <!-- Page Indicators -->
+                <HBox fx:id="pageIndicators" alignment="CENTER" spacing="8" style="-fx-padding: 8 0 0 0;">
+                    <!-- Indicators will be added dynamically -->
+                </HBox>
+            </VBox>
         </VBox>
-        
-        <!-- Bottom Navigation Bar moved outside scroll (fixed) -->
         </VBox>
-            </content>
         </ScrollPane>
     </center>
     

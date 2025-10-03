@@ -1,27 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.StallController"
-	alignment="TOP_LEFT" spacing="12" style="-fx-background-color: #ffffff; -fx-padding: 16;"
-	prefWidth="360" prefHeight="800">
+      fx:id="root" spacing="12" prefWidth="360" prefHeight="800">
+  <padding>
+    <Insets topRightBottomLeft="16" />
+  </padding>
 
-	<HBox alignment="CENTER_LEFT" spacing="8">
-		<Label text="Stall Dashboard" style="-fx-font-size: 18; -fx-font-weight: bold;" />
-		<Region HBox.hgrow="ALWAYS" />
-		<Button text="Back" onAction="#handleBack" />
-	</HBox>
+  <!-- Header with user info -->
+  <HBox spacing="16" alignment="CENTER_LEFT" VBox.vgrow="NEVER" styleClass="header">
+    <!-- User avatar with gradient background -->
+    <StackPane styleClass="avatar-container">
+      <StackPane styleClass="avatar-bg">
+        <ImageView fitWidth="50" fitHeight="50" pickOnBounds="true" preserveRatio="true" styleClass="user-avatar" />
+      </StackPane>
+    </StackPane>
+    
+    <!-- User info -->
+    <VBox spacing="4" alignment="CENTER_LEFT">
+      <Label fx:id="userNameLabel" styleClass="user-name" text="Loading..." />
+      <Label fx:id="userCategoryLabel" styleClass="user-category" />
+    </VBox>
+    <Region HBox.hgrow="ALWAYS" />
+    <Button text="≡" mnemonicParsing="false" styleClass="icon-btn" onAction="#handleMenu" />
+  </HBox>
 
-	<Separator />
+  <!-- Main Dashboard Card -->
+  <VBox spacing="12" styleClass="card-teal">
+    <HBox spacing="12" alignment="CENTER_LEFT">
+      <VBox spacing="4" alignment="CENTER_LEFT">
+        <Label fx:id="totalMenusLabel" text="180" styleClass="big-number" />
+        <Label text="Total Menus" styleClass="small-label" />
+      </VBox>
+      <Region HBox.hgrow="ALWAYS" />
+      <VBox spacing="8" alignment="CENTER_RIGHT">
+        <Label text="📄" style="-fx-font-size: 24; -fx-text-fill: white;" />
+        <Label fx:id="progressPercentLabel" text="75%" style="-fx-text-fill: white; -fx-font-weight: bold;" />
+      </VBox>
+    </HBox>
+    <ProgressBar fx:id="menuProgress" progress="0.0" maxWidth="Infinity" styleClass="progress-bar" />
+  </VBox>
 
-	<VBox spacing="10">
-		<Button text="Post Food Item" onAction="#handlePostItem" />
-		<Button text="Manage Orders" onAction="#handleManageOrders" />
-		<Button text="Inventory" onAction="#handleInventory" />
-		<Button text="Sales History" onAction="#handleSalesHistory" />
-	</VBox>
+  <!-- Order Summary Card -->
+  <VBox spacing="10" styleClass="card">
+    <HBox alignment="CENTER_LEFT" spacing="8">
+      <Label text="Order Summary" styleClass="title-text" />
+      <Region HBox.hgrow="ALWAYS" />
+      <HBox spacing="4" alignment="CENTER" styleClass="segmented">
+        <ToggleButton fx:id="ordersMonthlyBtn" text="Monthly" selected="true" />
+        <ToggleButton fx:id="ordersWeeklyBtn" text="Weekly" />
+        <ToggleButton fx:id="ordersTodayBtn" text="Today" />
+      </HBox>
+    </HBox>
+    <BarChart fx:id="ordersChart" animated="true" legendVisible="false" maxHeight="260">
+      <xAxis>
+        <CategoryAxis fx:id="ordersXAxis" />
+      </xAxis>
+      <yAxis>
+        <NumberAxis fx:id="ordersYAxis" />
+      </yAxis>
+    </BarChart>
+  </VBox>
+
+  <!-- Revenue Card -->
+  <VBox spacing="10" styleClass="card">
+    <HBox alignment="CENTER_LEFT" spacing="8">
+      <Label text="Revenue" styleClass="title-text" />
+      <Region HBox.hgrow="ALWAYS" />
+      <HBox spacing="4" alignment="CENTER" styleClass="segmented">
+        <ToggleButton fx:id="revenueMonthlyBtn" text="Monthly" selected="true" />
+        <ToggleButton fx:id="revenueWeeklyBtn" text="Weekly" />
+        <ToggleButton fx:id="revenueTodayBtn" text="Today" />
+      </HBox>
+    </HBox>
+    <BarChart fx:id="revenueChart" animated="true" legendVisible="false" maxHeight="220">
+      <xAxis>
+        <CategoryAxis fx:id="revenueXAxis" />
+      </xAxis>
+      <yAxis>
+        <NumberAxis fx:id="revenueYAxis" />
+      </yAxis>
+    </BarChart>
+  </VBox>
+
+  <Region VBox.vgrow="ALWAYS" />
+
+  <!-- Bottom Navigation Bar -->
+  <HBox spacing="24" alignment="CENTER" styleClass="bottom-nav">
+    <VBox alignment="CENTER" spacing="2">
+      <Button text="🏠" styleClass="nav-item nav-active" />
+      <Label text="Home" styleClass="subtitle-text" />
+    </VBox>
+    <Button text="🚚" styleClass="nav-item" />
+    <Button text="📊" styleClass="nav-item" />
+    <Button text="👤" styleClass="nav-item" />
+  </HBox>
 
 </VBox>
 

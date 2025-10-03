@@ -5,19 +5,16 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.AdminSellersController" spacing="8" visible="false" managed="false">
     <HBox spacing="6" alignment="CENTER_LEFT">
-        <Label text="Manage Shops" style="-fx-font-size: 16; -fx-font-weight: bold;" />
+        <Label text="Shops" style="-fx-font-size: 16; -fx-font-weight: bold;" />
         <Region HBox.hgrow="ALWAYS" />
         <TextField fx:id="sellerSearchField" promptText="Search shops..." />
         <Button fx:id="refreshSellersButton" text="Refresh" />
     </HBox>
-    <TableView fx:id="sellersTable" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="sellerIdColumn" text="ID" prefWidth="60" />
-            <TableColumn fx:id="sellerNameColumn" text="Shop" prefWidth="160" />
-            <TableColumn fx:id="sellerOwnerColumn" text="Owner ID" prefWidth="100" />
-            <TableColumn fx:id="sellerStatusColumn" text="Status" prefWidth="120" />
-        </columns>
-    </TableView>
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+        <content>
+            <FlowPane fx:id="shopCardsFlow" hgap="10" vgap="10" prefWrapLength="320" stylesheets="@../css/styles.css" styleClass="cards-flow" />
+        </content>
+    </ScrollPane>
 </VBox>
 
 

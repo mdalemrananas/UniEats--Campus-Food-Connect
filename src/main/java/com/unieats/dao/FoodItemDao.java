@@ -101,4 +101,21 @@ public class FoodItemDao {
 		} catch (Exception ignored) {}
 		return fi;
 	}
+    
+    public List<FoodItem> getRandomItems(int limit) {
+        String sql = "SELECT * FROM food_items ORDER BY RANDOM() LIMIT ?";
+        List<FoodItem> items = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    items.add(map(rs));
+                }
+            }
+            return items;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to fetch random food items", e);
+        }
+    }
 }

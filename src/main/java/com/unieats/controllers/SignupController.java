@@ -34,7 +34,7 @@ public class SignupController {
     }
     
     private void setupUserCategoryComboBox() {
-        userCategoryComboBox.getItems().addAll("Student", "Seller", "Admin");
+        userCategoryComboBox.getItems().addAll("Student", "Seller");
         userCategoryComboBox.setValue("Student"); // Default selection
     }
     

@@ -58,8 +58,39 @@ public class SigninController {
             return;
         }
         
+        // Check shop status if user is a seller
+        if ("seller".equalsIgnoreCase(user.getUserCategory())) {
+            String shopStatus = dbManager.getShopStatus(user.getId());
+            
+            if (shopStatus == null) {
+                showError("No shop found for this seller account. Please contact support.");
+                return;
+            }
+            
+            switch (shopStatus.toLowerCase()) {
+                case "pending" -> {
+                    showError("Your shop approval is pending. Please wait for admin approval.");
+                    return;
+                }
+                case "rejected" -> {
+                    showError("Your shop approval has been rejected. Please contact support for more information.");
+                    return;
+                }
+                case "approved" -> {
+                    // Continue with login
+                }
+                default -> {
+                    showError("Invalid shop status. Please contact support.");
+                    return;
+                }
+            }
+        }
+        
         // Authentication successful
         showSuccess("Sign in successful! Welcome back, " + user.getFullName() + "!");
+        
+        // Set the current user in DatabaseManager
+        DatabaseManager.setCurrentUser(user);
 
         // Route based on role
         switch (user.getUserCategory().toLowerCase()) {
