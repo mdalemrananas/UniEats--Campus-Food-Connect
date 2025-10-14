@@ -4,7 +4,14 @@
 <?import javafx.scene.layout.*?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.AdminPaymentsController" spacing="8" visible="false" managed="false">
-    <Label text="Payments (dummy view)" />
+    <HBox spacing="6" alignment="CENTER_LEFT">
+        <Label text="Payments" style="-fx-font-size: 16; -fx-font-weight: bold;" />
+    </HBox>
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+        <content>
+            <FlowPane fx:id="paymentsFlow" hgap="10" vgap="10" prefWrapLength="320" stylesheets="@../css/styles.css" styleClass="cards-flow" />
+        </content>
+    </ScrollPane>
 </VBox>
 
 

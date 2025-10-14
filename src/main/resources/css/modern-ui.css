@@ -1,0 +1,373 @@
+/* Modern UI Styles for UniEats Application */
+
+/* Root Variables */
+.root {
+    -fx-primary-color: #ff6b35;
+    -fx-secondary-color: #2d3436;
+    -fx-success-color: #10b981;
+    -fx-error-color: #ef4444;
+    -fx-warning-color: #f59e0b;
+    -fx-info-color: #3b82f6;
+    
+    -fx-background-color: #f8f9fa;
+    -fx-text-color: #2d3436;
+    -fx-text-secondary: #6c757d;
+    -fx-text-muted: #adb5bd;
+    
+    -fx-border-color: #e9ecef;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+/* Button Styles */
+.modern-button {
+    -fx-background-color: -fx-primary-color;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+}
+
+.modern-button:hover {
+    -fx-background-color: #e55a2b;
+    -fx-effect: dropshadow(gaussian, rgba(255, 107, 53, 0.3), 8, 0, 0, 2);
+}
+
+.modern-button:pressed {
+    -fx-background-color: #cc4e23;
+}
+
+.secondary-button {
+    -fx-background-color: #e9ecef;
+    -fx-text-fill: #6c757d;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #dee2e6;
+}
+
+.danger-button {
+    -fx-background-color: -fx-error-color;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+}
+
+.danger-button:hover {
+    -fx-background-color: #dc2626;
+}
+
+/* Input Field Styles */
+.modern-text-field {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 12 16;
+    -fx-font-size: 14px;
+}
+
+.modern-text-field:focused {
+    -fx-border-color: -fx-primary-color;
+    -fx-border-width: 2px;
+}
+
+.modern-text-field:error {
+    -fx-border-color: -fx-error-color;
+    -fx-border-width: 2px;
+}
+
+.modern-text-field:success {
+    -fx-border-color: -fx-success-color;
+    -fx-border-width: 2px;
+}
+
+.modern-password-field {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px 0 0 8px;
+    -fx-background-radius: 8px 0 0 8px;
+    -fx-padding: 12 16;
+    -fx-font-size: 14px;
+}
+
+.modern-password-field:focused {
+    -fx-border-color: -fx-primary-color;
+    -fx-border-width: 2px;
+}
+
+.modern-password-toggle-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1px 1px 1px 0;
+    -fx-border-radius: 0 8px 8px 0;
+    -fx-background-radius: 0 8px 8px 0;
+    -fx-cursor: hand;
+}
+
+.modern-password-toggle-button:hover {
+    -fx-background-color: #f8f9fa;
+}
+
+/* Card Styles */
+.modern-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-padding: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 8, 0, 0, 2);
+}
+
+.modern-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+}
+
+/* List Item Styles */
+.modern-list-item {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-padding: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 8, 0, 0, 2);
+    -fx-cursor: hand;
+}
+
+.modern-list-item:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+}
+
+/* Typography */
+.title-large {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-color;
+}
+
+.title-medium {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-color;
+}
+
+.title-small {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-color;
+}
+
+.body-large {
+    -fx-font-size: 16px;
+    -fx-text-fill: -fx-text-color;
+}
+
+.body-medium {
+    -fx-font-size: 14px;
+    -fx-text-fill: -fx-text-color;
+}
+
+.body-small {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-text-secondary;
+}
+
+.label-secondary {
+    -fx-font-size: 14px;
+    -fx-text-fill: -fx-text-secondary;
+}
+
+.label-muted {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-text-muted;
+}
+
+/* Price Styles */
+.price-large {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-primary-color;
+}
+
+.price-medium {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-primary-color;
+}
+
+.price-small {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-primary-color;
+}
+
+/* Status Styles */
+.status-success {
+    -fx-text-fill: -fx-success-color;
+    -fx-font-weight: bold;
+}
+
+.status-warning {
+    -fx-text-fill: -fx-warning-color;
+    -fx-font-weight: bold;
+}
+
+.status-error {
+    -fx-text-fill: -fx-error-color;
+    -fx-font-weight: bold;
+}
+
+.status-info {
+    -fx-text-fill: -fx-info-color;
+    -fx-font-weight: bold;
+}
+
+/* Navigation Styles */
+.nav-item {
+    -fx-cursor: hand;
+    -fx-padding: 8px;
+    -fx-background-radius: 12px;
+}
+
+.nav-item:hover {
+    -fx-background-color: #f8f9fa;
+}
+
+.nav-item-active {
+    -fx-background-color: #e8f5e9;
+}
+
+.nav-icon {
+    -fx-icon-color: -fx-text-secondary;
+    -fx-icon-size: 20px;
+}
+
+.nav-icon-active {
+    -fx-icon-color: -fx-success-color;
+}
+
+.nav-label {
+    -fx-font-size: 10px;
+    -fx-text-fill: -fx-text-secondary;
+}
+
+.nav-label-active {
+    -fx-text-fill: -fx-success-color;
+    -fx-font-weight: bold;
+}
+
+/* Pagination Styles */
+.pagination-button {
+    -fx-background-color: #e9ecef;
+    -fx-text-fill: #6c757d;
+    -fx-background-radius: 4px;
+    -fx-padding: 4 8;
+    -fx-cursor: hand;
+}
+
+.pagination-button:hover {
+    -fx-background-color: #dee2e6;
+}
+
+.pagination-button-active {
+    -fx-background-color: -fx-primary-color;
+    -fx-text-fill: white;
+}
+
+/* Form Styles */
+.form-section {
+    -fx-spacing: 16px;
+    -fx-padding: 16px;
+}
+
+.form-field {
+    -fx-spacing: 8px;
+}
+
+.form-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-color;
+}
+
+.form-error {
+    -fx-font-size: 11px;
+    -fx-text-fill: -fx-error-color;
+}
+
+/* Animation Styles */
+.fade-in {
+    -fx-opacity: 0;
+}
+
+.fade-in.animate {
+    -fx-opacity: 1;
+}
+
+.slide-in {
+    -fx-translate-x: -20;
+}
+
+.slide-in.animate {
+    -fx-translate-x: 0;
+}
+
+/* Responsive Styles */
+@media (max-width: 480px) {
+    .title-large {
+        -fx-font-size: 20px;
+    }
+    
+    .title-medium {
+        -fx-font-size: 16px;
+    }
+    
+    .modern-button {
+        -fx-padding: 10 20;
+        -fx-font-size: 13px;
+    }
+    
+    .modern-card {
+        -fx-padding: 12px;
+    }
+}
+
+/* Dark Mode Support */
+.dark-mode {
+    -fx-background-color: #1a1a1a;
+    -fx-text-color: #ffffff;
+    -fx-text-secondary: #a0a0a0;
+    -fx-text-muted: #707070;
+    -fx-border-color: #404040;
+}
+
+.dark-mode .modern-card {
+    -fx-background-color: #2d2d2d;
+}
+
+.dark-mode .modern-text-field {
+    -fx-background-color: #2d2d2d;
+    -fx-text-fill: white;
+    -fx-border-color: #404040;
+}
+
+.dark-mode .modern-text-field:focused {
+    -fx-border-color: -fx-primary-color;
+}
+
+.dark-mode .secondary-button {
+    -fx-background-color: #404040;
+    -fx-text-fill: #a0a0a0;
+}
+
+.dark-mode .secondary-button:hover {
+    -fx-background-color: #505050;
+}

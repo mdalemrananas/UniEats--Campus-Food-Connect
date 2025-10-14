@@ -37,6 +37,7 @@ public class ShopDao {
 			ps.setString(2, LocalDateTime.now().toString());
 			ps.setInt(3, shopId);
 			ps.executeUpdate();
+            com.unieats.services.EventNotifier.notifyChange("shops");
 		} catch (SQLException e) {
 			throw new RuntimeException("Failed to update shop status", e);
 		}
@@ -61,6 +62,17 @@ public class ShopDao {
 			return shops;
 		} catch (SQLException e) {
 			throw new RuntimeException("Failed to list shops", e);
+		}
+	}
+
+	public List<Shop> listAll() {
+		String sql = "SELECT * FROM shops ORDER BY created_at DESC";
+		List<Shop> shops = new ArrayList<>();
+		try (Connection conn = DriverManager.getConnection(DB_URL); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+			while (rs.next()) shops.add(map(rs));
+			return shops;
+		} catch (SQLException e) {
+			throw new RuntimeException("Failed to list all shops", e);
 		}
 	}
 

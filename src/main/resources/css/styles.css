@@ -197,15 +197,186 @@
     -fx-opacity: 1;
 }
 
-.copyright {
-    -fx-text-fill: #7f8c8d;
-    -fx-font-size: 12px;
-    -fx-padding: 10px 0 0 0;
-    -fx-alignment: center;
-}
-
 /* Utility Classes */
 .separator .line {
     -fx-border-color: #3d566e;
     -fx-border-width: 0.5px;
+}
+
+/* Admin UI enhancements */
+.card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(17,24,39,0.06), 10, 0.2, 0, 2);
+}
+
+.card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(17,24,39,0.12), 16, 0.24, 0, 4);
+}
+
+.btn-primary {
+    -fx-background-color: linear-gradient(to bottom, #2563eb, #1d4ed8);
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12 6 12;
+}
+
+.btn-primary:hover {
+    -fx-background-color: linear-gradient(to bottom, #1d4ed8, #1e40af);
+}
+
+.btn-danger {
+    -fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626);
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12 6 12;
+}
+
+.btn-danger:hover {
+    -fx-background-color: linear-gradient(to bottom, #dc2626, #b91c1c);
+}
+
+.tag {
+    -fx-background-color: #f3f4f6;
+    -fx-text-fill: #374151;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 6;
+    -fx-font-size: 11px;
+}
+
+.cards-flow {
+    -fx-padding: 6 2 12 2;
+}
+
+/* Admin theming */
+.admin-topbar {
+    -fx-padding: 12;
+    -fx-background-color: linear-gradient(to right, #6d28d9, #2563eb);
+    -fx-border-color: rgba(255,255,255,0.15);
+    -fx-border-width: 0 0 1 0;
+}
+
+.admin-title {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.drawer-surface {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f3f4f6);
+    -fx-padding: 16;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 0 0 0 1;
+}
+
+.button.drawer-button {
+    -fx-background-radius: 10;
+    -fx-background-color: #ffffff; /* default for non-accent */
+    -fx-effect: dropshadow(gaussian, rgba(17,24,39,0.08), 8, 0.2, 0, 2);
+    -fx-text-fill: #374151;
+    -fx-padding: 8 14 8 14;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.button.drawer-button:hover {
+    -fx-opacity: 0.95;
+}
+
+/* Drawer accent colors */
+.button.drawer-dashboard {
+    -fx-background-color: linear-gradient(to right, #ede9fe, #ddd6fe);
+    -fx-text-fill: #5b21b6;
+}
+.button.drawer-dashboard .text { -fx-fill: #5b21b6; }
+
+.button.drawer-users {
+    -fx-background-color: linear-gradient(to right, #dbeafe, #bfdbfe);
+    -fx-text-fill: #1d4ed8;
+}
+.button.drawer-users .text { -fx-fill: #1d4ed8; }
+
+.button.drawer-shops {
+    -fx-background-color: linear-gradient(to right, #d1fae5, #bbf7d0);
+    -fx-text-fill: #047857;
+}
+.button.drawer-shops .text { -fx-fill: #047857; }
+
+.button.drawer-reports {
+    -fx-background-color: linear-gradient(to right, #ffedd5, #fed7aa);
+    -fx-text-fill: #c2410c;
+}
+.button.drawer-reports .text { -fx-fill: #c2410c; }
+
+.button.drawer-payments {
+    -fx-background-color: linear-gradient(to right, #fee2e2, #fecaca);
+    -fx-text-fill: #b91c1c;
+}
+.button.drawer-payments .text { -fx-fill: #b91c1c; }
+
+.button.drawer-settings {
+    -fx-background-color: linear-gradient(to right, #f3f4f6, #e5e7eb);
+    -fx-text-fill: #111827;
+}
+.button.drawer-settings .text { -fx-fill: #111827; }
+
+/* KPI cards */
+.kpi-card {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-padding: 16;
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 6;
+    -fx-min-height: 84;
+}
+.kpi-grid {
+    -fx-padding: 4 0 8 0;
+}
+.kpi-orange {
+    -fx-background-color: linear-gradient(to bottom, #ffedd5, #fed7aa);
+    -fx-border-color: #f59e0b;
+    -fx-border-width: 1;
+}
+.kpi-card > .label:first-child {
+    -fx-text-fill: #9a3412; /* title */
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+.kpi-card > .label:last-child {
+    -fx-text-fill: #7c2d12; /* value */
+    -fx-font-size: 20px;
+    -fx-font-weight: 700;
+}
+
+/* Download Button Styles */
+.download-btn {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 1);
+    -fx-font-weight: 600;
+    -fx-text-fill: white;
+    -fx-border-width: 0;
+}
+
+.download-btn:hover {
+    -fx-opacity: 0.9;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 6, 0, 0, 2);
+}
+
+.download-btn-1 {
+    -fx-background-color: linear-gradient(to right, #3b82f6, #1d4ed8);
+}
+
+.download-btn-2 {
+    -fx-background-color: linear-gradient(to right, #10b981, #047857);
+}
+
+.download-btn-3 {
+    -fx-background-color: linear-gradient(to right, #f59e0b, #d97706);
+}
+
+.download-btn-4 {
+    -fx-background-color: linear-gradient(to right, #ef4444, #dc2626);
 }

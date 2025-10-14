@@ -10,7 +10,9 @@ module com.unieats {
     requires org.kordamp.ikonli.fontawesome5;
     requires org.kordamp.ikonli.material2;
 
-    opens com.unieats to javafx.fxml;
     exports com.unieats;
-    opens com.unieats.controllers to javafx.fxml;
+    exports com.unieats.controllers;
+    
+    opens com.unieats to javafx.fxml, javafx.graphics;
+    opens com.unieats.controllers to javafx.fxml, javafx.graphics;
 }

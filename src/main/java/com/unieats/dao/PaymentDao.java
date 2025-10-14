@@ -27,6 +27,7 @@ public class PaymentDao {
                 if (rs.next()) {
                     int paymentId = rs.getInt(1);
                     System.out.println("Payment created with ID: " + paymentId);
+                    com.unieats.services.EventNotifier.notifyChange("payments");
                     return paymentId;
                 }
             }
@@ -78,6 +79,34 @@ public class PaymentDao {
             return null;
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * List latest payments
+     */
+    public ResultSet listLatest(Connection external, int limit) throws SQLException {
+        String sql = "SELECT * FROM payments ORDER BY created_at DESC LIMIT ?";
+        PreparedStatement ps = external.prepareStatement(sql);
+        ps.setInt(1, limit);
+        return ps.executeQuery();
+    }
+
+    /**
+     * Get total sum of all payments
+     */
+    public double getTotalPaymentsSum() {
+        String sql = "SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status IN ('completed', 'success')";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble("total");
+            }
+            return 0.0;
+        } catch (SQLException e) {
+            System.err.println("Error getting total payments sum: " + e.getMessage());
+            return 0.0;
         }
     }
 

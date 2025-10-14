@@ -6,80 +6,150 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import javafx.scene.image.ImageView?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.FoodDetailsController"
-      style="-fx-background-color: #fafafa;" prefWidth="360" prefHeight="800" maxWidth="360" maxHeight="800" spacing="0">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.FoodDetailsController"
+      style="-fx-background-color: #fafafa;" prefWidth="360" prefHeight="800" maxWidth="360" maxHeight="800">
 
-    <!-- Header -->
-    <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
-        <Button fx:id="backButton" style="-fx-background-color: transparent; -fx-padding: 8;">
-            <graphic>
-                <FontIcon iconLiteral="fas-arrow-left" iconSize="20" iconColor="#2d3436"/>
-            </graphic>
-        </Button>
-        <Label fx:id="titleLabel" text="Food Details" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 0 0 0 16;"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="favButton" style="-fx-background-color: transparent; -fx-padding: 8;">
-            <graphic>
-                <FontIcon fx:id="favIcon" iconLiteral="far-heart" iconSize="20" iconColor="#e74c3c"/>
-            </graphic>
-        </Button>
-    </HBox>
+    <top>
+        <!-- Header -->
+        <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
+            <Button fx:id="backButton" style="-fx-background-color: transparent; -fx-padding: 8;">
+                <graphic>
+                    <FontIcon iconLiteral="fas-arrow-left" iconSize="20" iconColor="#2d3436"/>
+                </graphic>
+            </Button>
+            <Label fx:id="titleLabel" text="Food Details" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 0 0 0 16;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="favButton" style="-fx-background-color: transparent; -fx-padding: 8;">
+                <graphic>
+                    <FontIcon fx:id="favIcon" iconLiteral="far-heart" iconSize="20" iconColor="#e74c3c"/>
+                </graphic>
+            </Button>
+        </HBox>
+    </top>
 
-    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
-        <VBox spacing="16" style="-fx-padding: 20;">
-            <!-- Image / placeholder -->
-            <StackPane style="-fx-background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); -fx-background-radius: 12; -fx-pref-height: 180; -fx-pref-width: 320;" alignment="CENTER">
-                <ImageView fx:id="imageView" fitWidth="320" fitHeight="180" preserveRatio="true"/>
-                <FontIcon fx:id="placeholderIcon" iconLiteral="fas-utensils" iconSize="48" iconColor="#ff6b35"/>
-            </StackPane>
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox spacing="16" style="-fx-padding: 20;">
+                <!-- Image / placeholder -->
+                <StackPane style="-fx-background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); -fx-background-radius: 12; -fx-pref-height: 180; -fx-pref-width: 320;" alignment="CENTER">
+                    <ImageView fx:id="imageView" fitWidth="320" fitHeight="180" preserveRatio="true"/>
+                    <FontIcon fx:id="placeholderIcon" iconLiteral="fas-utensils" iconSize="48" iconColor="#ff6b35"/>
+                </StackPane>
 
-            <!-- Details -->
-            <VBox spacing="8">
-                <Label fx:id="nameLabel" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                <Label fx:id="shopLabel" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                <!-- Details -->
+                <VBox spacing="8">
+                    <Label fx:id="nameLabel" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    <Label fx:id="shopLabel" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
 
-                <HBox spacing="16">
-                    <Label fx:id="priceLabel" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;"/>
-                    <Label fx:id="discountLabel" style="-fx-font-size: 12px; -fx-text-fill: #e74c3c;"/>
-                    <Label fx:id="pointsLabel" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
-                    <Label fx:id="stockLabel" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
-                </HBox>
+                    <HBox spacing="16">
+                        <Label fx:id="priceLabel" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;"/>
+                        <Label fx:id="discountLabel" style="-fx-font-size: 12px; -fx-text-fill: #e74c3c;"/>
+                        <Label fx:id="pointsLabel" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
+                        <Label fx:id="stockLabel" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
+                    </HBox>
 
-                <!-- Rating summary -->
-                <HBox alignment="CENTER_LEFT" spacing="8">
-                    <Label fx:id="avgStarsLabel" text="★★★★★" style="-fx-font-size: 14px; -fx-text-fill: #ffb703;"/>
-                    <Label fx:id="avgRatingLabel" text="0.0" style="-fx-font-size: 14px; -fx-text-fill: #2d3436;"/>
-                    <Label fx:id="reviewsCountLabel" text="(0 reviews)" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
-                </HBox>
+                    <!-- Rating summary -->
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label fx:id="avgStarsLabel" text="★★★★★" style="-fx-font-size: 14px; -fx-text-fill: #ffb703;"/>
+                        <Label fx:id="avgRatingLabel" text="0.0" style="-fx-font-size: 14px; -fx-text-fill: #2d3436;"/>
+                        <Label fx:id="reviewsCountLabel" text="(0 reviews)" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
+                    </HBox>
 
-                <Label text="Description" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 12 0 0 0;"/>
-                <Label fx:id="descriptionLabel" wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #2d3436;"/>
-            </VBox>
+                    <Label text="Description" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 12 0 0 0;"/>
+                    <Label fx:id="descriptionLabel" wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #2d3436;"/>
+                </VBox>
 
-            <!-- Actions -->
-            <HBox alignment="CENTER_RIGHT">
-                <Button fx:id="addToCartButton" text="Add to Cart"
-                        style="-fx-background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 12; -fx-cursor: hand;"/>
-            </HBox>
-
-            <!-- Reviews List -->
-            <VBox spacing="8" style="-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
-                <Label text="Reviews" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                <ListView fx:id="reviewsList" prefHeight="200" style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
-            </VBox>
-
-            <!-- Add Review -->
-            <VBox spacing="8" style="-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
-                <Label text="Write a Review" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                <HBox spacing="8" alignment="CENTER_LEFT">
-                    <Label text="Rating:"/>
-                    <ComboBox fx:id="ratingCombo" prefWidth="120"/>
-                </HBox>
-                <TextArea fx:id="commentField" promptText="Share your thoughts..." prefRowCount="3" wrapText="true"/>
+                <!-- Actions -->
                 <HBox alignment="CENTER_RIGHT">
-                    <Button fx:id="submitReviewButton" text="Submit Review" style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 16;"/>
+                    <Button fx:id="addToCartButton" text="Add to Cart"
+                            style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 12; -fx-cursor: hand;"/>
                 </HBox>
+
+                <!-- Reviews List -->
+                <VBox spacing="8" style="-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                    <Label text="Reviews" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    <ListView fx:id="reviewsList" prefHeight="200" style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
+                </VBox>
+
+                <!-- Add Review -->
+                <VBox spacing="8" style="-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                    <Label text="Write a Review" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="Rating:"/>
+                        <HBox fx:id="ratingStarsContainer" spacing="4" alignment="CENTER_LEFT">
+                            <Button fx:id="star1" style="-fx-background-color: transparent; -fx-padding: 2; -fx-cursor: hand;">
+                                <graphic>
+                                    <FontIcon fx:id="star1Icon" iconLiteral="far-star" iconSize="20" iconColor="#6c757d"/>
+                                </graphic>
+                            </Button>
+                            <Button fx:id="star2" style="-fx-background-color: transparent; -fx-padding: 2; -fx-cursor: hand;">
+                                <graphic>
+                                    <FontIcon fx:id="star2Icon" iconLiteral="far-star" iconSize="20" iconColor="#6c757d"/>
+                                </graphic>
+                            </Button>
+                            <Button fx:id="star3" style="-fx-background-color: transparent; -fx-padding: 2; -fx-cursor: hand;">
+                                <graphic>
+                                    <FontIcon fx:id="star3Icon" iconLiteral="far-star" iconSize="20" iconColor="#6c757d"/>
+                                </graphic>
+                            </Button>
+                            <Button fx:id="star4" style="-fx-background-color: transparent; -fx-padding: 2; -fx-cursor: hand;">
+                                <graphic>
+                                    <FontIcon fx:id="star4Icon" iconLiteral="far-star" iconSize="20" iconColor="#6c757d"/>
+                                </graphic>
+                            </Button>
+                            <Button fx:id="star5" style="-fx-background-color: transparent; -fx-padding: 2; -fx-cursor: hand;">
+                                <graphic>
+                                    <FontIcon fx:id="star5Icon" iconLiteral="far-star" iconSize="20" iconColor="#6c757d"/>
+                                </graphic>
+                            </Button>
+                        </HBox>
+                    </HBox>
+                    <TextArea fx:id="commentField" promptText="Share your thoughts..." prefRowCount="3" wrapText="true"/>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button fx:id="submitReviewButton" text="Submit Review" style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 16;"/>
+                    </HBox>
+                </VBox>
             </VBox>
-        </VBox>
-    </ScrollPane>
-</VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" spacing="0" style="-fx-background-color: #ffffff; -fx-padding: 12 0; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);">
+            <!-- Home -->
+            <VBox fx:id="navHome" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-home" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Home" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Orders -->
+            <VBox fx:id="navOrders" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-list-alt" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="My Orders" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Cart -->
+            <VBox fx:id="navCart" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Cart" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Favourite -->
+            <VBox fx:id="navFav" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-heart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Favourite" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Profile -->
+            <VBox fx:id="navProfile" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-user" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Profile" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+        </HBox>
+    </bottom>
+</BorderPane>
