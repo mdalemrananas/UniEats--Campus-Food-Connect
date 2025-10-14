@@ -348,6 +348,50 @@ public class DatabaseManager {
             if (!columns.contains("attachments")) {
                 s.execute("ALTER TABLE reports ADD COLUMN attachments TEXT DEFAULT '[]'");
             }
+            
+            // Check if address and description columns exist in shops table, add if not
+            ResultSet shopColumns = s.executeQuery("PRAGMA table_info(shops)");
+            Set<String> shopColumnNames = new HashSet<>();
+            while (shopColumns.next()) {
+                shopColumnNames.add(shopColumns.getString("name"));
+            }
+            shopColumns.close();
+            
+            if (!shopColumnNames.contains("address")) {
+                s.execute("ALTER TABLE shops ADD COLUMN address TEXT DEFAULT ''");
+            }
+            if (!shopColumnNames.contains("description")) {
+                s.execute("ALTER TABLE shops ADD COLUMN description TEXT DEFAULT ''");
+            }
+            
+            // Create order_requests table if it doesn't exist
+            s.execute("""
+                CREATE TABLE IF NOT EXISTS order_requests (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    customer_id INTEGER NOT NULL,
+                    customer_name TEXT NOT NULL,
+                    shop_id INTEGER NOT NULL,
+                    total_price REAL NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'accepted', 'declined')),
+                    order_time TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    FOREIGN KEY(shop_id) REFERENCES shops(id)
+                )
+            """);
+            
+            // Create order_items table if it doesn't exist
+            s.execute("""
+                CREATE TABLE IF NOT EXISTS order_items (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    order_id INTEGER NOT NULL,
+                    food_item_id INTEGER NOT NULL,
+                    food_item_name TEXT NOT NULL,
+                    quantity INTEGER NOT NULL,
+                    unit_price REAL NOT NULL,
+                    total_price REAL NOT NULL,
+                    FOREIGN KEY(order_id) REFERENCES order_requests(id) ON DELETE CASCADE
+                )
+            """);
             if (!columns.contains("status")) {
                 s.execute("ALTER TABLE reports ADD COLUMN status TEXT NOT NULL DEFAULT 'open'");
             }

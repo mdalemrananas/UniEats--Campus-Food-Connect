@@ -23,19 +23,32 @@ import java.util.List;
 
 public class CheckoutController {
 
-    @FXML private Button backButton;
-    @FXML private ListView<CartItemView> orderItemsList;
-    @FXML private Label subtotalLabel;
-    @FXML private Label taxLabel;
-    @FXML private Label totalLabel;
-    @FXML private TextField nameField;
-    @FXML private TextField phoneField;
-    @FXML private TextArea addressField;
-    @FXML private RadioButton cardPayment;
-    @FXML private RadioButton cashPayment;
-    @FXML private RadioButton walletPayment;
-    @FXML private TextArea instructionsField;
-    @FXML private Button proceedToPaymentButton;
+    @FXML
+    private Button backButton;
+    @FXML
+    private ListView<CartItemView> orderItemsList;
+    @FXML
+    private Label subtotalLabel;
+    @FXML
+    private Label taxLabel;
+    @FXML
+    private Label totalLabel;
+    @FXML
+    private TextField nameField;
+    @FXML
+    private TextField phoneField;
+    @FXML
+    private TextArea addressField;
+    @FXML
+    private RadioButton cardPayment;
+    @FXML
+    private RadioButton cashPayment;
+    @FXML
+    private RadioButton walletPayment;
+    @FXML
+    private TextArea instructionsField;
+    @FXML
+    private Button proceedToPaymentButton;
 
     private final CartQueryDao cartQueryDao = new CartQueryDao();
     private final OrderDao orderDao = new OrderDao();
@@ -148,7 +161,8 @@ public class CheckoutController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/cart.fxml"));
             Parent root = loader.load();
             CartController controller = loader.getController();
-            if (controller != null) controller.setCurrentUserId(currentUserId);
+            if (controller != null)
+                controller.setCurrentUserId(currentUserId);
 
             Stage stage = (Stage) backButton.getScene().getWindow();
             Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
@@ -177,6 +191,38 @@ public class CheckoutController {
             // Add order items
             for (CartItemView item : cartItems) {
                 orderDao.addOrderItem(orderId, item.itemId, item.quantity, item.price);
+            }
+
+            // Broadcast inventory update via WebSocket
+            try {
+                StringBuilder payload = new StringBuilder();
+                payload.append('{')
+                        .append("\"type\":\"inventory_update\",")
+                        .append("\"shopId\":" + currentShop.getId() + ",")
+                        .append("\"items\":[");
+                for (int i = 0; i < cartItems.size(); i++) {
+                    CartItemView it = cartItems.get(i);
+                    payload.append('{')
+                            .append("\"itemId\":" + it.itemId + ",")
+                            .append("\"delta\":" + (-it.quantity))
+                            .append('}');
+                    if (i < cartItems.size() - 1)
+                        payload.append(',');
+                }
+                payload.append("]}");
+                com.unieats.util.SocketBus.broadcast(payload.toString());
+            } catch (Exception ignored) {
+            }
+
+            // Notify order management to refresh
+            try {
+                String orderMsg = '{' +
+                        "\"type\":\"order_update\"," +
+                        "\"shopId\":" + currentShop.getId() + ',' +
+                        "\"orderId\":" + orderId +
+                        '}';
+                com.unieats.util.SocketBus.broadcast(orderMsg);
+            } catch (Exception ignored) {
             }
 
             // Navigate to payment page

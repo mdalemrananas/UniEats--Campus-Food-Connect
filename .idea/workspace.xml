@@ -4,89 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7e92108f-61e7-4822-a886-0ad50c123eec" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/unieats/hello-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/unieats/hello-view.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/CartItemView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/CartItemView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/DatabaseManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/DatabaseManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/FoodItem.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/FoodItem.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/RewardService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/RewardService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/Shop.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/Shop.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/UniEatsApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/UniEatsApp.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminDashboardController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminDashboardController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminPaymentsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminPaymentsController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminReportsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminReportsController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminSellersController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminSellersController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminSettingsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminSettingsController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminUsersController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminUsersController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/CartController$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/CartController$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/CartController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/CartController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/FoodDetailsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/FoodDetailsController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/FoodItemsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/FoodItemsController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/HomeController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/HomeController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/MenuController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/MenuController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ProfileController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ProfileController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ReportController$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ReportController$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ReportController$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ReportController$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ReportController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ReportController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ShopsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ShopsController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/SigninController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/SigninController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/SignupController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/SignupController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/StallController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/StallController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/dao/CartDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/dao/CartDao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/dao/CartQueryDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/dao/CartQueryDao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/dao/FoodItemDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/dao/FoodItemDao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/dao/OrderDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/dao/OrderDao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/dao/ReportDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/dao/ReportDao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/dao/ShopDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/dao/ShopDao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/util/PasswordUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/util/PasswordUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/util/ResponsiveSceneFactory.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/util/ResponsiveSceneFactory.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/css/dark.css" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/css/dark.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/css/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/fxml/cart.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/cart.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/fxml/home.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/home.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/fxml/home_minimal.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/home_minimal.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/fxml/menu.backup.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/menu.backup.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/fxml/report.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/report.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/fxml/signin.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/signin.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/fxml/signup.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/signup.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/module-info.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/module-info.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/unieats.db" beforeDir="false" afterPath="$PROJECT_DIR$/unieats.db" afterDir="false" />
-    </list>
+    <list default="true" id="7e92108f-61e7-4822-a886-0ad50c123eec" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="main" />
-      </map>
-    </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;The-RushCoder&quot;
-  }
-}</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/mdalemrananas/UniEats--Campus-Food-Connect.git&quot;,
-    &quot;accountId&quot;: &quot;04a75b29-a6d5-47c7-8e10-5c06676e9a7e&quot;
-  }
-}</component>
-  <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
-      </MavenGeneralSettings>
-    </option>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
@@ -102,20 +24,15 @@
     "Application.UniEatsApp.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "User-Panel",
+    "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "F:/UniEats",
+    "last_opened_file_path": "D:/UIU/11th trimester/AOOP/Project_file/Ori_1/UniEats",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
@@ -151,11 +68,10 @@
       <list>
         <item itemvalue="Application.UniEatsApp" />
         <item itemvalue="Application.Launcher" />
-        <item itemvalue="Application.UniEatsApp" />
-        <item itemvalue="Application.Launcher" />
       </list>
     </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="7e92108f-61e7-4822-a886-0ad50c123eec" name="Changes" comment="" />

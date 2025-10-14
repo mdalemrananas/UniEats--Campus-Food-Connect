@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="com.unieats.controllers.OrderManagementController"
+      spacing="10"
+      style="-fx-background-color: #f8f9fa;"
+      prefWidth="360"
+      prefHeight="720">
+    
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+    
+    <!-- Header (stacked for mobile visibility) -->
+    <VBox spacing="8">
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <Button fx:id="backButton" text="← Back"
+                    style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 6 10; -fx-font-size: 13px; -fx-cursor: hand;"
+                    onAction="#handleBack"/>
+            <Label text="🧾 Order Management" 
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+        </HBox>
+        <HBox spacing="8" alignment="CENTER_RIGHT">
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="addSampleButton" 
+                    text="+ Add Sample Orders" 
+                    style="-fx-background-color: #ffc107; -fx-text-fill: #212529; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 12; -fx-font-size: 13px; -fx-cursor: hand;"/>
+            <Button fx:id="refreshButton" 
+                    text="🔄 Refresh" 
+                    style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 12; -fx-font-size: 13px; -fx-cursor: hand;"/>
+        </HBox>
+    </VBox>
+    
+    <!-- Status Label -->
+    <Label fx:id="statusLabel" 
+           text="Loading orders..." 
+           style="-fx-font-size: 14px; -fx-text-fill: #6c757d; -fx-padding: 0 0 8 0;"/>
+    
+    <!-- Table -->
+    <TableView fx:id="ordersTable" 
+               style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-width: 1; -fx-border-radius: 8;"
+               VBox.vgrow="ALWAYS">
+        
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" sortable="true" minWidth="70"/>
+            <TableColumn fx:id="customerNameColumn" text="Customer" sortable="true" minWidth="100"/>
+            <TableColumn fx:id="foodNameColumn" text="Food" sortable="true" minWidth="120"/>
+            <TableColumn fx:id="quantityColumn" text="Qty" sortable="true" minWidth="60"/>
+            <TableColumn fx:id="totalPriceColumn" text="Total" sortable="true" minWidth="90"/>
+            <TableColumn fx:id="statusColumn" text="Status" sortable="true" minWidth="110"/>
+            <TableColumn fx:id="createdAtColumn" text="Date" sortable="true" minWidth="120"/>
+        </columns>
+        
+    </TableView>
+    
+   
+    
+</VBox>

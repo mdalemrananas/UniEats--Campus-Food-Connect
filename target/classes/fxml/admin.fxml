@@ -9,16 +9,15 @@
 	<children>
 		<BorderPane prefWidth="360" prefHeight="800" minWidth="320" minHeight="560" style="-fx-background-color: #ffffff;">
 			<top>
-				<HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 12; -fx-background-color: #f7f7f7; -fx-border-color: #e6e6e6; -fx-border-width: 0 0 1 0;">
+                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 12; -fx-background-color: #ffffff; -fx-border-color: #e6e6e6; -fx-border-width: 0 0 1 0;">
 					<Button onAction="#toggleDrawer" style="-fx-background-color: transparent; -fx-cursor: hand;">
 						<graphic>
-							<FontIcon iconLiteral="fas-bars" iconSize="18" iconColor="#4B5563" />
+                            <FontIcon iconLiteral="fas-bars" iconSize="18" iconColor="#6D28D9" />
 						</graphic>
 					</Button>
-					<Label text="Dashboard" style="-fx-font-size: 18; -fx-font-weight: bold;" />
+                    <Label fx:id="titleLabel" text="Dashboard" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #111827;" />
 					<Region HBox.hgrow="ALWAYS" />
-					<Label fx:id="sessionLabel" text="Session: 00:00" />
-					<Button text="Logout" onAction="#handleLogout" />
+                    <!-- Session and Logout removed per requirements -->
 				</HBox>
 			</top>
 			<center>
@@ -34,16 +33,16 @@
 		<AnchorPane fx:id="drawerContainer" visible="false" managed="false" pickOnBounds="true">
 			<HBox AnchorPane.topAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0">
 				<StackPane onMouseClicked="#closeDrawer" HBox.hgrow="ALWAYS" style="-fx-background-color: rgba(0,0,0,0.35);" />
-				<VBox spacing="10" prefWidth="220" minWidth="180" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #e6e6e6; -fx-border-width: 0 0 0 1;">
+                <VBox spacing="10" prefWidth="220" minWidth="180" stylesheets="@../css/styles.css" styleClass="drawer-surface">
 					<Label text="Navigation" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-padding: 0 0 8 0;" />
-					<Button text="Dashboard" onAction="#showDashboard" />
-					<Button text="Manage Users" onAction="#showUsers" />
-					<Button text="Manage Sellers" onAction="#showSellers" />
-					<Button text="Reports" onAction="#showReports" />
-					<Button text="Payments" onAction="#showPayments" />
-					<Button text="Settings" onAction="#showSettings" />
+                    <Button text="Dashboard" onAction="#showDashboard" styleClass="drawer-button" style="-fx-background-color: linear-gradient(to right, #ede9fe, #ddd6fe); -fx-text-fill: #5b21b6; -fx-background-insets: 0; -fx-background-radius: 10;" />
+                    <Button text="Manage Users" onAction="#showUsers" styleClass="drawer-button" style="-fx-background-color: linear-gradient(to right, #dbeafe, #bfdbfe); -fx-text-fill: #1d4ed8; -fx-background-insets: 0; -fx-background-radius: 10;" />
+                    <Button text="Manage Shops" onAction="#showSellers" styleClass="drawer-button" style="-fx-background-color: linear-gradient(to right, #d1fae5, #bbf7d0); -fx-text-fill: #047857; -fx-background-insets: 0; -fx-background-radius: 10;" />
+                    <Button text="Reports" onAction="#showReports" styleClass="drawer-button" style="-fx-background-color: linear-gradient(to right, #ffedd5, #fed7aa); -fx-text-fill: #c2410c; -fx-background-insets: 0; -fx-background-radius: 10;" />
+                    <Button text="Payments" onAction="#showPayments" styleClass="drawer-button" style="-fx-background-color: linear-gradient(to right, #fee2e2, #fecaca); -fx-text-fill: #b91c1c; -fx-background-insets: 0; -fx-background-radius: 10;" />
+                    <Button text="Settings" onAction="#showSettings" styleClass="drawer-button" style="-fx-background-color: linear-gradient(to right, #f3f4f6, #e5e7eb); -fx-text-fill: #111827; -fx-background-insets: 0; -fx-background-radius: 10;" />
 					<Region VBox.vgrow="ALWAYS" />
-					<Button text="Logout" onAction="#handleLogout" />
+                    <!-- Logout removed per requirements -->
 				</VBox>
 			</HBox>
 		</AnchorPane>

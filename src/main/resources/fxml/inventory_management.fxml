@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.unieats.controllers.InventoryController"
+      spacing="16"
+      style="-fx-background-color: #f8f9fa;"
+      prefWidth="360"
+      prefHeight="720">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Button fx:id="backButton" text="← Back"
+                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 6 10; -fx-font-size: 14px; -fx-cursor: hand;"
+                onAction="#handleBack"/>
+        <Label text="📦 Inventory Management"
+               style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="addNewButton"
+                text="+ Add New Item"
+                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 16; -fx-font-size: 14px; -fx-cursor: hand;"/>
+        <Button fx:id="refreshButton"
+                text="🔄 Refresh"
+                style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 16; -fx-font-size: 14px; -fx-cursor: hand;"/>
+    </HBox>
+
+    <!-- Status Label -->
+    <Label fx:id="statusLabel"
+           text="Loading inventory..."
+           style="-fx-font-size: 14px; -fx-text-fill: #6c757d; -fx-padding: 0 0 8 0;"/>
+
+    <!-- Table -->
+    <TableView fx:id="inventoryTable"
+               editable="true"
+               style="
+                   -fx-background-color: white;
+                   -fx-border-color: #dee2e6;
+                   -fx-border-width: 1;
+                   -fx-border-radius: 8;
+                   -fx-text-fill: black;
+               "
+               VBox.vgrow="ALWAYS">
+
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="80"/>
+            <TableColumn fx:id="nameColumn" text="Food Name" prefWidth="200"/>
+            <TableColumn fx:id="priceColumn" text="Price (৳)" prefWidth="120"/>
+            <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="150"/>
+        </columns>
+
+        <placeholder>
+            <Label text="No items found." style="-fx-text-fill: #6c757d;"/>
+        </placeholder>
+    </TableView>
+
+</VBox>

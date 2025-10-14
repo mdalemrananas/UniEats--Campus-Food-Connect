@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="com.unieats.controllers.FoodPostController"
+      alignment="CENTER"
+      spacing="20"
+      style="-fx-background-color: #f8f9fa;"
+      prefWidth="360"
+      prefHeight="720">
+    
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+    
+    <!-- Header -->
+    <VBox alignment="CENTER" spacing="8">
+        <HBox alignment="CENTER_LEFT" spacing="8">
+            <Button fx:id="backButton" text="← Back"
+                    style="-fx-font-size: 14px; -fx-padding: 6 10; -fx-background-radius: 8;"
+                    onAction="#handleBack"/>
+        </HBox>
+        <Label text="🍔 Add New Food Item" 
+               style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+        <Label text="Fill in the details below to add a new food item to your menu" 
+               style="-fx-font-size: 14px; -fx-text-fill: #6c757d; -fx-text-alignment: center;"/>
+    </VBox>
+    
+    <!-- Form -->
+    <VBox spacing="16" prefWidth="340">
+        <!-- Food Name -->
+        <VBox spacing="6">
+            <Label text="Food Name *" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+            <TextField fx:id="foodNameField" 
+                       promptText="Enter food name (e.g., Chicken Burger)"
+                       style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 12; -fx-font-size: 14px;"/>
+        </VBox>
+        
+        <!-- Price -->
+        <VBox spacing="6">
+            <Label text="Price (৳) *" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+            <TextField fx:id="foodPriceField" 
+                       promptText="Enter price (e.g., 250.00)"
+                       style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 12; -fx-font-size: 14px;"/>
+        </VBox>
+
+        <!-- Stock -->
+        <VBox spacing="6">
+            <Label text="Stock *" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+            <TextField fx:id="stockField" 
+                       promptText="Enter stock quantity (e.g., 50)"
+                       style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 12; -fx-font-size: 14px;"/>
+        </VBox>
+
+        <!-- Description -->
+        <VBox spacing="6">
+            <Label text="Description" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+            <TextField fx:id="descriptionField" 
+                       promptText="Enter description (optional)"
+                       style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 12; -fx-font-size: 14px;"/>
+        </VBox>
+
+        <!-- Image -->
+        <VBox spacing="6">
+            <Label text="Image URL/Path" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+            <TextField fx:id="imageField" 
+                       promptText="Enter image URL or path"
+                       style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 12; -fx-font-size: 14px;"/>
+        </VBox>
+
+        <!-- Discount -->
+        <VBox spacing="6">
+            <Label text="Discount (৳)" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+            <TextField fx:id="discountField" 
+                       promptText="Enter discount amount (optional)"
+                       style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 12; -fx-font-size: 14px;"/>
+        </VBox>
+    </VBox>
+    
+    <!-- Buttons -->
+    <HBox spacing="12" alignment="CENTER">
+        <Button fx:id="cancelButton" 
+                text="Cancel" 
+                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12 24; -fx-font-size: 14px; -fx-cursor: hand;"
+                onAction="#handleBack"/>
+        
+        <Button fx:id="submitButton" 
+                text="Add Food Item" 
+                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12 24; -fx-font-size: 14px; -fx-cursor: hand;"
+                onAction="#handleSubmit"/>
+    </HBox>
+    
+    <!-- Footer Note -->
+    <Label text="* Required fields" 
+           style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-text-alignment: center;"/>
+    
+</VBox>

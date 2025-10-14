@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.FoodReviewController" prefWidth="360" prefHeight="720">
+    <top>
+        <Label text="🍽 Food Reviews" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-padding: 10;" />
+    </top>
+
+    <center>
+        <TableView fx:id="reviewTable" prefHeight="400" prefWidth="600">
+            <columns>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="50" />
+                <TableColumn fx:id="userIdColumn" text="User ID" prefWidth="100" />
+                <TableColumn fx:id="foodIdColumn" text="Food ID" prefWidth="100" />
+                <TableColumn fx:id="ratingColumn" text="Rating" prefWidth="80" />
+                <TableColumn fx:id="commentColumn" text="Comment" prefWidth="250" />
+                <TableColumn fx:id="createdAtColumn" text="Date" prefWidth="120" />
+            </columns>
+        </TableView>
+    </center>
+
+    <bottom>
+        <Button text="← Back" fx:id="backButton" style="-fx-font-size: 14px; -fx-padding: 8;" BorderPane.alignment="CENTER" onAction="#handleBack" />
+    </bottom>
+</BorderPane>

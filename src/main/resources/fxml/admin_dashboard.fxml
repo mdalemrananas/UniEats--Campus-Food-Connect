@@ -4,9 +4,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.AdminDashboardController" spacing="10" fillWidth="true">
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.AdminDashboardController" spacing="10" fillWidth="true" stylesheets="@../css/styles.css">
     <!-- KPI cards laid out 2 per row -->
-    <GridPane hgap="8" vgap="8">
+    <GridPane hgap="8" vgap="8" styleClass="kpi-grid">
         <columnConstraints>
             <ColumnConstraints percentWidth="50" />
             <ColumnConstraints percentWidth="50" />
@@ -16,20 +16,20 @@
             <RowConstraints />
         </rowConstraints>
 
-        <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" spacing="4" style="-fx-background-color: #ffffff; -fx-border-color: #eeeeee; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">
+        <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS" fillWidth="true" spacing="4" styleClass="kpi-card kpi-orange" prefHeight="84" style="-fx-background-color: #FFF3E0; -fx-border-color: #F59E0B; -fx-border-width: 1; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 16;">
             <Label text="Total Users" />
             <Label fx:id="totalUsersLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
         </VBox>
-        <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="4" style="-fx-background-color: #ffffff; -fx-border-color: #eeeeee; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">
-            <Label text="Active Sellers" />
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS" fillWidth="true" spacing="4" styleClass="kpi-card kpi-orange" prefHeight="84" style="-fx-background-color: #FFF3E0; -fx-border-color: #F59E0B; -fx-border-width: 1; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 16;">
+            <Label text="Active Shops" />
             <Label fx:id="activeSellersLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
         </VBox>
-        <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" spacing="4" style="-fx-background-color: #ffffff; -fx-border-color: #eeeeee; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">
-            <Label text="Pending Seller Requests" />
+        <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" fillWidth="true" spacing="4" styleClass="kpi-card kpi-orange" prefHeight="84" style="-fx-background-color: #FFF3E0; -fx-border-color: #F59E0B; -fx-border-width: 1; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 16;">
+            <Label text="Total Reports" />
             <Label fx:id="pendingSellersLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
         </VBox>
-        <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" spacing="4" style="-fx-background-color: #ffffff; -fx-border-color: #eeeeee; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">
-            <Label text="Pending Reports" />
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" fillWidth="true" spacing="4" styleClass="kpi-card kpi-orange" prefHeight="84" style="-fx-background-color: #FFF3E0; -fx-border-color: #F59E0B; -fx-border-width: 1; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 16;">
+            <Label text="Total Payments" />
             <Label fx:id="pendingReportsLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
         </VBox>
     </GridPane>
