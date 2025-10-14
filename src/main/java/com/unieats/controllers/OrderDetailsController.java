@@ -34,13 +34,6 @@ public class OrderDetailsController {
     @FXML private Label paymentStatusLabel;
     @FXML private ListView<OrderInfo.OrderItemInfo> orderItemsList;
     @FXML private Button backToMenuButton;
-    
-    // Bottom navigation
-    @FXML private VBox navHome;
-    @FXML private VBox navOrders;
-    @FXML private VBox navCart;
-    @FXML private VBox navFav;
-    @FXML private VBox navProfile;
 
     private final OrderDao orderDao = new OrderDao();
     private int orderId;
@@ -50,7 +43,6 @@ public class OrderDetailsController {
     @FXML
     private void initialize() {
         setupOrderItemsList();
-        wireBottomNav();
     }
 
     private void setupOrderItemsList() {
@@ -242,118 +234,5 @@ public class OrderDetailsController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
-    }
-    
-    private void wireBottomNav() {
-        if (navHome != null) {
-            navHome.setOnMouseClicked(e -> navigateToHome());
-        }
-        if (navOrders != null) {
-            navOrders.setOnMouseClicked(e -> navigateToOrders());
-        }
-        if (navCart != null) {
-            navCart.setOnMouseClicked(e -> navigateToCart());
-        }
-        if (navFav != null) {
-            navFav.setOnMouseClicked(e -> navigateToFavorites());
-        }
-        if (navProfile != null) {
-            navProfile.setOnMouseClicked(e -> navigateToProfile());
-        }
-    }
-    
-    private void navigateToHome() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/menu.fxml"));
-            Parent root = loader.load();
-            MenuController controller = loader.getController();
-            if (controller != null && currentUser != null) {
-                controller.setCurrentUser(currentUser);
-            }
-
-            Stage stage = (Stage) navHome.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - Menu");
-            stage.show();
-        } catch (Exception e) {
-            showAlert("Navigation Error", "Failed to navigate to menu: " + e.getMessage());
-        }
-    }
-    
-    private void navigateToOrders() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/my_orders.fxml"));
-            Parent root = loader.load();
-            MyOrdersController controller = loader.getController();
-            if (controller != null && currentUser != null) {
-                controller.setCurrentUser(currentUser);
-            }
-
-            Stage stage = (Stage) navOrders.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - My Orders");
-            stage.show();
-        } catch (Exception e) {
-            showAlert("Navigation Error", "Failed to navigate to orders: " + e.getMessage());
-        }
-    }
-    
-    private void navigateToCart() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/cart.fxml"));
-            Parent root = loader.load();
-            CartController controller = loader.getController();
-            if (controller != null && currentUser != null) {
-                controller.setCurrentUserId(currentUser.getId());
-            }
-
-            Stage stage = (Stage) navCart.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - Cart");
-            stage.show();
-        } catch (Exception e) {
-            showAlert("Navigation Error", "Failed to navigate to cart: " + e.getMessage());
-        }
-    }
-    
-    private void navigateToFavorites() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/wishlist.fxml"));
-            Parent root = loader.load();
-            WishlistController controller = loader.getController();
-            if (controller != null && currentUser != null) {
-                controller.setCurrentUser(currentUser);
-            }
-
-            Stage stage = (Stage) navFav.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - Favorites");
-            stage.show();
-        } catch (Exception e) {
-            showAlert("Navigation Error", "Failed to navigate to favorites: " + e.getMessage());
-        }
-    }
-    
-    private void navigateToProfile() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/profile.fxml"));
-            Parent root = loader.load();
-            ProfileController controller = loader.getController();
-            if (controller != null && currentUser != null) {
-                controller.setCurrentUser(currentUser);
-            }
-
-            Stage stage = (Stage) navProfile.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - Profile");
-            stage.show();
-        } catch (Exception e) {
-            showAlert("Navigation Error", "Failed to navigate to profile: " + e.getMessage());
-        }
     }
 }

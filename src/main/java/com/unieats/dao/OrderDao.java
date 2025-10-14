@@ -220,7 +220,7 @@ public class OrderDao {
 	}
 
 	/**
-	 * Get order history for a specific user (delivered, cancelled, completed)
+	 * Get order history for a specific user (delivered, cancelled)
 	 */
 	public List<OrderInfo> getOrderHistoryByUserId(int userId) {
 		String sql = """
@@ -228,7 +228,7 @@ public class OrderDao {
 			FROM orders o 
 			JOIN shops s ON o.shop_id = s.id 
 			WHERE o.user_id = ? 
-			AND o.status IN ('delivered', 'cancelled', 'completed')
+			AND o.status IN ('delivered', 'cancelled')
 			ORDER BY o.created_at DESC
 		""";
 		List<OrderInfo> orders = new ArrayList<>();
@@ -251,70 +251,6 @@ public class OrderDao {
 				}
 			}
 			return orders;
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
-	 * Get paginated order history for a specific user
-	 */
-	public List<OrderInfo> getOrderHistoryByUserId(int userId, int offset, int limit) {
-		String sql = """
-			SELECT o.*, s.shop_name 
-			FROM orders o 
-			JOIN shops s ON o.shop_id = s.id 
-			WHERE o.user_id = ? 
-			AND o.status IN ('delivered', 'cancelled', 'completed')
-			ORDER BY o.created_at DESC
-			LIMIT ? OFFSET ?
-		""";
-		List<OrderInfo> orders = new ArrayList<>();
-		try (Connection conn = DriverManager.getConnection(DB_URL);
-			 PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setInt(1, userId);
-			ps.setInt(2, limit);
-			ps.setInt(3, offset);
-			try (ResultSet rs = ps.executeQuery()) {
-				while (rs.next()) {
-					OrderInfo order = new OrderInfo(
-						rs.getInt("id"),
-						rs.getInt("user_id"),
-						rs.getInt("shop_id"),
-						rs.getString("shop_name"),
-						rs.getDouble("total_price"),
-						rs.getString("status"),
-						parseDateTime(rs.getString("created_at")),
-						parseDateTime(rs.getString("updated_at"))
-					);
-					orders.add(order);
-				}
-			}
-			return orders;
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
-	 * Get total count of order history for a specific user
-	 */
-	public int getOrderHistoryCount(int userId) {
-		String sql = """
-			SELECT COUNT(*) 
-			FROM orders o 
-			WHERE o.user_id = ? 
-			AND o.status IN ('delivered', 'cancelled', 'completed')
-		""";
-		try (Connection conn = DriverManager.getConnection(DB_URL);
-			 PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setInt(1, userId);
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) {
-					return rs.getInt(1);
-				}
-			}
-			return 0;
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}

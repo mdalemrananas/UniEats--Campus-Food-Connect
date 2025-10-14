@@ -25,8 +25,6 @@ import com.unieats.FoodItem;
 import com.unieats.Shop;
 import com.unieats.dao.FoodItemDao;
 import com.unieats.dao.ShopDao;
-import com.unieats.services.StockUpdateService;
-import com.unieats.services.RealTimeStockBroadcaster;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class MenuController {
@@ -92,49 +90,6 @@ public class MenuController {
         startSession();
         // Default active tab is Home
         setActiveNav(navHome);
-        
-        // Start the stock update service
-        StockUpdateService.getInstance().start();
-        
-        // Start the real-time stock broadcaster
-        RealTimeStockBroadcaster.getInstance().start();
-        
-        // Add this controller as a listener for real-time stock changes
-        RealTimeStockBroadcaster.getInstance().addListener(new RealTimeStockBroadcaster.StockChangeListener() {
-            @Override
-            public void onStockChanged(int itemId, int oldStock, int newStock) {
-                Platform.runLater(() -> {
-                    // Update the specific item in the display
-                    updateFoodItemStock(itemId, newStock);
-                    System.out.println("Real-time update: Item " + itemId + " stock changed from " + oldStock + " to " + newStock);
-                });
-            }
-        });
-        
-        // Also add the original stock update service listener for compatibility
-        StockUpdateService.getInstance().addListener(new StockUpdateService.StockUpdateListener() {
-            @Override
-            public void onStockUpdated(int itemId, int quantityReduced) {
-                Platform.runLater(() -> {
-                    // Refresh the food items display
-                    loadRandomFoodItems();
-                });
-            }
-            
-            @Override
-            public void onStockUpdateError(int itemId, String error) {
-                Platform.runLater(() -> {
-                    showAlert("Stock Update Error", "Failed to update stock: " + error);
-                });
-            }
-            
-            @Override
-            public void onAllItemsRefreshed() {
-                Platform.runLater(() -> {
-                    loadRandomFoodItems();
-                });
-            }
-        });
         
         // Load random food items
         loadRandomFoodItems();
@@ -298,104 +253,9 @@ public class MenuController {
         String searchTerm = searchField.getText().trim();
         if (!searchTerm.isEmpty()) {
             System.out.println("Searching for: " + searchTerm);
-            searchFoodItems(searchTerm);
-        } else {
-            // If search is empty, reload random items
-            loadRandomFoodItems();
+            // TODO: Implement search functionality
+            showAlert("Search", "Searching for: " + searchTerm);
         }
-    }
-    
-    private void searchFoodItems(String searchTerm) {
-        try {
-            // Show loading indicator
-            loadingIndicator.setVisible(true);
-            foodItemsContainer.setVisible(false);
-            
-            // Search in a background thread
-            new Thread(() -> {
-                try {
-                    // Search for food items
-                    allFoodItems = foodItemDao.searchItems(searchTerm);
-                    totalPages = (int) Math.ceil((double) allFoodItems.size() / ITEMS_PER_PAGE);
-                    
-                    // Update UI on JavaFX Application Thread
-                    Platform.runLater(() -> {
-                        loadingIndicator.setVisible(false);
-                        foodItemsContainer.setVisible(true);
-                        if (allFoodItems.isEmpty()) {
-                            showNoResultsMessage(searchTerm);
-                        } else {
-                            showPage(0);
-                            startCarousel();
-                        }
-                    });
-                } catch (Exception e) {
-                    Platform.runLater(() -> {
-                        loadingIndicator.setVisible(false);
-                        showAlert("Search Error", "Failed to search food items: " + e.getMessage());
-                    });
-                }
-            }).start();
-        } catch (Exception e) {
-            loadingIndicator.setVisible(false);
-            showAlert("Search Error", "Failed to search food items: " + e.getMessage());
-        }
-    }
-    
-    private void showNoResultsMessage(String searchTerm) {
-        foodItemsContainer.getChildren().clear();
-        
-        VBox noResultsBox = new VBox(16);
-        noResultsBox.setAlignment(javafx.geometry.Pos.CENTER);
-        noResultsBox.setStyle("-fx-padding: 40; -fx-min-width: 248; -fx-pref-width: 248; -fx-max-width: 248;");
-        
-        FontIcon searchIcon = new FontIcon("fas-search");
-        searchIcon.setIconSize(48);
-        searchIcon.setIconColor(javafx.scene.paint.Color.web("#adb5bd"));
-        
-        Label noResultsLabel = new Label("No results found");
-        noResultsLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #6c757d;");
-        
-        Label searchTermLabel = new Label("for \"" + searchTerm + "\"");
-        searchTermLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6c757d;");
-        
-        Label suggestionLabel = new Label("Try searching for different keywords");
-        suggestionLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #adb5bd;");
-        
-        noResultsBox.getChildren().addAll(searchIcon, noResultsLabel, searchTermLabel, suggestionLabel);
-        foodItemsContainer.getChildren().add(noResultsBox);
-    }
-    
-    /**
-     * Update stock display for a specific food item in real-time
-     */
-    private void updateFoodItemStock(int itemId, int newStock) {
-        // Update the allFoodItems list
-        for (int i = 0; i < allFoodItems.size(); i++) {
-            FoodItem item = allFoodItems.get(i);
-            if (item.getId() == itemId) {
-                // Create a new FoodItem with updated stock
-                FoodItem updatedItem = new FoodItem(
-                    item.getShopId(),
-                    item.getName(),
-                    item.getPrice(),
-                    item.getPointsMultiplier(),
-                    newStock
-                );
-                updatedItem.setId(item.getId());
-                updatedItem.setDescription(item.getDescription());
-                updatedItem.setImages(item.getImages());
-                updatedItem.setDiscount(item.getDiscount());
-                updatedItem.setCreatedAt(item.getCreatedAt());
-                updatedItem.setUpdatedAt(item.getUpdatedAt());
-                
-                allFoodItems.set(i, updatedItem);
-                break;
-            }
-        }
-        
-        // Refresh the current page display
-        showPage(currentPage);
     }
 
     @FXML
@@ -567,8 +427,9 @@ public class MenuController {
 		}
 	}
 
-    private void handleAddToCart(int itemId) {
+    private void handleAddToCart(int itemNumber) {
         // Demo mapping: itemNumber 1..4 -> existing sample item ids (1..4)
+        int itemId = itemNumber; // adjust when loading items dynamically
         int userId = currentUser != null ? currentUser.getId() : -1;
         if (userId <= 0) { showAlert("Cart", "You must be signed in to add items to cart."); return; }
         try {
@@ -580,16 +441,6 @@ public class MenuController {
             } else {
                 showAlert("Cart Error", ex.getMessage());
             }
-        }
-    }
-
-    private void removeFromCart(int itemId) {
-        int userId = currentUser != null ? currentUser.getId() : -1;
-        if (userId <= 0) { showAlert("Cart", "You must be signed in to remove items from cart."); return; }
-        try {
-            new com.unieats.dao.CartDao().removeFromCart(userId, itemId);
-        } catch (Exception ex) {
-            showAlert("Cart Error", "Failed to remove item from cart: " + ex.getMessage());
         }
     }
 
@@ -949,12 +800,8 @@ public class MenuController {
         updateCartButton(addToCartButton, item.getId());
         addToCartButton.setOnAction(e -> {
             if (isInCart(item.getId())) {
-                // Remove from cart
-                removeFromCart(item.getId());
-                updateCartButton(addToCartButton, item.getId());
-                showAlert("Cart", "Removed " + item.getName() + " from cart!");
+                navigateToCart();
             } else {
-                // Add to cart
                 handleAddToCart(item.getId());
                 updateCartButton(addToCartButton, item.getId());
             }
@@ -1268,7 +1115,7 @@ public class MenuController {
         btn.setText(carted ? "Carted" : "Add to Cart");
         btn.setStyle(carted ?
             "-fx-background-color: #e9ecef; -fx-background-radius: 12; -fx-padding: 10 24; -fx-text-fill: #6c757d; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;" :
-            "-fx-background-color: #28a745; -fx-background-radius: 12; -fx-padding: 10 24; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;");
+            "-fx-background-color: #ff6b35; -fx-background-radius: 12; -fx-padding: 10 24; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;");
     }
 
     private void styleCartButton(Button btn) {

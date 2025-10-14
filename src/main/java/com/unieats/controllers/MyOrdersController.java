@@ -3,7 +3,6 @@ package com.unieats.controllers;
 import com.unieats.OrderInfo;
 import com.unieats.User;
 import com.unieats.dao.OrderDao;
-import com.unieats.util.ThreadSafeUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -33,13 +32,6 @@ public class MyOrdersController {
     @FXML private VBox currentOrdersEmpty;
     @FXML private VBox orderHistoryEmpty;
     
-    // Pagination controls
-    @FXML private VBox paginationContainer;
-    @FXML private Button prevPageButton;
-    @FXML private HBox pageNumbersContainer;
-    @FXML private Button nextPageButton;
-    @FXML private Label pageInfoLabel;
-    
     // Bottom navigation
     @FXML private VBox navHome;
     @FXML private VBox navOrders;
@@ -49,19 +41,12 @@ public class MyOrdersController {
 
     private final OrderDao orderDao = new OrderDao();
     private User currentUser;
-    
-    // Pagination state
-    private static final int ORDERS_PER_PAGE = 10;
-    private int currentPage = 1;
-    private int totalPages = 1;
-    private int totalOrders = 0;
 
     @FXML
     private void initialize() {
         setupOrderLists();
         setupNavigationHandlers();
-        setupPagination();
-        showCurrentOrdersTab(); // Start with current orders at top
+        showCurrentOrdersTab();
     }
 
     private void setupOrderLists() {
@@ -80,15 +65,6 @@ public class MyOrdersController {
         navProfile.setOnMouseClicked(e -> navigateTo("/fxml/profile.fxml", "UniEats - Profile"));
     }
 
-    private void setupPagination() {
-        if (prevPageButton != null) {
-            prevPageButton.setOnAction(e -> goToPreviousPage());
-        }
-        if (nextPageButton != null) {
-            nextPageButton.setOnAction(e -> goToNextPage());
-        }
-    }
-
     public void setCurrentUser(User user) {
         this.currentUser = user;
         loadOrders();
@@ -97,126 +73,23 @@ public class MyOrdersController {
     private void loadOrders() {
         if (currentUser == null) return;
         
-        // Load orders in background thread to avoid blocking UI
-        ThreadSafeUtils.runAsyncWithErrorHandling(
-            () -> {
-                // Background task - load current orders
-                List<OrderInfo> currentOrders = orderDao.getCurrentOrdersByUserId(currentUser.getId());
-                ObservableList<OrderInfo> currentOrdersObservable = FXCollections.observableArrayList(currentOrders);
-                
-                // Update UI on JavaFX thread
-                ThreadSafeUtils.runOnFXThread(() -> {
-                    currentOrdersList.setItems(currentOrdersObservable);
-                    currentOrdersEmpty.setVisible(currentOrders.isEmpty());
-                });
-                
-                // Load order history with pagination
-                loadOrderHistoryPage();
-            },
-            () -> {
-                // UI update completed
-            },
-            exception -> {
-                showAlert("Error", "Failed to load orders: " + exception.getMessage());
-            }
-        );
-    }
-
-    private void loadOrderHistoryPage() {
-        if (currentUser == null) return;
-        
-        // Load order history in background thread
-        ThreadSafeUtils.runAsyncWithErrorHandling(
-            () -> {
-                // Background task
-                totalOrders = orderDao.getOrderHistoryCount(currentUser.getId());
-                totalPages = (int) Math.ceil((double) totalOrders / ORDERS_PER_PAGE);
-                if (totalPages == 0) totalPages = 1;
-                
-                // Ensure current page is within bounds
-                if (currentPage > totalPages) currentPage = totalPages;
-                if (currentPage < 1) currentPage = 1;
-                
-                // Load paginated order history
-                int offset = (currentPage - 1) * ORDERS_PER_PAGE;
-                List<OrderInfo> orderHistory = orderDao.getOrderHistoryByUserId(currentUser.getId(), offset, ORDERS_PER_PAGE);
-                ObservableList<OrderInfo> orderHistoryObservable = FXCollections.observableArrayList(orderHistory);
-                
-                // Update UI on JavaFX thread
-                ThreadSafeUtils.runOnFXThread(() -> {
-                    orderHistoryList.setItems(orderHistoryObservable);
-                    updatePaginationUI();
-                    orderHistoryEmpty.setVisible(orderHistory.isEmpty());
-                });
-            },
-            () -> {
-                // UI update completed
-            },
-            exception -> {
-                showAlert("Error", "Failed to load order history: " + exception.getMessage());
-            }
-        );
-    }
-
-    private void updatePaginationUI() {
-        if (pageInfoLabel != null) {
-            pageInfoLabel.setText(String.format("Page %d of %d (%d orders)", currentPage, totalPages, totalOrders));
-        }
-        
-        if (prevPageButton != null) {
-            prevPageButton.setDisable(currentPage <= 1);
-        }
-        
-        if (nextPageButton != null) {
-            nextPageButton.setDisable(currentPage >= totalPages);
-        }
-        
-        // Update page number buttons
-        if (pageNumbersContainer != null) {
-            pageNumbersContainer.getChildren().clear();
+        try {
+            // Load current orders (pending, preparing, ready, out_for_delivery)
+            List<OrderInfo> currentOrders = orderDao.getCurrentOrdersByUserId(currentUser.getId());
+            ObservableList<OrderInfo> currentOrdersObservable = FXCollections.observableArrayList(currentOrders);
+            currentOrdersList.setItems(currentOrdersObservable);
             
-            // Show up to 5 page numbers around current page
-            int startPage = Math.max(1, currentPage - 2);
-            int endPage = Math.min(totalPages, currentPage + 2);
+            // Load order history (delivered, cancelled)
+            List<OrderInfo> orderHistory = orderDao.getOrderHistoryByUserId(currentUser.getId());
+            ObservableList<OrderInfo> orderHistoryObservable = FXCollections.observableArrayList(orderHistory);
+            orderHistoryList.setItems(orderHistoryObservable);
             
-            for (int i = startPage; i <= endPage; i++) {
-                Button pageButton = new Button(String.valueOf(i));
-                pageButton.setStyle(i == currentPage ? 
-                    "-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-background-radius: 4; -fx-padding: 4 8;" :
-                    "-fx-background-color: #e9ecef; -fx-text-fill: #6c757d; -fx-background-radius: 4; -fx-padding: 4 8;");
-                pageButton.setCursor(javafx.scene.Cursor.HAND);
-                
-                final int pageNum = i;
-                pageButton.setOnAction(e -> goToPage(pageNum));
-                
-                pageNumbersContainer.getChildren().add(pageButton);
-            }
-        }
-        
-        // Show/hide pagination container
-        if (paginationContainer != null) {
-            paginationContainer.setVisible(totalPages > 1);
-        }
-    }
-
-    private void goToPreviousPage() {
-        if (currentPage > 1) {
-            currentPage--;
-            loadOrderHistoryPage();
-        }
-    }
-
-    private void goToNextPage() {
-        if (currentPage < totalPages) {
-            currentPage++;
-            loadOrderHistoryPage();
-        }
-    }
-
-    private void goToPage(int page) {
-        if (page >= 1 && page <= totalPages) {
-            currentPage = page;
-            loadOrderHistoryPage();
+            // Show/hide empty states
+            currentOrdersEmpty.setVisible(currentOrders.isEmpty());
+            orderHistoryEmpty.setVisible(orderHistory.isEmpty());
+            
+        } catch (Exception e) {
+            showAlert("Error", "Failed to load orders: " + e.getMessage());
         }
     }
 
@@ -231,59 +104,23 @@ public class MyOrdersController {
     }
 
     private void showCurrentOrdersTab() {
-        if (currentOrdersTab != null) {
-            currentOrdersTab.setStyle("-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8 0 0 8; -fx-padding: 12 24; -fx-cursor: hand;");
-        }
-        if (orderHistoryTab != null) {
-            orderHistoryTab.setStyle("-fx-background-color: #e9ecef; -fx-text-fill: #6c757d; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 0 8 8 0; -fx-padding: 12 24; -fx-cursor: hand;");
-        }
-
-        if (currentOrdersSection != null) currentOrdersSection.setVisible(true);
-        if (orderHistorySection != null) orderHistorySection.setVisible(false);
-        if (paginationContainer != null) paginationContainer.setVisible(false);
-
-        // Move current orders section to top
-        if (contentContainer != null && currentOrdersSection != null && orderHistorySection != null) {
-            // Store references before removing
-            VBox currentOrders = currentOrdersSection;
-            VBox orderHistory = orderHistorySection;
-
-            contentContainer.getChildren().remove(currentOrdersSection);
-            contentContainer.getChildren().remove(orderHistorySection);
-
-            // Add current orders first (at top)
-            contentContainer.getChildren().add(0, currentOrders);
-            // Add order history second (below)
-            contentContainer.getChildren().add(1, orderHistory);
-        }
+        // Update tab styles
+        currentOrdersTab.setStyle("-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8 0 0 8; -fx-padding: 12 24; -fx-cursor: hand;");
+        orderHistoryTab.setStyle("-fx-background-color: #e9ecef; -fx-text-fill: #6c757d; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 0 8 8 0; -fx-padding: 12 24; -fx-cursor: hand;");
+        
+        // Show current orders section
+        currentOrdersSection.setVisible(true);
+        orderHistorySection.setVisible(false);
     }
 
     private void showOrderHistoryTab() {
-        if (currentOrdersTab != null) {
-            currentOrdersTab.setStyle("-fx-background-color: #e9ecef; -fx-text-fill: #6c757d; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8 0 0 8; -fx-padding: 12 24; -fx-cursor: hand;");
-        }
-        if (orderHistoryTab != null) {
-            orderHistoryTab.setStyle("-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 0 8 8 0; -fx-padding: 12 24; -fx-cursor: hand;");
-        }
+        // Update tab styles
+        currentOrdersTab.setStyle("-fx-background-color: #e9ecef; -fx-text-fill: #6c757d; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8 0 0 8; -fx-padding: 12 24; -fx-cursor: hand;");
+        orderHistoryTab.setStyle("-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 0 8 8 0; -fx-padding: 12 24; -fx-cursor: hand;");
         
-        if (currentOrdersSection != null) currentOrdersSection.setVisible(false);
-        if (orderHistorySection != null) orderHistorySection.setVisible(true);
-        if (paginationContainer != null) paginationContainer.setVisible(totalPages > 1);
-
-        // Move order history section to top
-        if (contentContainer != null && currentOrdersSection != null && orderHistorySection != null) {
-            // Store references before removing
-            VBox currentOrders = currentOrdersSection;
-            VBox orderHistory = orderHistorySection;
-
-            contentContainer.getChildren().remove(currentOrdersSection);
-            contentContainer.getChildren().remove(orderHistorySection);
-
-            // Add order history first (at top)
-            contentContainer.getChildren().add(0, orderHistory);
-            // Add current orders second (below)
-            contentContainer.getChildren().add(1, currentOrders);
-        }
+        // Show order history section
+        currentOrdersSection.setVisible(false);
+        orderHistorySection.setVisible(true);
     }
 
     @FXML
@@ -345,36 +182,6 @@ public class MyOrdersController {
             VBox card = new VBox();
             card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-cursor: hand;");
             card.setSpacing(8);
-
-            // Food items section at the top
-            if (order.getItems() != null && !order.getItems().isEmpty()) {
-                VBox foodItemsSection = new VBox(6);
-                foodItemsSection.setStyle("-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 12;");
-
-                Label foodTitle = new Label("Items:");
-                foodTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #6c757d;");
-                foodItemsSection.getChildren().add(foodTitle);
-
-                VBox foodItemsList = new VBox(4);
-                for (OrderInfo.OrderItemInfo item : order.getItems()) {
-                    HBox foodItem = new HBox();
-                    foodItem.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-                    foodItem.setSpacing(8);
-
-                    Label itemName = new Label(item.itemName);
-                    itemName.setStyle("-fx-font-size: 12px; -fx-text-fill: #2d3436;");
-                    itemName.setMaxWidth(Double.MAX_VALUE);
-                    HBox.setHgrow(itemName, Priority.ALWAYS);
-
-                    Label itemQty = new Label("×" + item.quantity);
-                    itemQty.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;");
-
-                    foodItem.getChildren().addAll(itemName, itemQty);
-                    foodItemsList.getChildren().add(foodItem);
-                }
-                foodItemsSection.getChildren().add(foodItemsList);
-                card.getChildren().add(foodItemsSection);
-            }
 
             // Header with order ID and status
             HBox header = new HBox();

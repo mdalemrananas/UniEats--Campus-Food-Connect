@@ -33,7 +33,15 @@ public class TestApp extends Application {
         
         Button testFoodInsert = new Button("Test Food Insert");
         testFoodInsert.setOnAction(e -> {
-            boolean success = DatabaseHelper.insertFood("Test Burger", 150.0, 1);
+            boolean success = DatabaseHelper.insertFoodItem(
+                "Test Burger",  // name
+                150.0,          // price
+                10,             // stock
+                "Delicious test burger",  // description
+                "",             // images (empty string for test)
+                0.0,            // discount
+                1               // shop_id (assuming 1 is a valid shop ID)
+            );
             System.out.println("Food insert result: " + success);
         });
         

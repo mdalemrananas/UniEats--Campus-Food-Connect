@@ -6,132 +6,89 @@
 <?import javafx.geometry.Insets?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.unieats.controllers.ReportController"
+<VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="com.unieats.controllers.ReportController" 
       style="-fx-background-color: #fafafa;"
-      prefWidth="360"
+      prefWidth="360" 
       prefHeight="800"
       maxWidth="360"
-      maxHeight="800">
+      maxHeight="800"
+      spacing="0">
 
-    <top>
-        <!-- Header -->
-        <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
-            <Button fx:id="backButton" style="-fx-background-color: transparent; -fx-padding: 8;">
-                <graphic>
-                    <FontIcon iconLiteral="fas-arrow-left" iconSize="20" iconColor="#2d3436"/>
-                </graphic>
-            </Button>
-            <Label text="Submit Report" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 0 0 0 16;"/>
-        </HBox>
-    </top>
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
+        <Button fx:id="backButton" style="-fx-background-color: transparent; -fx-padding: 8;">
+            <graphic>
+                <FontIcon iconLiteral="fas-arrow-left" iconSize="20" iconColor="#2d3436"/>
+            </graphic>
+        </Button>
+        <Label text="Submit Report" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 0 0 0 16;"/>
+    </HBox>
 
-    <center>
-        <!-- Report Form -->
-        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
-            <VBox spacing="20" style="-fx-padding: 20;">
+    <!-- Report Form -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+        <VBox spacing="20" style="-fx-padding: 20;">
+            
+            <!-- Report Type Selection -->
+            <VBox spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                <Label text="Report Type" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                <fx:define>
+                    <ToggleGroup fx:id="reportTypeGroup"/>
+                </fx:define>
+                
+                <HBox spacing="12">
+                    <RadioButton fx:id="shopReportRadio" text="Shop Report" selected="true" toggleGroup="$reportTypeGroup"/>
+                    <RadioButton fx:id="foodItemReportRadio" text="Food Item Report" toggleGroup="$reportTypeGroup"/>
+                </HBox>
+            </VBox>
 
-                <!-- Report Type Selection -->
-                <VBox spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
-                    <Label text="Report Type" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                    <fx:define>
-                        <ToggleGroup fx:id="reportTypeGroup"/>
-                    </fx:define>
+            <!-- Shop Selection (for shop reports) -->
+            <VBox fx:id="shopSelectionBox" spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                <Label text="Select Shop" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                <ComboBox fx:id="shopComboBox" promptText="Choose a shop..." style="-fx-pref-width: 320;"/>
+            </VBox>
 
-                    <HBox spacing="12">
-                        <RadioButton fx:id="shopReportRadio" text="Shop Report" selected="true" toggleGroup="$reportTypeGroup"/>
-                        <RadioButton fx:id="foodItemReportRadio" text="Food Item Report" toggleGroup="$reportTypeGroup"/>
-                    </HBox>
-                </VBox>
+            <!-- Food Item Selection (for food item reports) -->
+            <VBox fx:id="foodItemSelectionBox" spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);" visible="false" managed="false">
+                <Label text="Select Food Item" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                <ComboBox fx:id="foodItemComboBox" promptText="Choose a food item..." style="-fx-pref-width: 320;"/>
+            </VBox>
 
-                <!-- Shop Selection (for shop reports) -->
-                <VBox fx:id="shopSelectionBox" spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
-                    <Label text="Select Shop" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                    <ComboBox fx:id="shopComboBox" promptText="Choose a shop..." style="-fx-pref-width: 320;"/>
-                </VBox>
+            <!-- Report Details -->
+            <VBox spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                <Label text="Report Details" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                
+                <TextField fx:id="titleField" promptText="Report Title" style="-fx-pref-width: 320; -fx-pref-height: 40; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e9ecef; -fx-border-width: 1; -fx-padding: 8 12;"/>
+                
+                <TextArea fx:id="descriptionField" promptText="Describe the issue in detail..." style="-fx-pref-width: 320; -fx-pref-height: 120; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e9ecef; -fx-border-width: 1; -fx-padding: 8 12; -fx-wrap-text: true;"/>
+            </VBox>
 
-                <!-- Food Item Selection (for food item reports) -->
-                <VBox fx:id="foodItemSelectionBox" spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);" visible="false" managed="false">
-                    <Label text="Select Food Item" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                    <ComboBox fx:id="foodItemComboBox" promptText="Choose a food item..." style="-fx-pref-width: 320;"/>
-                </VBox>
-
-                <!-- Report Details -->
-                <VBox spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
-                    <Label text="Report Details" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-
-                    <TextField fx:id="titleField" promptText="Report Title" style="-fx-pref-width: 320; -fx-pref-height: 40; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e9ecef; -fx-border-width: 1; -fx-padding: 8 12;"/>
-
-                    <TextArea fx:id="descriptionField" promptText="Describe the issue in detail..." style="-fx-pref-width: 320; -fx-pref-height: 120; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e9ecef; -fx-border-width: 1; -fx-padding: 8 12; -fx-wrap-text: true;"/>
-                </VBox>
-
-                <!-- Image Upload -->
-                <VBox spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
-                    <Label text="Attachments (Optional)" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-
-                    <HBox spacing="12" alignment="CENTER_LEFT">
-                        <Button fx:id="uploadImageButton" text="Upload Image" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 12; -fx-cursor: hand;">
-                            <graphic>
-                                <FontIcon iconLiteral="fas-upload" iconSize="14" iconColor="white"/>
-                            </graphic>
-                        </Button>
-                        <Label fx:id="imageStatusLabel" text="No image selected" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
-                    </HBox>
-
-                    <Label text="Supported formats: JPG, PNG, GIF (Max 5MB)" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
-                </VBox>
-
-                <!-- Submit Button -->
-                <VBox spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
-                    <Button fx:id="submitReportButton" text="Submit Report" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 24; -fx-background-radius: 12; -fx-cursor: hand; -fx-pref-width: 320;">
+            <!-- Image Upload -->
+            <VBox spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                <Label text="Attachments (Optional)" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Button fx:id="uploadImageButton" text="Upload Image" style="-fx-background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 12; -fx-cursor: hand;">
                         <graphic>
-                            <FontIcon iconLiteral="fas-paper-plane" iconSize="16" iconColor="white"/>
+                            <FontIcon iconLiteral="fas-upload" iconSize="14" iconColor="white"/>
                         </graphic>
                     </Button>
+                    <Label fx:id="imageStatusLabel" text="No image selected" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
+                </HBox>
+                
+                <Label text="Supported formats: JPG, PNG, GIF (Max 5MB)" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
 
-                    <Label text="Your report will be reviewed by our team" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-alignment: center;"/>
-                </VBox>
+            <!-- Submit Button -->
+            <VBox spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                <Button fx:id="submitReportButton" text="Submit Report" style="-fx-background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 24; -fx-background-radius: 12; -fx-cursor: hand; -fx-pref-width: 320;">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-paper-plane" iconSize="16" iconColor="white"/>
+                    </graphic>
+                </Button>
+                
+                <Label text="Your report will be reviewed by our team" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-alignment: center;"/>
             </VBox>
-        </ScrollPane>
-    </center>
-
-    <bottom>
-        <HBox alignment="CENTER" spacing="0" style="-fx-background-color: #ffffff; -fx-padding: 12 0; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);">
-            <!-- Home -->
-            <VBox fx:id="navHome" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
-                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
-                    <FontIcon iconLiteral="fas-home" iconSize="20" iconColor="#6c757d"/>
-                </StackPane>
-                <Label text="Home" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
-            </VBox>
-            <!-- Orders -->
-            <VBox fx:id="navOrders" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
-                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
-                    <FontIcon iconLiteral="fas-list-alt" iconSize="20" iconColor="#6c757d"/>
-                </StackPane>
-                <Label text="My Orders" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
-            </VBox>
-            <!-- Cart -->
-            <VBox fx:id="navCart" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
-                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
-                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="20" iconColor="#6c757d"/>
-                </StackPane>
-                <Label text="Cart" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
-            </VBox>
-            <!-- Favourite -->
-            <VBox fx:id="navFav" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
-                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
-                    <FontIcon iconLiteral="fas-heart" iconSize="20" iconColor="#6c757d"/>
-                </StackPane>
-                <Label text="Favourite" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
-            </VBox>
-            <!-- Profile -->
-            <VBox fx:id="navProfile" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
-                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
-                    <FontIcon iconLiteral="fas-user" iconSize="20" iconColor="#6c757d"/>
-                </StackPane>
-                <Label text="Profile" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
-            </VBox>
-        </HBox>
-    </bottom>
-</BorderPane>
+        </VBox>
+    </ScrollPane>
+</VBox>

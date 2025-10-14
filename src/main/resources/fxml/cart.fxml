@@ -16,7 +16,7 @@
                 <Button text="Clear" onAction="#handleClear" />
             </HBox>
 
-            <ListView fx:id="cartList"/>
+            <ListView fx:id="cartList" prefHeight="600"/>
 
             <VBox spacing="6">
                 <HBox>

@@ -27,7 +27,6 @@ public class PaymentDao {
                 if (rs.next()) {
                     int paymentId = rs.getInt(1);
                     System.out.println("Payment created with ID: " + paymentId);
-                    com.unieats.services.EventNotifier.notifyChange("payments");
                     return paymentId;
                 }
             }

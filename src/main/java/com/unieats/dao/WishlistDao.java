@@ -1,7 +1,6 @@
 package com.unieats.dao;
 
 import com.unieats.FoodItem;
-import com.unieats.WishlistItemView;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -90,39 +89,6 @@ public class WishlistDao {
 					try { item.setDescription(rs.getString("description")); } catch (SQLException ignored) {}
 					try { item.setImages(rs.getString("images")); } catch (SQLException ignored) {}
 					try { item.setDiscount(rs.getDouble("discount")); } catch (SQLException ignored) {}
-					items.add(item);
-				}
-			}
-			return items;
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public List<WishlistItemView> listWishlistItemsWithShop(int userId) {
-		String sql = """
-			SELECT fi.id as item_id, fi.shop_id, fi.name as item_name, fi.price, fi.description, fi.images, s.shop_name
-			FROM wishlist w
-			JOIN food_items fi ON w.item_id = fi.id
-			JOIN shops s ON fi.shop_id = s.id
-			WHERE w.user_id = ?
-			ORDER BY w.created_at DESC
-		""";
-		List<WishlistItemView> items = new ArrayList<>();
-		try (Connection conn = DriverManager.getConnection(DB_URL);
-			 PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setInt(1, userId);
-			try (ResultSet rs = ps.executeQuery()) {
-				while (rs.next()) {
-					WishlistItemView item = new WishlistItemView(
-						rs.getInt("item_id"),
-						rs.getInt("shop_id"),
-						rs.getString("item_name"),
-						rs.getDouble("price"),
-						rs.getString("shop_name"),
-						rs.getString("description"),
-						rs.getString("images")
-					);
 					items.add(item);
 				}
 			}

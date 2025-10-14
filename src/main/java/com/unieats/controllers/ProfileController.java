@@ -9,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
@@ -30,16 +29,13 @@ public class ProfileController {
     
     @FXML private Label profileNameLabel;
     @FXML private Label profileEmailLabel;
-    @FXML private Label profileEmailInfoLabel;
-    @FXML private Label profilePhoneLabel;
-    @FXML private Label profileAddressLabel;
+    @FXML private Label profileIdLabel;
     @FXML private Label profileCategoryLabel;
     @FXML private Label profileCreatedLabel;
     @FXML private Label profileUpdatedLabel;
     @FXML private Button backButton;
     @FXML private Button editProfileButton;
     @FXML private Button changePasswordButton;
-    @FXML private Button logoutButton;
     @FXML private ImageView profileImageView;
     // Bottom nav items on profile screen
     @FXML private VBox navHome;
@@ -63,7 +59,6 @@ public class ProfileController {
         backButton.setOnAction(e -> handleBack());
         editProfileButton.setOnAction(e -> handleEditProfile());
         changePasswordButton.setOnAction(e -> handleChangePassword());
-        logoutButton.setOnAction(e -> handleLogout());
         // Bottom navigation wiring
         if (navHome != null) navHome.setOnMouseClicked(e -> { setActiveNav(navHome); navigateToMenu(); });
         if (navOrders != null) navOrders.setOnMouseClicked(e -> { setActiveNav(navOrders); navigateToOrders(); });
@@ -81,16 +76,16 @@ public class ProfileController {
         if (currentUser != null) {
             profileNameLabel.setText(currentUser.getFullName());
             profileEmailLabel.setText(currentUser.getEmail());
-            if (profileEmailInfoLabel != null) profileEmailInfoLabel.setText(currentUser.getEmail());
-            if (profilePhoneLabel != null) profilePhoneLabel.setText(currentUser.getPhoneNo() == null || currentUser.getPhoneNo().isEmpty() ? "Not set" : currentUser.getPhoneNo());
-            if (profileAddressLabel != null) profileAddressLabel.setText(currentUser.getAddress() == null || currentUser.getAddress().isEmpty() ? "Not set" : currentUser.getAddress());
+            profileIdLabel.setText(String.valueOf(currentUser.getId()));
             profileCategoryLabel.setText(currentUser.getUserCategory().toUpperCase());
             
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
             if (currentUser.getCreatedAt() != null) {
                 profileCreatedLabel.setText(currentUser.getCreatedAt().format(formatter));
             }
-            // Hide last updated per requirements
+            if (currentUser.getUpdatedAt() != null) {
+                profileUpdatedLabel.setText(currentUser.getUpdatedAt().format(formatter));
+            }
 
             // Load profile picture if available
             if (profileImageView != null) {
@@ -176,22 +171,13 @@ public class ProfileController {
 
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Edit Profile");
-        dialog.setHeaderText("Update your profile");
-        // Mobile size dialog
-        dialog.getDialogPane().setPrefWidth(320);
-        dialog.getDialogPane().setPrefHeight(480);
+        dialog.setHeaderText("Update your name and email");
 
         // Dialog controls
         TextField nameField = new TextField(currentUser.getFullName());
         nameField.setPromptText("Full name");
-        // Email is no longer editable per requirement
-        Label emailStatic = new Label(currentUser.getEmail());
-        emailStatic.setStyle("-fx-text-fill: #6c757d;");
-        TextField phoneField = new TextField(currentUser.getPhoneNo() == null ? "" : currentUser.getPhoneNo());
-        phoneField.setPromptText("Phone no");
-        TextArea addressArea = new TextArea(currentUser.getAddress() == null ? "" : currentUser.getAddress());
-        addressArea.setPromptText("Address");
-        addressArea.setPrefRowCount(3);
+        TextField emailField = new TextField(currentUser.getEmail());
+        emailField.setPromptText("Email address");
         // Picture preview + chooser
         ImageView preview = new ImageView();
         preview.setFitWidth(80);
@@ -245,17 +231,13 @@ public class ProfileController {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.add(new Label("Profile picture:"), 0, 0);
-        grid.add(preview, 1, 0);
-        grid.add(choosePicBtn, 1, 1);
-        grid.add(new Label("Full name:"), 0, 2);
-        grid.add(nameField, 1, 2);
-        grid.add(new Label("Email:"), 0, 3);
-        grid.add(emailStatic, 1, 3);
-        grid.add(new Label("Phone no:"), 0, 4);
-        grid.add(phoneField, 1, 4);
-        grid.add(new Label("Address:"), 0, 5);
-        grid.add(addressArea, 1, 5);
+        grid.add(new Label("Full name:"), 0, 0);
+        grid.add(nameField, 1, 0);
+        grid.add(new Label("Email:"), 0, 1);
+        grid.add(emailField, 1, 1);
+        grid.add(new Label("Profile picture:"), 0, 2);
+        grid.add(preview, 1, 2);
+        grid.add(choosePicBtn, 1, 3);
         dialog.getDialogPane().setContent(grid);
 
         ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
@@ -265,20 +247,22 @@ public class ProfileController {
         Button saveBtn = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
         saveBtn.addEventFilter(javafx.event.ActionEvent.ACTION, ev -> {
             String fullName = nameField.getText() != null ? nameField.getText().trim() : "";
+            String email = emailField.getText() != null ? emailField.getText().trim() : "";
             if (fullName.isEmpty()) {
                 ev.consume();
                 showAlert("Validation Error", "Full name is required.");
                 return;
             }
-            String phone = phoneField.getText() != null ? phoneField.getText().trim() : "";
-            String addr = addressArea.getText() != null ? addressArea.getText().trim() : "";
+            if (email.isEmpty() || !email.contains("@")) {
+                ev.consume();
+                showAlert("Validation Error", "Enter a valid email address.");
+                return;
+            }
 
             // Attempt update
             try {
                 currentUser.setFullName(fullName);
-                // Email not changed
-                currentUser.setPhoneNo(phone.isEmpty() ? null : phone);
-                currentUser.setAddress(addr.isEmpty() ? null : addr);
+                currentUser.setEmail(email);
                 boolean ok = dbManager.updateUser(currentUser);
                 if (!ok) {
                     ev.consume();
@@ -368,34 +352,16 @@ public class ProfileController {
         newField.setPromptText("New password (min 6 chars)");
         PasswordField confirmField = new PasswordField();
         confirmField.setPromptText("Confirm new password");
-        Button toggleCurrent = new Button();
-        toggleCurrent.setGraphic(new FontIcon("fas-eye"));
-        Button toggleNew = new Button();
-        toggleNew.setGraphic(new FontIcon("fas-eye"));
-        Button toggleConfirm = new Button();
-        toggleConfirm.setGraphic(new FontIcon("fas-eye"));
-        TextField currentText = new TextField(); currentText.setManaged(false); currentText.setVisible(false);
-        TextField newText = new TextField(); newText.setManaged(false); newText.setVisible(false);
-        TextField confirmText = new TextField(); confirmText.setManaged(false); confirmText.setVisible(false);
-        currentText.textProperty().bindBidirectional(currentField.textProperty());
-        newText.textProperty().bindBidirectional(newField.textProperty());
-        confirmText.textProperty().bindBidirectional(confirmField.textProperty());
-        toggleCurrent.setOnAction(e -> toggleFieldVisibility(currentField, currentText, (FontIcon) toggleCurrent.getGraphic()));
-        toggleNew.setOnAction(e -> toggleFieldVisibility(newField, newText, (FontIcon) toggleNew.getGraphic()));
-        toggleConfirm.setOnAction(e -> toggleFieldVisibility(confirmField, confirmText, (FontIcon) toggleConfirm.getGraphic()));
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.add(new Label("Current:"), 0, 0);
-        HBox r0 = new HBox(6, currentField, currentText, toggleCurrent);
-        grid.add(r0, 1, 0);
+        grid.add(currentField, 1, 0);
         grid.add(new Label("New:"), 0, 1);
-        HBox r1 = new HBox(6, newField, newText, toggleNew);
-        grid.add(r1, 1, 1);
+        grid.add(newField, 1, 1);
         grid.add(new Label("Confirm:"), 0, 2);
-        HBox r2 = new HBox(6, confirmField, confirmText, toggleConfirm);
-        grid.add(r2, 1, 2);
+        grid.add(confirmField, 1, 2);
         dialog.getDialogPane().setContent(grid);
 
         ButtonType changeButtonType = new ButtonType("Change", ButtonBar.ButtonData.OK_DONE);
@@ -453,50 +419,6 @@ public class ProfileController {
                 showAlert("Success", "Password changed successfully.");
             }
         });
-    }
-
-    @FXML
-    private void handleLogout() {
-        if (currentUser == null) {
-            showAlert("Error", "No user is signed in.");
-            return;
-        }
-
-        // Show confirmation dialog
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Logout");
-        alert.setHeaderText("Are you sure you want to logout?");
-        alert.setContentText("You will need to sign in again to access your account.");
-
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                try {
-                    // Navigate to signin page
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/signin.fxml"));
-                    Parent root = loader.load();
-
-                    Stage stage = (Stage) logoutButton.getScene().getWindow();
-                    Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-                    stage.setScene(scene);
-                    stage.setTitle("UniEats - Sign In");
-                    stage.show();
-
-                } catch (IOException e) {
-                    showAlert("Navigation Error", "Failed to navigate to sign in page: " + e.getMessage());
-                }
-            }
-        });
-    }
-
-    private void toggleFieldVisibility(PasswordField pwd, TextField txt, FontIcon icon) {
-        boolean show = !txt.isVisible();
-        txt.setManaged(show);
-        txt.setVisible(show);
-        pwd.setManaged(!show);
-        pwd.setVisible(!show);
-        icon.setIconLiteral(show ? "fas-eye-slash" : "fas-eye");
-        if (show) { txt.requestFocus(); txt.positionCaret(txt.getText() != null ? txt.getText().length() : 0); }
-        else { pwd.requestFocus(); pwd.positionCaret(pwd.getText() != null ? pwd.getText().length() : 0); }
     }
     
     private void showAlert(String title, String content) {

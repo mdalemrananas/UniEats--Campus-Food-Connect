@@ -8,10 +8,7 @@ public class User {
     private String password;
     private String fullName;
     private String profilePicture; // path or URI to profile picture
-    private String phoneNo; // user's phone number (nullable)
-    private String address; // user's address (nullable)
     private String userCategory; // 'student' or 'seller'
-    private String status; // 'approved', 'pending', 'rejected'
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -89,36 +86,12 @@ public class User {
         this.profilePicture = profilePicture;
     }
 
-    public String getPhoneNo() {
-        return phoneNo;
-    }
-
-    public void setPhoneNo(String phoneNo) {
-        this.phoneNo = phoneNo;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public String getUserCategory() {
         return userCategory;
     }
 
     public void setUserCategory(String userCategory) {
         this.userCategory = userCategory;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public LocalDateTime getCreatedAt() {

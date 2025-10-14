@@ -37,43 +37,30 @@
         <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
             <VBox fx:id="contentContainer" spacing="16" style="-fx-padding: 16;">
                 
-                <!-- Order History Section (moved to top) -->
-                <VBox fx:id="orderHistorySection" spacing="12">
-                    <Label text="Order History" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                    <ListView fx:id="orderHistoryList" prefHeight="350" style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
-                    
-                    <!-- Pagination Controls -->
-                    <VBox fx:id="paginationContainer" spacing="8" alignment="CENTER" style="-fx-padding: 16 0;">
-                        <HBox alignment="CENTER" spacing="8">
-                            <Button fx:id="prevPageButton" text="Previous" 
-                                    style="-fx-background-color: #e9ecef; -fx-text-fill: #6c757d; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;"/>
-                            <HBox fx:id="pageNumbersContainer" alignment="CENTER" spacing="4"/>
-                            <Button fx:id="nextPageButton" text="Next" 
-                                    style="-fx-background-color: #e9ecef; -fx-text-fill: #6c757d; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;"/>
-                        </HBox>
-                        <Label fx:id="pageInfoLabel" text="Page 1 of 1 (0 orders)" 
-                               style="-fx-text-fill: #6c757d; -fx-font-size: 12px;"/>
-                    </VBox>
-                </VBox>
-
                 <!-- Current Orders Section -->
                 <VBox fx:id="currentOrdersSection" spacing="12">
                     <Label text="Active Orders" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
                     <ListView fx:id="currentOrdersList" prefHeight="400" style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
                 </VBox>
 
-                <!-- Empty state for order history (moved to top) -->
-                <VBox fx:id="orderHistoryEmpty" alignment="CENTER" spacing="16" style="-fx-padding: 40 20;">
-                    <FontIcon iconLiteral="fas-history" iconSize="48" iconColor="#e9ecef"/>
-                    <Label text="No Order History" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #6c757d;"/>
-                    <Label text="Your completed orders will appear here" style="-fx-font-size: 14px; -fx-text-fill: #adb5bd;"/>
+                <!-- Order History Section -->
+                <VBox fx:id="orderHistorySection" spacing="12" visible="false">
+                    <Label text="Order History" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    <ListView fx:id="orderHistoryList" prefHeight="400" style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
                 </VBox>
 
                 <!-- Empty state for current orders -->
-                <VBox fx:id="currentOrdersEmpty" alignment="CENTER" spacing="16" style="-fx-padding: 40 20;" visible="false">
+                <VBox fx:id="currentOrdersEmpty" alignment="CENTER" spacing="16" style="-fx-padding: 40 20;">
                     <FontIcon iconLiteral="fas-shopping-bag" iconSize="48" iconColor="#e9ecef"/>
                     <Label text="No Active Orders" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #6c757d;"/>
                     <Label text="Your current orders will appear here" style="-fx-font-size: 14px; -fx-text-fill: #adb5bd;"/>
+                </VBox>
+
+                <!-- Empty state for order history -->
+                <VBox fx:id="orderHistoryEmpty" alignment="CENTER" spacing="16" style="-fx-padding: 40 20;" visible="false">
+                    <FontIcon iconLiteral="fas-history" iconSize="48" iconColor="#e9ecef"/>
+                    <Label text="No Order History" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #6c757d;"/>
+                    <Label text="Your completed orders will appear here" style="-fx-font-size: 14px; -fx-text-fill: #adb5bd;"/>
                 </VBox>
 
             </VBox>

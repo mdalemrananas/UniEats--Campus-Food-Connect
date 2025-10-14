@@ -46,41 +46,17 @@
             <!-- Profile Details -->
             <VBox spacing="16" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
                 <Label text="Profile Information" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 0 0 16 0;"/>
-
-                <!-- Email -->
-                <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 12 0;">
-                    <StackPane style="-fx-background-color: #f0fdf4; -fx-background-radius: 8; -fx-padding: 8;">
-                        <FontIcon iconLiteral="fas-envelope" iconSize="16" iconColor="#16a34a"/>
-                    </StackPane>
-                    <VBox spacing="2">
-                        <Label text="Email" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
-                        <Label fx:id="profileEmailInfoLabel" text="email" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                    </VBox>
-                </HBox>
-
-                <!-- Phone -->
-                <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 12 0;">
-                    <StackPane style="-fx-background-color: #f0fdf4; -fx-background-radius: 8; -fx-padding: 8;">
-                        <FontIcon iconLiteral="fas-phone" iconSize="16" iconColor="#16a34a"/>
-                    </StackPane>
-                    <VBox spacing="2">
-                        <Label text="Phone no" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
-                        <Label fx:id="profilePhoneLabel" text="Not set" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                    </VBox>
-                </HBox>
-
-                <!-- Address -->
-                <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 12 0;">
-                    <StackPane style="-fx-background-color: #f0fdf4; -fx-background-radius: 8; -fx-padding: 8;">
-                        <FontIcon iconLiteral="fas-map-marker-alt" iconSize="16" iconColor="#16a34a"/>
-                    </StackPane>
-                    <VBox spacing="2">
-                        <Label text="Address" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
-                        <Label fx:id="profileAddressLabel" text="Not set" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                    </VBox>
-                </HBox>
                 
-                <!-- Removed User ID per requirements -->
+                <!-- User ID -->
+                <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 12 0;">
+                    <StackPane style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 8;">
+                        <FontIcon iconLiteral="fas-id-card" iconSize="16" iconColor="#6c757d"/>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label text="User ID" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
+                        <Label fx:id="profileIdLabel" text="ID" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    </VBox>
+                </HBox>
 
                 <!-- User Category -->
                 <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 12 0;">
@@ -104,14 +80,23 @@
                     </VBox>
                 </HBox>
 
-                <!-- Removed Last Updated per requirements -->
+                <!-- Last Updated -->
+                <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 12 0;">
+                    <StackPane style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 8;">
+                        <FontIcon iconLiteral="fas-clock" iconSize="16" iconColor="#6c757d"/>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label text="Last Updated" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"/>
+                        <Label fx:id="profileUpdatedLabel" text="Date" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    </VBox>
+                </HBox>
             </VBox>
 
             <!-- Actions -->
             <VBox spacing="12" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
                 <Label text="Actions" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 0 0 16 0;"/>
                 
-                <Button fx:id="editProfileButton" text="Edit Profile" style="-fx-background-color: #16a34a; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 12 24; -fx-background-radius: 12; -fx-cursor: hand;">
+                <Button fx:id="editProfileButton" text="Edit Profile" style="-fx-background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 12 24; -fx-background-radius: 12; -fx-cursor: hand;">
                     <graphic>
                         <FontIcon iconLiteral="fas-edit" iconSize="14" iconColor="white"/>
                     </graphic>
@@ -121,12 +106,6 @@
                 <Button fx:id="changePasswordButton" text="Change Password" style="-fx-background-color: #f8f9fa; -fx-text-fill: #2d3436; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 12 24; -fx-background-radius: 12; -fx-cursor: hand; -fx-border-color: #e9ecef; -fx-border-width: 1;">
                     <graphic>
                         <FontIcon iconLiteral="fas-lock" iconSize="14" iconColor="#6c757d"/>
-                    </graphic>
-                </Button>
-                
-                <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout" style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 12 24; -fx-background-radius: 12; -fx-cursor: hand;">
-                    <graphic>
-                        <FontIcon iconLiteral="fas-sign-out-alt" iconSize="14" iconColor="white"/>
                     </graphic>
                 </Button>
             </VBox>

@@ -1,11 +1,12 @@
 package com.unieats.controllers;
 
 import com.unieats.CartItemView;
+import com.unieats.RewardService;
 import com.unieats.dao.CartDao;
 import com.unieats.dao.CartQueryDao;
+import com.unieats.dao.OrderDao;
 import com.unieats.DatabaseManager;
 import com.unieats.User;
-import com.unieats.util.ThreadSafeUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -46,6 +47,7 @@ public class CartController {
 
     private final CartQueryDao cartQueryDao = new CartQueryDao();
     private final CartDao cartDao = new CartDao();
+    private final OrderDao orderDao = new OrderDao();
     private int currentUserId;
 
     @FXML
@@ -80,17 +82,10 @@ public class CartController {
 
                     // Texts
                     Label name = new Label(item.name);
-                    name.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;");
-                    Label shopLabel = new Label("from " + item.shopName);
-                    shopLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12px;");
+                    name.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
                     Label price = new Label(String.format("$ %.2f", item.price));
-                    price.setStyle("-fx-text-fill: #ff6b35; -fx-font-size: 14px; -fx-font-weight: bold;");
-                    Label points = new Label("Points: " + String.format("%.1fx", item.pointsMultiplier));
-                    points.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12px;");
-                    // Stock requires a join; if not available in CartItemView, leave as N/A
-                    Label stock = new Label("Stock: N/A");
-                    stock.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12px;");
-                    VBox textBox = new VBox(2, name, shopLabel, price, points, stock);
+                    price.setStyle("-fx-text-fill: #2d3436; -fx-font-size: 12px;");
+                    VBox textBox = new VBox(4, name, price);
                     textBox.setAlignment(Pos.CENTER_LEFT);
 
                     // Quantity control
@@ -119,8 +114,6 @@ public class CartController {
                     row.setAlignment(Pos.CENTER_LEFT);
                     row.setPadding(new Insets(8));
                     row.setStyle("-fx-background-color: transparent; -fx-border-color: rgba(0,0,0,0.06); -fx-border-width: 0 0 1 0;");
-                    // Navigate to details when clicking the row
-                    row.setOnMouseClicked(e -> openFoodDetails(item.itemId, item.shopId));
                     setGraphic(row);
                     setText(null);
                 }
@@ -131,28 +124,6 @@ public class CartController {
         wireBottomNav();
         // Highlight Cart as active and ensure pointer cursor on its icon/label
         highlightActiveCart();
-    }
-
-    private void openFoodDetails(int itemId, int shopId) {
-        try {
-            var foodDao = new com.unieats.dao.FoodItemDao();
-            var shopDao = new com.unieats.dao.ShopDao();
-            com.unieats.FoodItem item = foodDao.getById(itemId);
-            com.unieats.Shop shop = shopDao.getShopById(shopId);
-            if (item == null || shop == null) return;
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/food_details.fxml"));
-            Parent root = loader.load();
-            FoodDetailsController controller = loader.getController();
-            User user = currentUserId > 0 ? DatabaseManager.getInstance().getUserById(currentUserId) : null;
-            controller.setData(user, item, shop);
-            Stage stage = findStage();
-            if (stage == null) return;
-            Scene newScene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            copyCurrentStyles(newScene);
-            stage.setScene(newScene);
-            stage.setTitle("UniEats - Details");
-            stage.show();
-        } catch (Exception ignored) {}
     }
 
     private void wireBottomNav() {
@@ -253,42 +224,18 @@ public class CartController {
     }
 
     private void refresh() {
-        // Refresh cart in background thread to avoid blocking UI
-        ThreadSafeUtils.runAsyncWithErrorHandling(
-            () -> {
-                // Background task - load cart items
-                List<CartItemView> items = cartQueryDao.listCartItems(currentUserId);
-                ObservableList<CartItemView> data = FXCollections.observableArrayList(items);
+        List<CartItemView> items = cartQueryDao.listCartItems(currentUserId);
+        ObservableList<CartItemView> data = FXCollections.observableArrayList(items);
+        if (cartTable != null) cartTable.setItems(data);
+        if (cartList != null) cartList.setItems(data);
 
-                double subtotal = items.stream().mapToDouble(i -> i.price * i.quantity).sum();
-                double tax = Math.round(subtotal * 0.02 * 100.0) / 100.0; // 2%
-                double total = subtotal + tax;
+        double subtotal = items.stream().mapToDouble(i -> i.price * i.quantity).sum();
+        double tax = Math.round(subtotal * 0.02 * 100.0) / 100.0; // 2%
+        double total = subtotal + tax;
 
-                // Update UI on JavaFX thread
-                ThreadSafeUtils.runOnFXThread(() -> {
-                    if (cartTable != null) cartTable.setItems(data);
-                    if (cartList != null) cartList.setItems(data);
-
-                    if (subtotalLabel != null) subtotalLabel.setText(String.format("$%.2f", subtotal));
-                    if (taxLabel != null) taxLabel.setText(String.format("$%.2f", tax));
-                    if (totalLabel != null) totalLabel.setText(String.format("$%.2f", total));
-                });
-            },
-            () -> {
-                // UI update completed
-            },
-            exception -> {
-                showAlert("Error", "Failed to refresh cart: " + exception.getMessage());
-            }
-        );
-    }
-
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        if (subtotalLabel != null) subtotalLabel.setText(String.format("$%.2f", subtotal));
+        if (taxLabel != null) taxLabel.setText(String.format("$%.2f", tax));
+        if (totalLabel != null) totalLabel.setText(String.format("$%.2f", total));
     }
 
     @FXML

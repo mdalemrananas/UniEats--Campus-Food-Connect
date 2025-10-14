@@ -38,10 +38,6 @@ import java.util.concurrent.TimeUnit;
 import com.unieats.util.ReportFileManager;
 import java.io.File;
 import java.util.List;
-import javafx.stage.Stage;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import com.unieats.services.RealtimeService;
 
 public class AdminController {
 	// Root content stack (we will add child panes at runtime)
@@ -111,7 +107,6 @@ public class AdminController {
 		renderReportsAndPayments();
 		populateCharts();
 		startAutoRefresh();
-		startRealtime();
 		wireSearchFields();
 	}
 
@@ -220,12 +215,7 @@ public class AdminController {
 	private void loadDummyData() {
 		allUsers.clear();
 		// Load real users from DB
-        // Only students shown in Manage Users (sellers are handled in Manage Shops)
-        for (User u : com.unieats.DatabaseManager.getInstance().getAllUsers()) {
-            if ("student".equalsIgnoreCase(u.getUserCategory())) {
-                allUsers.add(u);
-            }
-        }
+		allUsers.addAll(com.unieats.DatabaseManager.getInstance().getAllUsers());
 		renderUserCards(allUsers);
 
 		allSellers.clear();
@@ -280,7 +270,6 @@ public class AdminController {
                     VBox attachmentsContainer = new VBox();
                     attachmentsContainer.setSpacing(4);
                     
-                    // Only show buttons that point to existing files
                     if (!attachments.isEmpty()) {
                         Text attachmentsLabel = new Text("Attachments:");
                         attachmentsLabel.setStyle("-fx-font-size: 12; -fx-font-weight: 600; -fx-fill: #374151;");
@@ -290,22 +279,16 @@ public class AdminController {
                         buttonsContainer.setSpacing(6);
                         buttonsContainer.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
                         
-                        int shown = 0;
                         for (int i = 0; i < attachments.size(); i++) {
                             String attachmentPath = attachments.get(i);
-                            if (ReportFileManager.attachmentExists(attachmentPath)) {
-                                Button downloadBtn = new Button("📎 Download " + (shown + 1));
-                                downloadBtn.getStyleClass().addAll("download-btn", "download-btn-" + ((shown % 4) + 1));
-                                downloadBtn.setStyle("-fx-font-size: 10px; -fx-padding: 4 8 4 8; -fx-cursor: hand;");
-                                downloadBtn.setOnAction(e -> downloadAttachment(attachmentPath));
-                                buttonsContainer.getChildren().add(downloadBtn);
-                                shown++;
-                            }
-                        }
-                        if (shown == 0) {
-                            // no existing attachments -> don't show container
-                            buttonsContainer.setManaged(false);
-                            buttonsContainer.setVisible(false);
+                            Button downloadBtn = new Button("📎 Download " + (i + 1));
+                            downloadBtn.getStyleClass().addAll("download-btn", "download-btn-" + ((i % 4) + 1));
+                            downloadBtn.setStyle("-fx-font-size: 10px; -fx-padding: 4 8 4 8; -fx-cursor: hand;");
+                            
+                            // Add download functionality
+                            downloadBtn.setOnAction(e -> downloadAttachment(attachmentPath));
+                            
+                            buttonsContainer.getChildren().add(downloadBtn);
                         }
                         
                         attachmentsContainer.getChildren().add(buttonsContainer);
@@ -319,44 +302,23 @@ public class AdminController {
         // Payments
         if (this.paymentsFlow != null) {
                 this.paymentsFlow.getChildren().clear();
-                // Join orders, users, shops, order_items, food_items, payments to show rich card for completed payments
-                String sql = """
-                    SELECT p.id as payment_id, p.amount, p.payment_method, p.status as payment_status,
-                           o.id as order_id, u.full_name as user_name, s.shop_name,
-                           GROUP_CONCAT(fi.name || ' x' || oi.quantity || ' ($' || printf('%.2f', oi.price) || ')', '\n') as items
-                    FROM payments p
-                    JOIN orders o ON p.order_id = o.id
-                    JOIN users u ON o.user_id = u.id
-                    JOIN shops s ON o.shop_id = s.id
-                    LEFT JOIN order_items oi ON oi.order_id = o.id
-                    LEFT JOIN food_items fi ON fi.id = oi.item_id
-                    WHERE p.status IN ('completed','success')
-                    GROUP BY p.id, p.amount, p.payment_method, p.status, o.id, u.full_name, s.shop_name
-                    ORDER BY p.created_at DESC
-                    LIMIT 50
-                """;
-                try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet pr = ps.executeQuery()) {
-                    while (pr.next()) {
-                        VBox card = new VBox();
-                        card.setSpacing(6);
-                        card.setPadding(new Insets(10));
-                        card.getStyleClass().add("card");
-                        card.setPrefWidth(300);
-                        Text header = new Text("Payment #" + pr.getInt("payment_id") + " - $" + String.format("%.2f", pr.getDouble("amount")));
-                        header.setStyle("-fx-font-size: 14; -fx-font-weight: 600;");
-                        Text user = new Text("User: " + pr.getString("user_name"));
-                        user.setStyle("-fx-fill: #6b7280;");
-                        Text shop = new Text("Shop: " + pr.getString("shop_name"));
-                        shop.setStyle("-fx-fill: #6b7280;");
-                        Text method = new Text("Method: " + pr.getString("payment_method"));
-                        Text statusText = new Text("Status: " + pr.getString("payment_status"));
-                        statusText.getStyleClass().add("tag");
-                        String items = pr.getString("items");
-                        Text itemsText = new Text(items == null ? "Items: (none)" : ("Items:\n" + items));
-                        itemsText.setStyle("-fx-fill: #374151;");
-                        card.getChildren().addAll(header, user, shop, method, statusText, itemsText);
-                        this.paymentsFlow.getChildren().add(card);
-                    }
+                ResultSet pr = new com.unieats.dao.PaymentDao().listLatest(conn, 50);
+                while (pr.next()) {
+                    VBox card = new VBox();
+                    card.setSpacing(6);
+                    card.setPadding(new Insets(10));
+                    card.getStyleClass().add("card");
+                    card.setPrefWidth(300);
+                    Text method = new Text("Method: " + pr.getString("payment_method"));
+                    method.setStyle("-fx-font-size: 14; -fx-font-weight: 600;");
+                    Text amount = new Text("Amount: $" + pr.getDouble("amount"));
+                    amount.setStyle("-fx-fill: #6b7280;");
+                Text statusText = new Text("Status: " + pr.getString("status"));
+                    statusText.getStyleClass().add("tag");
+                    Text details = new Text(pr.getString("payment_details") == null ? "" : pr.getString("payment_details"));
+                    details.setStyle("-fx-fill: #6b7280;");
+                    card.getChildren().addAll(method, amount, statusText, details);
+                    this.paymentsFlow.getChildren().add(card);
                 }
             }
         } catch (Exception ignored) {}
@@ -410,31 +372,6 @@ public class AdminController {
 		}), 60, 60, TimeUnit.SECONDS);
 	}
 
-    private void startRealtime() {
-        RealtimeService rt = RealtimeService.getInstance();
-        rt.onEvent(topic -> Platform.runLater(() -> {
-            switch (topic) {
-                case "users" -> {
-                    allUsers.clear();
-                    for (User u : com.unieats.DatabaseManager.getInstance().getAllUsers()) {
-                        if ("student".equalsIgnoreCase(u.getUserCategory())) allUsers.add(u);
-                    }
-                    renderUserCards(allUsers);
-                    populateDashboard();
-                }
-                case "shops" -> {
-                    allSellers.clear();
-                    allSellers.addAll(new com.unieats.dao.ShopDao().listAll());
-                    renderShopCards(allSellers);
-                    populateDashboard();
-                }
-                case "reports" -> renderReportsAndPayments();
-                case "payments" -> renderReportsAndPayments();
-            }
-        }));
-        rt.start();
-    }
-
 	@FXML private void showDashboard() { showOnly(dashboardPane); }
 	@FXML private void showUsers() { showOnly(usersPane); }
 	@FXML private void showSellers() { showOnly(sellersPane); }
@@ -459,23 +396,32 @@ public class AdminController {
         if (titleLabel != null) titleLabel.setText(title);
 	}
 	
-    private void downloadAttachment(String attachmentPath) {
+	private void downloadAttachment(String attachmentPath) {
 		try {
 			String fullPath = ReportFileManager.getAttachmentPath(attachmentPath);
 			if (fullPath != null && ReportFileManager.attachmentExists(attachmentPath)) {
-                File file = new File(fullPath);
-                javafx.stage.FileChooser chooser = new javafx.stage.FileChooser();
-                chooser.setTitle("Save Attachment");
-                chooser.setInitialFileName(file.getName());
-                javafx.stage.Window w = contentStack.getScene() == null ? null : contentStack.getScene().getWindow();
-                File target = chooser.showSaveDialog(w);
-                if (target != null) {
-                    java.nio.file.Files.copy(file.toPath(), target.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                    Alert ok = new Alert(Alert.AlertType.INFORMATION);
-                    ok.setHeaderText("Downloaded");
-                    ok.setContentText("Saved to: " + target.getAbsolutePath());
-                    ok.showAndWait();
-                }
+				File file = new File(fullPath);
+				
+				// Show file location dialog with copy option
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Attachment Location");
+				alert.setHeaderText("Attachment Found");
+				alert.setContentText("File location: " + file.getAbsolutePath() + 
+									"\n\nClick OK to copy the path to clipboard, then navigate to this location in your file explorer.");
+				
+				// Add copy to clipboard functionality
+				alert.setOnHidden(e -> {
+					try {
+						javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
+						javafx.scene.input.ClipboardContent content = new javafx.scene.input.ClipboardContent();
+						content.putString(file.getAbsolutePath());
+						clipboard.setContent(content);
+					} catch (Exception ex) {
+						System.err.println("Failed to copy to clipboard: " + ex.getMessage());
+					}
+				});
+				
+				alert.showAndWait();
 			} else {
 				Alert alert = new Alert(Alert.AlertType.ERROR);
 				alert.setTitle("File Not Found");
@@ -521,41 +467,6 @@ public class AdminController {
 		drawerContainer.setManaged(false);
 	}
 
-	@FXML private void handleLogout() {
-		try {
-			Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-			confirm.setHeaderText("Logout Confirmation");
-			confirm.setContentText("Are you sure you want to logout?");
-			java.util.Optional<ButtonType> res = confirm.showAndWait();
-			if (res.isEmpty() || res.get() != ButtonType.OK) {
-				return;
-			}
-			// Clear current session
-			com.unieats.DatabaseManager.setCurrentUser(null);
-			// Navigate to signin page
-			java.net.URL url = getClass().getResource("/fxml/signin.fxml");
-			if (url == null) {
-				Alert a = new Alert(Alert.AlertType.ERROR);
-				a.setHeaderText("Sign In View Not Found");
-				a.setContentText("Could not locate signin.fxml");
-				a.showAndWait();
-				return;
-			}
-			FXMLLoader loader = new FXMLLoader(url);
-			Parent root = loader.load();
-			Stage stage = (Stage) contentStack.getScene().getWindow();
-			Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-			stage.setScene(scene);
-			stage.setTitle("UniEats - Sign In");
-			stage.show();
-		} catch (Exception e) {
-			Alert a = new Alert(Alert.AlertType.ERROR);
-			a.setHeaderText("Logout Failed");
-			a.setContentText(e.getMessage());
-			a.showAndWait();
-		}
-	}
-
 	@FXML private void handleManageUsers() { showUsers(); }
 
 	private void info(String msg) {
@@ -594,47 +505,40 @@ public class AdminController {
 		HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
         Button viewBtn = new Button("View");
         viewBtn.getStyleClass().add("btn-primary");
-        javafx.scene.control.ComboBox<String> status = new javafx.scene.control.ComboBox<>();
-        status.getItems().addAll("approved", "pending", "rejected");
-        String currentStatus = user.getStatus() == null ? "pending" : user.getStatus();
-        status.getSelectionModel().select(currentStatus);
-        actions.getChildren().addAll(spacer, status, viewBtn);
+        Button deleteBtn = new Button("Delete");
+        deleteBtn.getStyleClass().add("btn-danger");
+		actions.getChildren().addAll(spacer, viewBtn, deleteBtn);
 
-        viewBtn.setOnAction(e -> showUserDetails(user));
-        status.valueProperty().addListener((obs, oldV, newV) -> {
-            if (oldV != null && !oldV.equals(newV)) {
-                user.setStatus(newV);
-                boolean ok = com.unieats.DatabaseManager.getInstance().updateUser(user);
-                if (!ok) {
-                    user.setStatus(oldV);
-                    status.getSelectionModel().select(oldV);
-                    info("Failed to update user status");
-                } else {
-                    info("User status updated to: " + newV.toUpperCase());
-                }
-            }
-        });
+		viewBtn.setOnAction(e -> showUserDetails(user));
+		deleteBtn.setOnAction(e -> confirmAndDeleteUser(user));
 
 		card.getChildren().addAll(name, email, category, actions);
 		return card;
 	}
 
-    private void showUserDetails(User user) {
-        Alert dialog = new Alert(AlertType.INFORMATION);
-        dialog.setHeaderText("User Details");
-        String phone = user.getPhoneNo() == null ? "-" : user.getPhoneNo();
-        String address = user.getAddress() == null ? "-" : user.getAddress();
-        String status = user.getStatus() == null ? "pending" : user.getStatus();
-        dialog.setContentText(
-            "Name: " + user.getFullName() +
-            "\nCategory: " + user.getUserCategory() +
-            "\nEmail: " + user.getEmail() +
-            "\nPhone: " + phone +
-            "\nAddress: " + address +
-            "\nStatus: " + status.toUpperCase()
-        );
-        dialog.showAndWait();
-    }
+	private void showUserDetails(User user) {
+		Alert dialog = new Alert(AlertType.INFORMATION);
+		dialog.setHeaderText("User Details");
+		dialog.setContentText("Name: " + user.getFullName() + "\nCategory: " + user.getUserCategory() + "\nEmail: " + user.getEmail());
+		dialog.showAndWait();
+	}
+
+	private void confirmAndDeleteUser(User user) {
+		Alert confirm = new Alert(AlertType.CONFIRMATION);
+		confirm.setHeaderText("Delete user?");
+		confirm.setContentText("Are you sure you want to delete " + user.getFullName() + "?");
+		confirm.showAndWait().ifPresent(btn -> {
+			if (btn == ButtonType.OK) {
+				boolean ok = com.unieats.DatabaseManager.getInstance().deleteUser(user.getId());
+				if (ok) {
+					allUsers.removeIf(u -> u.getId() == user.getId());
+					renderUserCards(allUsers);
+				} else {
+					info("Failed to delete user");
+				}
+			}
+		});
+	}
 
 	private void renderShopCards(ObservableList<Shop> shops) {
 		if (shopCardsFlow == null) return;

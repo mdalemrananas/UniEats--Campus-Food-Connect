@@ -4,7 +4,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,15 +11,12 @@ import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import com.unieats.FoodItem;
 import com.unieats.Shop;
 import com.unieats.User;
 import com.unieats.dao.FoodItemDao;
 import com.unieats.dao.ShopDao;
-import com.unieats.services.StockUpdateService;
-import com.unieats.services.RealTimeStockBroadcaster;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class FoodItemsController {
@@ -29,12 +25,6 @@ public class FoodItemsController {
     @FXML private TextField searchField;
     @FXML private Button filterButton;
     @FXML private VBox foodItemsContainer;
-    // Bottom nav items
-    @FXML private VBox navHome;
-    @FXML private VBox navOrders;
-    @FXML private VBox navCart;
-    @FXML private VBox navFav;
-    @FXML private VBox navProfile;
     
     private User currentUser;
     private FoodItemDao foodItemDao;
@@ -53,162 +43,14 @@ public class FoodItemsController {
     @FXML
     public void initialize() {
         setupEventHandlers();
-        setupNavigationHandlers();
         foodItemDao = new FoodItemDao();
         shopDao = new ShopDao();
-        
-        // Start the stock update service
-        StockUpdateService.getInstance().start();
-        
-        // Start the real-time stock broadcaster
-        RealTimeStockBroadcaster.getInstance().start();
-        
-        // Add this controller as a listener for real-time stock changes
-        RealTimeStockBroadcaster.getInstance().addListener(new RealTimeStockBroadcaster.StockChangeListener() {
-            @Override
-            public void onStockChanged(int itemId, int oldStock, int newStock) {
-                Platform.runLater(() -> {
-                    // Update the specific item in the display
-                    updateFoodItemStockInDisplay(itemId, newStock);
-                    System.out.println("FoodItems real-time update: Item " + itemId + " stock changed from " + oldStock + " to " + newStock);
-                });
-            }
-        });
-        
-        // Also add the original stock update service listener for compatibility
-        StockUpdateService.getInstance().addListener(new StockUpdateService.StockUpdateListener() {
-            @Override
-            public void onStockUpdated(int itemId, int quantityReduced) {
-                Platform.runLater(() -> {
-                    // Refresh the food items display
-                    foodItemsContainer.getChildren().clear();
-                    loadFoodItems();
-                });
-            }
-            
-            @Override
-            public void onStockUpdateError(int itemId, String error) {
-                Platform.runLater(() -> {
-                    showAlert("Stock Update Error", "Failed to update stock: " + error);
-                });
-            }
-            
-            @Override
-            public void onAllItemsRefreshed() {
-                Platform.runLater(() -> {
-                    foodItemsContainer.getChildren().clear();
-                    loadFoodItems();
-                });
-            }
-        });
-        
-        // Default active tab: Food Items (no direct tab, but highlight orders as context)
-        setActiveNav(navOrders);
     }
-
+    
     private void setupEventHandlers() {
         backButton.setOnAction(e -> handleBack());
         searchField.setOnAction(e -> handleSearch());
         filterButton.setOnAction(e -> handleFilter());
-    }
-    
-    private void setupNavigationHandlers() {
-        if (navHome != null) navHome.setOnMouseClicked(e -> { setActiveNav(navHome); navigateToMenu(); });
-        if (navOrders != null) navOrders.setOnMouseClicked(e -> { setActiveNav(navOrders); navigateToOrders(); });
-        if (navCart != null) navCart.setOnMouseClicked(e -> { setActiveNav(navCart); navigateToCart(); });
-        if (navFav != null) navFav.setOnMouseClicked(e -> { setActiveNav(navFav); navigateToFavourites(); });
-        if (navProfile != null) navProfile.setOnMouseClicked(e -> { setActiveNav(navProfile); navigateToProfile(); });
-    }
-
-    private void setActiveNav(VBox active) {
-        if (navHome != null) applyActive(navHome, navHome == active, "#2e7d32");
-        if (navOrders != null) applyActive(navOrders, navOrders == active, "#ff6b35");
-        if (navCart != null) applyActive(navCart, navCart == active, "#0d6efd");
-        if (navFav != null) applyActive(navFav, navFav == active, "#e63946");
-        if (navProfile != null) applyActive(navProfile, navProfile == active, "#6f42c1");
-    }
-
-    private void applyActive(VBox tab, boolean active, String colorHex) {
-        if (tab == null) return;
-        if (tab.getChildren().size() < 2) return;
-        StackPane iconWrap = (StackPane) tab.getChildren().get(0);
-        Label label = (Label) tab.getChildren().get(1);
-
-        if (!iconWrap.getChildren().isEmpty() && iconWrap.getChildren().get(0) instanceof FontIcon) {
-            FontIcon icon = (FontIcon) iconWrap.getChildren().get(0);
-            icon.setIconColor(active ? javafx.scene.paint.Paint.valueOf(colorHex) : javafx.scene.paint.Paint.valueOf("#6c757d"));
-        }
-
-        String bg = active ? String.format("-fx-background-color: %s1A; -fx-background-radius: 12; -fx-padding: 8;", colorHex.replace("#","#"))
-                           : "-fx-background-radius: 12; -fx-padding: 8;";
-        iconWrap.setStyle(bg);
-
-        label.setStyle(active ? String.format("-fx-font-size: 10px; -fx-text-fill: %s; -fx-font-weight: bold;", colorHex)
-                              : "-fx-font-size: 10px; -fx-text-fill: #6c757d;");
-    }
-
-    private void navigateToMenu() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/menu.fxml"));
-            Parent root = loader.load();
-            MenuController controller = loader.getController();
-            if (controller != null && currentUser != null) controller.setCurrentUser(currentUser);
-            Stage stage = (Stage) navHome.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - Menu");
-            stage.show();
-        } catch (IOException e) {
-            showAlert("Navigation Error", e.getMessage());
-        }
-    }
-
-    private void navigateToOrders() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/my_orders.fxml"));
-            Parent root = loader.load();
-            MyOrdersController controller = loader.getController();
-            if (controller != null && currentUser != null) controller.setCurrentUser(currentUser);
-            Stage stage = (Stage) navOrders.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - My Orders");
-            stage.show();
-        } catch (IOException e) {
-            showAlert("Navigation Error", e.getMessage());
-        }
-    }
-
-    private void navigateToFavourites() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/wishlist.fxml"));
-            Parent root = loader.load();
-            WishlistController controller = loader.getController();
-            if (controller != null && currentUser != null) controller.setCurrentUser(currentUser);
-            Stage stage = (Stage) navFav.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - Favourites");
-            stage.show();
-        } catch (IOException e) {
-            showAlert("Navigation Error", e.getMessage());
-        }
-    }
-
-    private void navigateToProfile() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/profile.fxml"));
-            Parent root = loader.load();
-            ProfileController controller = loader.getController();
-            if (controller != null && currentUser != null) controller.setCurrentUser(currentUser);
-            Stage stage = (Stage) navProfile.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - Profile");
-            stage.show();
-        } catch (IOException e) {
-            showAlert("Navigation Error", e.getMessage());
-        }
     }
     
     public void setCurrentUser(User user) {
@@ -318,21 +160,9 @@ public class FoodItemsController {
         HBox actions = new HBox(12);
         actions.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
         
-        Button addToCartButton = new Button();
-        styleCartButton(addToCartButton);
-        updateCartButton(addToCartButton, foodItem.getId());
-        addToCartButton.setOnAction(e -> {
-            if (isInCart(foodItem.getId())) {
-                // Remove from cart
-                removeFromCart(foodItem.getId());
-                updateCartButton(addToCartButton, foodItem.getId());
-                showAlert("Cart", "Removed " + foodItem.getName() + " from cart!");
-            } else {
-                // Add to cart
-                handleAddToCart(foodItem);
-                updateCartButton(addToCartButton, foodItem.getId());
-            }
-        });
+        Button addToCartButton = new Button("Add to Cart");
+        addToCartButton.setStyle("-fx-background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 12; -fx-cursor: hand;");
+        addToCartButton.setOnAction(e -> handleAddToCart(foodItem));
         
         actions.getChildren().addAll(addToCartButton);
         
@@ -381,296 +211,43 @@ public class FoodItemsController {
     
     @FXML
     private void handleBack() {
-        navigateToMenu();
+        try {
+            // Load the menu FXML
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/menu.fxml"));
+            Parent root = loader.load();
+            
+            // Get the current stage
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            
+            // Create new responsive scene and set it
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.show();
+            
+            // Set the current user in the menu controller
+            MenuController menuController = loader.getController();
+            if (menuController != null) {
+                menuController.setCurrentUser(currentUser);
+            }
+            
+        } catch (IOException e) {
+            System.err.println("Error navigating back to menu: " + e.getMessage());
+            showAlert("Navigation Error", "Failed to navigate back to menu: " + e.getMessage());
+        }
     }
     
     @FXML
     private void handleSearch() {
         String searchTerm = searchField.getText().trim();
         if (!searchTerm.isEmpty()) {
-            searchFoodItems(searchTerm);
-        } else {
-            // If search is empty, reload all items
-            foodItemsContainer.getChildren().clear();
-            loadFoodItems();
+            // TODO: Implement search functionality
+            showAlert("Search", "Searching for: " + searchTerm);
         }
-    }
-    
-    private void searchFoodItems(String searchTerm) {
-        try {
-            foodItemsContainer.getChildren().clear();
-            
-            // Search for food items
-            List<FoodItem> searchResults = foodItemDao.searchItems(searchTerm);
-            
-            if (searchResults.isEmpty()) {
-                showNoSearchResults(searchTerm);
-                return;
-            }
-            
-            // Display search results
-            for (FoodItem foodItem : searchResults) {
-                Shop shop = shopDao.getShopById(foodItem.getShopId());
-                createFoodItemCard(foodItem, shop);
-            }
-        } catch (Exception e) {
-            showAlert("Search Error", "Failed to search food items: " + e.getMessage());
-        }
-    }
-    
-    private void showNoSearchResults(String searchTerm) {
-        VBox noResultsBox = new VBox(16);
-        noResultsBox.setAlignment(javafx.geometry.Pos.CENTER);
-        noResultsBox.setStyle("-fx-padding: 40;");
-        
-        FontIcon searchIcon = new FontIcon("fas-search");
-        searchIcon.setIconSize(48);
-        searchIcon.setIconColor(javafx.scene.paint.Color.web("#adb5bd"));
-        
-        Label noResultsLabel = new Label("No results found");
-        noResultsLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #6c757d;");
-        
-        Label searchTermLabel = new Label("for \"" + searchTerm + "\"");
-        searchTermLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6c757d;");
-        
-        Label suggestionLabel = new Label("Try searching for different keywords");
-        suggestionLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #adb5bd;");
-        
-        noResultsBox.getChildren().addAll(searchIcon, noResultsLabel, searchTermLabel, suggestionLabel);
-        foodItemsContainer.getChildren().add(noResultsBox);
     }
     
     @FXML
     private void handleFilter() {
-        showFilterDialog();
-    }
-    
-    private void showFilterDialog() {
-        // Create a dialog for filter options
-        Dialog<FilterOptions> dialog = new Dialog<>();
-        dialog.setTitle("Filter Options");
-        dialog.setHeaderText("Choose your filter preferences");
-        
-        // Create filter controls
-        VBox filterContent = new VBox(16);
-        filterContent.setStyle("-fx-padding: 20;");
-        
-        // Price range
-        Label priceLabel = new Label("Price Range:");
-        priceLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-        
-        HBox priceRange = new HBox(8);
-        TextField minPriceField = new TextField();
-        minPriceField.setPromptText("Min Price");
-        minPriceField.setPrefWidth(80);
-        
-        Label toLabel = new Label("to");
-        toLabel.setStyle("-fx-text-fill: #6c757d;");
-        
-        TextField maxPriceField = new TextField();
-        maxPriceField.setPromptText("Max Price");
-        maxPriceField.setPrefWidth(80);
-        
-        priceRange.getChildren().addAll(minPriceField, toLabel, maxPriceField);
-        
-        // Sort options
-        Label sortLabel = new Label("Sort By:");
-        sortLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-        
-        ComboBox<String> sortCombo = new ComboBox<>();
-        sortCombo.getItems().addAll("Name (A-Z)", "Name (Z-A)", "Price (Low to High)", "Price (High to Low)", "Points (High to Low)");
-        sortCombo.setValue("Name (A-Z)");
-        sortCombo.setPrefWidth(200);
-        
-        // Stock filter
-        CheckBox inStockOnly = new CheckBox("Show only items in stock");
-        inStockOnly.setSelected(false);
-        
-        filterContent.getChildren().addAll(priceLabel, priceRange, sortLabel, sortCombo, inStockOnly);
-        
-        dialog.getDialogPane().setContent(filterContent);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
-        
-        // Apply filter when Apply button is clicked
-        dialog.setResultConverter(buttonType -> {
-            if (buttonType == ButtonType.APPLY) {
-                FilterOptions options = new FilterOptions();
-                try {
-                    if (!minPriceField.getText().trim().isEmpty()) {
-                        options.minPrice = Double.parseDouble(minPriceField.getText().trim());
-                    }
-                    if (!maxPriceField.getText().trim().isEmpty()) {
-                        options.maxPrice = Double.parseDouble(maxPriceField.getText().trim());
-                    }
-                    options.sortBy = sortCombo.getValue();
-                    options.inStockOnly = inStockOnly.isSelected();
-                    return options;
-                } catch (NumberFormatException e) {
-                    showAlert("Invalid Input", "Please enter valid numbers for price range.");
-                    return null;
-                }
-            }
-            return null;
-        });
-        
-        dialog.showAndWait().ifPresent(this::applyFilter);
-    }
-    
-    private void applyFilter(FilterOptions options) {
-        try {
-            foodItemsContainer.getChildren().clear();
-            
-            // Get all food items
-            List<FoodItem> allItems = new ArrayList<>();
-            if (shopFilterId != null) {
-                allItems = foodItemDao.listByShop(shopFilterId);
-            } else {
-                List<Shop> shops = shopDao.getApprovedShops();
-                for (Shop shop : shops) {
-                    allItems.addAll(foodItemDao.listByShop(shop.getId()));
-                }
-            }
-            
-            // Apply filters
-            List<FoodItem> filteredItems = filterItems(allItems, options);
-            
-            // Sort items
-            sortItems(filteredItems, options.sortBy);
-            
-            // Display filtered items
-            for (FoodItem foodItem : filteredItems) {
-                Shop shop = shopDao.getShopById(foodItem.getShopId());
-                createFoodItemCard(foodItem, shop);
-            }
-            
-            if (filteredItems.isEmpty()) {
-                showNoFilterResults();
-            }
-        } catch (Exception e) {
-            showAlert("Filter Error", "Failed to apply filters: " + e.getMessage());
-        }
-    }
-    
-    private List<FoodItem> filterItems(List<FoodItem> items, FilterOptions options) {
-        return items.stream()
-                .filter(item -> {
-                    // Price range filter
-                    if (options.minPrice != null && item.getPrice() < options.minPrice) {
-                        return false;
-                    }
-                    if (options.maxPrice != null && item.getPrice() > options.maxPrice) {
-                        return false;
-                    }
-                    // Stock filter
-                    if (options.inStockOnly && item.getStock() <= 0) {
-                        return false;
-                    }
-                    return true;
-                })
-                .collect(java.util.stream.Collectors.toList());
-    }
-    
-    private void sortItems(List<FoodItem> items, String sortBy) {
-        switch (sortBy) {
-            case "Name (A-Z)":
-                items.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
-                break;
-            case "Name (Z-A)":
-                items.sort((a, b) -> b.getName().compareToIgnoreCase(a.getName()));
-                break;
-            case "Price (Low to High)":
-                items.sort((a, b) -> Double.compare(a.getPrice(), b.getPrice()));
-                break;
-            case "Price (High to Low)":
-                items.sort((a, b) -> Double.compare(b.getPrice(), a.getPrice()));
-                break;
-            case "Points (High to Low)":
-                items.sort((a, b) -> Double.compare(b.getPointsMultiplier(), a.getPointsMultiplier()));
-                break;
-        }
-    }
-    
-    private void showNoFilterResults() {
-        VBox noResultsBox = new VBox(16);
-        noResultsBox.setAlignment(javafx.geometry.Pos.CENTER);
-        noResultsBox.setStyle("-fx-padding: 40;");
-        
-        FontIcon filterIcon = new FontIcon("fas-filter");
-        filterIcon.setIconSize(48);
-        filterIcon.setIconColor(javafx.scene.paint.Color.web("#adb5bd"));
-        
-        Label noResultsLabel = new Label("No items match your filters");
-        noResultsLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #6c757d;");
-        
-        Label suggestionLabel = new Label("Try adjusting your filter criteria");
-        suggestionLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #adb5bd;");
-        
-        noResultsBox.getChildren().addAll(filterIcon, noResultsLabel, suggestionLabel);
-        foodItemsContainer.getChildren().add(noResultsBox);
-    }
-    
-    // Filter options class
-    private static class FilterOptions {
-        Double minPrice;
-        Double maxPrice;
-        String sortBy;
-        boolean inStockOnly;
-    }
-    
-    /**
-     * Update stock display for a specific food item in real-time
-     */
-    private void updateFoodItemStockInDisplay(int itemId, int newStock) {
-        // Find and update the specific food item card in the display
-        for (javafx.scene.Node node : foodItemsContainer.getChildren()) {
-            if (node instanceof VBox) {
-                VBox card = (VBox) node;
-                // Check if this card contains the item we need to update
-                if (card.getChildren().size() >= 2) {
-                    VBox details = (VBox) card.getChildren().get(1);
-                    if (details.getChildren().size() >= 2) {
-                        HBox header = (HBox) details.getChildren().get(0);
-                        if (header.getChildren().size() >= 2) {
-                            Label nameLabel = (Label) header.getChildren().get(0);
-                            // This is a simple way to identify the item - in a real app you'd store itemId in userData
-                            // For now, we'll update all cards and let the user see the change
-                            updateStockInCard(card, newStock);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    /**
-     * Update stock information in a food item card
-     */
-    private void updateStockInCard(VBox card, int newStock) {
-        try {
-            VBox details = (VBox) card.getChildren().get(1);
-            HBox info = (HBox) details.getChildren().get(1);
-            
-            // Find and update the stock label
-            for (javafx.scene.Node node : info.getChildren()) {
-                if (node instanceof Label) {
-                    Label label = (Label) node;
-                    if (label.getText().startsWith("Stock:")) {
-                        label.setText("Stock: " + newStock);
-                        // Change color based on stock level
-                        if (newStock <= 0) {
-                            label.setStyle("-fx-font-size: 12px; -fx-text-fill: #dc3545;"); // Red for out of stock
-                        } else if (newStock <= 5) {
-                            label.setStyle("-fx-font-size: 12px; -fx-text-fill: #ffc107;"); // Yellow for low stock
-                        } else {
-                            label.setStyle("-fx-font-size: 12px; -fx-text-fill: #6c757d;"); // Gray for normal stock
-                        }
-                        break;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error updating stock in card: " + e.getMessage());
-        }
+        showAlert("Filter", "Filter options will be displayed here");
     }
     
     private void handleAddToCart(FoodItem foodItem) {
@@ -690,66 +267,11 @@ public class FoodItemsController {
             }
         }
     }
-
-    private void removeFromCart(int itemId) {
-        int userId = currentUser != null ? currentUser.getId() : -1;
-        if (userId <= 0) { showAlert("Cart", "You must be signed in to remove items from cart."); return; }
-        try {
-            new com.unieats.dao.CartDao().removeFromCart(userId, itemId);
-        } catch (Exception ex) {
-            showAlert("Cart Error", "Failed to remove item from cart: " + ex.getMessage());
-        }
-    }
     
-    private void navigateToCart() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/cart.fxml"));
-            Parent root = loader.load();
-            com.unieats.controllers.CartController controller = loader.getController();
-            if (controller != null && currentUser != null) controller.setCurrentUserId(currentUser.getId());
-            Stage stage = (Stage) navCart.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - Cart");
-            stage.show();
-        } catch (IOException e) {
-            showAlert("Navigation Error", e.getMessage());
-        }
-    }
-
-    private boolean isInCart(int itemId) {
-        int userId = currentUser != null ? currentUser.getId() : -1;
-        if (userId <= 0) return false;
-        return new com.unieats.dao.CartDao().isInCart(userId, itemId);
-    }
-
-    private void updateCartButton(Button btn, int itemId) {
-        boolean carted = isInCart(itemId);
-        btn.setText(carted ? "Carted" : "Add to Cart");
-        btn.setStyle(carted ?
-            "-fx-background-color: #e9ecef; -fx-background-radius: 12; -fx-padding: 8 16; -fx-text-fill: #6c757d; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;" :
-            "-fx-background-color: #28a745; -fx-background-radius: 12; -fx-padding: 8 16; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;");
-    }
-
-    private void styleCartButton(Button btn) {
-        btn.setOnMouseEntered(e -> {
-            String currentStyle = btn.getStyle();
-            if (!currentStyle.contains("dropshadow")) {
-                btn.setStyle(currentStyle + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 4, 0, 0, 1);");
-            }
-        });
-        btn.setOnMouseExited(e -> {
-            String currentStyle = btn.getStyle();
-            if (currentStyle.contains("dropshadow")) {
-                btn.setStyle(currentStyle.replace("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 4, 0, 0, 1);", ""));
-            }
-        });
-    }
-
     private void handleFavorite(FoodItem foodItem) {
         showAlert("Favorite", "Added " + foodItem.getName() + " to favorites!");
     }
-
+    
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -765,7 +287,7 @@ public class FoodItemsController {
             alert.setHeaderText(null);
             alert.setContentText(content);
             alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
-
+            
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.YES) {
                     // Clear cart and add the new item

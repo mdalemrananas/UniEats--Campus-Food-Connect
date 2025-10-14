@@ -100,7 +100,16 @@ public class DatabaseTest {
     
     public static void testInsertFood() {
         System.out.println("\n=== Testing Food Insert ===");
-        boolean success = DatabaseHelper.insertFood("Test Burger", 150.0, 1);
+        // Using default values for optional parameters
+        boolean success = DatabaseHelper.insertFoodItem(
+            "Test Burger",  // name
+            150.0,          // price
+            10,             // stock
+            "Delicious test burger",  // description
+            "",             // images (empty string for test)
+            0.0,            // discount
+            1               // shop_id (assuming 1 is a valid shop ID)
+        );
         if (success) {
             System.out.println("✅ Food insert successful!");
         } else {

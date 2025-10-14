@@ -14,13 +14,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.FileWriter;
-import java.io.IOException;
-
-import java.io.File;
 import java.time.format.DateTimeFormatter;
 
 public class OrderConfirmationController {
@@ -32,15 +27,8 @@ public class OrderConfirmationController {
     @FXML private Label orderTimeLabel;
     @FXML private Label estimatedDeliveryLabel;
     @FXML private ListView<OrderInfo.OrderItemInfo> orderItemsList;
-    @FXML private Button downloadInvoiceButton;
+    @FXML private Button viewOrderButton;
     @FXML private Button continueShoppingButton;
-    
-    // Bottom navigation
-    @FXML private VBox navHome;
-    @FXML private VBox navOrders;
-    @FXML private VBox navCart;
-    @FXML private VBox navFav;
-    @FXML private VBox navProfile;
 
     private final OrderDao orderDao = new OrderDao();
     private int orderId;
@@ -50,7 +38,6 @@ public class OrderConfirmationController {
     @FXML
     private void initialize() {
         setupOrderItemsList();
-        wireBottomNav();
     }
 
     private void setupOrderItemsList() {
@@ -145,22 +132,23 @@ public class OrderConfirmationController {
     }
 
     @FXML
-    private void handleDownloadInvoice() {
+    private void handleViewOrder() {
         try {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Save Invoice");
-            fileChooser.setInitialFileName("order_" + orderId + "_invoice.txt");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
-            
-            Stage stage = (Stage) downloadInvoiceButton.getScene().getWindow();
-            File file = fileChooser.showSaveDialog(stage);
-            
-            if (file != null) {
-                generatePDFInvoice(file);
-                showAlert("Success", "Invoice downloaded successfully!");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/order_details.fxml"));
+            Parent root = loader.load();
+            OrderDetailsController controller = loader.getController();
+            if (controller != null) {
+                controller.setOrderId(orderId);
+                controller.setCurrentUser(currentUser);
             }
+
+            Stage stage = (Stage) viewOrderButton.getScene().getWindow();
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.setTitle("UniEats - Order Details");
+            stage.show();
         } catch (Exception e) {
-            showAlert("Error", "Failed to download invoice: " + e.getMessage());
+            showAlert("Navigation Error", "Failed to navigate to order details: " + e.getMessage());
         }
     }
 
@@ -190,165 +178,5 @@ public class OrderConfirmationController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
-    }
-    
-    private void wireBottomNav() {
-        if (navHome != null) {
-            navHome.setOnMouseClicked(e -> navigateToHome());
-        }
-        if (navOrders != null) {
-            navOrders.setOnMouseClicked(e -> navigateToOrders());
-        }
-        if (navCart != null) {
-            navCart.setOnMouseClicked(e -> navigateToCart());
-        }
-        if (navFav != null) {
-            navFav.setOnMouseClicked(e -> navigateToFavorites());
-        }
-        if (navProfile != null) {
-            navProfile.setOnMouseClicked(e -> navigateToProfile());
-        }
-    }
-    
-    private void navigateToHome() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/menu.fxml"));
-            Parent root = loader.load();
-            MenuController controller = loader.getController();
-            if (controller != null && currentUser != null) {
-                controller.setCurrentUser(currentUser);
-            }
-
-            Stage stage = (Stage) navHome.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - Menu");
-            stage.show();
-        } catch (Exception e) {
-            showAlert("Navigation Error", "Failed to navigate to menu: " + e.getMessage());
-        }
-    }
-    
-    private void navigateToOrders() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/my_orders.fxml"));
-            Parent root = loader.load();
-            MyOrdersController controller = loader.getController();
-            if (controller != null && currentUser != null) {
-                controller.setCurrentUser(currentUser);
-            }
-
-            Stage stage = (Stage) navOrders.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - My Orders");
-            stage.show();
-        } catch (Exception e) {
-            showAlert("Navigation Error", "Failed to navigate to orders: " + e.getMessage());
-        }
-    }
-    
-    private void navigateToCart() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/cart.fxml"));
-            Parent root = loader.load();
-            CartController controller = loader.getController();
-            if (controller != null && currentUser != null) {
-                controller.setCurrentUserId(currentUser.getId());
-            }
-
-            Stage stage = (Stage) navCart.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - Cart");
-            stage.show();
-        } catch (Exception e) {
-            showAlert("Navigation Error", "Failed to navigate to cart: " + e.getMessage());
-        }
-    }
-    
-    private void navigateToFavorites() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/wishlist.fxml"));
-            Parent root = loader.load();
-            WishlistController controller = loader.getController();
-            if (controller != null && currentUser != null) {
-                controller.setCurrentUser(currentUser);
-            }
-
-            Stage stage = (Stage) navFav.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - Favorites");
-            stage.show();
-        } catch (Exception e) {
-            showAlert("Navigation Error", "Failed to navigate to favorites: " + e.getMessage());
-        }
-    }
-    
-    private void navigateToProfile() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/profile.fxml"));
-            Parent root = loader.load();
-            ProfileController controller = loader.getController();
-            if (controller != null && currentUser != null) {
-                controller.setCurrentUser(currentUser);
-            }
-
-            Stage stage = (Stage) navProfile.getScene().getWindow();
-            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
-            stage.setScene(scene);
-            stage.setTitle("UniEats - Profile");
-            stage.show();
-        } catch (Exception e) {
-            showAlert("Navigation Error", "Failed to navigate to profile: " + e.getMessage());
-        }
-    }
-    
-    private void generatePDFInvoice(File file) {
-        try {
-            StringBuilder invoice = new StringBuilder();
-            
-            // Title
-            invoice.append("========================================\n");
-            invoice.append("           UniEats Order Invoice\n");
-            invoice.append("========================================\n\n");
-            
-            // Order details
-            invoice.append("Order Details:\n");
-            invoice.append("-------------\n");
-            invoice.append("Order ID: #").append(orderInfo.getId()).append("\n");
-            invoice.append("Shop: ").append(orderInfo.getShopName()).append("\n");
-            invoice.append("Status: ").append(capitalizeFirst(orderInfo.getStatus())).append("\n");
-            invoice.append("Order Time: ").append(orderInfo.getCreatedAt().format(DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' HH:mm"))).append("\n");
-            invoice.append("Total Amount: $").append(String.format("%.2f", orderInfo.getTotalPrice())).append("\n\n");
-            
-            // Order items
-            invoice.append("Order Items:\n");
-            invoice.append("------------\n");
-            invoice.append(String.format("%-20s %-8s %-10s %-10s\n", "Item", "Qty", "Unit Price", "Total"));
-            invoice.append("--------------------------------------------------------\n");
-            
-            for (OrderInfo.OrderItemInfo item : orderInfo.getItems()) {
-                invoice.append(String.format("%-20s %-8d $%-9.2f $%-9.2f\n", 
-                    item.itemName, 
-                    item.quantity, 
-                    item.price, 
-                    item.totalPrice));
-            }
-            
-            invoice.append("\n");
-            invoice.append("========================================\n");
-            invoice.append("    Thank you for choosing UniEats!\n");
-            invoice.append("========================================\n");
-            
-            // Write to file
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write(invoice.toString());
-            }
-            
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to generate invoice: " + e.getMessage(), e);
-        }
     }
 }
