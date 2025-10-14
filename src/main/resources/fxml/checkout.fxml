@@ -28,7 +28,7 @@
                 <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
                     <Label text="Order Summary" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
                     
-                    <ListView fx:id="orderItemsList" prefHeight="200" style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
+                    <ListView fx:id="orderItemsList" style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
                     
                     <Separator/>
                     
@@ -67,16 +67,6 @@
                     </VBox>
                 </VBox>
 
-                <!-- Payment Method -->
-                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
-                    <Label text="Payment Method" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
-                    
-                    <VBox spacing="8">
-                        <RadioButton fx:id="cardPayment" text="Credit/Debit Card" selected="true" style="-fx-font-size: 14px;"/>
-                        <RadioButton fx:id="cashPayment" text="Cash on Delivery" style="-fx-font-size: 14px;"/>
-                        <RadioButton fx:id="walletPayment" text="Digital Wallet" style="-fx-font-size: 14px;"/>
-                    </VBox>
-                </VBox>
 
                 <!-- Special Instructions -->
                 <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
@@ -84,17 +74,53 @@
                     <TextArea fx:id="instructionsField" promptText="Any special instructions for your order?" prefRowCount="2" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 12;"/>
                 </VBox>
 
+                <!-- Payment Button -->
+                <Button fx:id="proceedToPaymentButton" text="Proceed to payment" onAction="#handleProceedToPayment"
+                        style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 12; -fx-padding: 12; -fx-cursor: hand; -fx-max-width: 200;"/>
+
             </VBox>
         </ScrollPane>
     </center>
 
     <!-- Bottom action buttons -->
     <bottom>
-        <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 16; -fx-border-color: #e9ecef; -fx-border-width: 1 0 0 0;">
-            <Button fx:id="proceedToPaymentButton" text="Proceed to Payment" 
-                    style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 16; -fx-cursor: hand;"
-                    onAction="#handleProceedToPayment"/>
-        </VBox>
+        <HBox alignment="CENTER" spacing="0" style="-fx-background-color: #ffffff; -fx-padding: 12 0; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);">
+            <!-- Home -->
+            <VBox fx:id="navHome" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-home" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Home" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Orders -->
+            <VBox fx:id="navOrders" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-list-alt" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="My Orders" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Cart -->
+            <VBox fx:id="navCart" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Cart" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Favourite -->
+            <VBox fx:id="navFav" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-heart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Favourite" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Profile -->
+            <VBox fx:id="navProfile" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-user" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Profile" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+        </HBox>
     </bottom>
 
 </BorderPane>

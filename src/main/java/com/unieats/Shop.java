@@ -7,8 +7,6 @@ public class Shop {
 	private int ownerId;
 	private String shopName;
 	private String status;
-	private String address;
-	private String description;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 
@@ -29,12 +27,6 @@ public class Shop {
 
 	public String getStatus() { return status; }
 	public void setStatus(String status) { this.status = status; }
-
-	public String getAddress() { return address; }
-	public void setAddress(String address) { this.address = address; }
-
-	public String getDescription() { return description; }
-	public void setDescription(String description) { this.description = description; }
 
 	public LocalDateTime getCreatedAt() { return createdAt; }
 	public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

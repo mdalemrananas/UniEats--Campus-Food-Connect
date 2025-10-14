@@ -5,6 +5,7 @@ import com.unieats.User;
 import com.unieats.util.PasswordUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -17,13 +18,25 @@ public class SignupController {
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmPasswordField;
+    @FXML private HBox passwordRow;
+    @FXML private HBox confirmPasswordRow;
     @FXML private TextField fullNameField;
     @FXML private ComboBox<String> userCategoryComboBox;
     @FXML private Button signupButton;
     @FXML private Button backButton;
     @FXML private Label errorLabel;
+    @FXML private Button passwordToggleButton;
+    @FXML private Button confirmPasswordToggleButton;
+    @FXML private Label passwordValidationLabel;
+    @FXML private Label confirmPasswordValidationLabel;
+    @FXML private org.kordamp.ikonli.javafx.FontIcon passwordToggleIcon;
+    @FXML private org.kordamp.ikonli.javafx.FontIcon confirmPasswordToggleIcon;
     
     private DatabaseManager dbManager;
+    private boolean passwordVisible = false;
+    private boolean confirmPasswordVisible = false;
+    private TextField passwordTextField;
+    private TextField confirmPasswordTextField;
     
     @FXML
     private void initialize() {
@@ -48,23 +61,73 @@ public class SignupController {
             }
         });
         
-        // Real-time validation for password
+        // Enhanced password validation
         passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue.length() < 6) {
-                passwordField.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
-            } else {
-                passwordField.setStyle("-fx-border-color: #d1d5db; -fx-border-width: 1;");
-            }
+            validatePassword(newValue);
+            // Also update confirm password validation
+            validateConfirmPassword(confirmPasswordField.getText());
         });
         
-        // Real-time validation for confirm password
+        // Confirm password validation
         confirmPasswordField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && !newValue.equals(passwordField.getText())) {
-                confirmPasswordField.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
-            } else {
-                confirmPasswordField.setStyle("-fx-border-color: #d1d5db; -fx-border-width: 1;");
-            }
+            validateConfirmPassword(newValue);
         });
+    }
+
+    private void validatePassword(String password) {
+        if (password == null || password.isEmpty()) {
+            passwordValidationLabel.setVisible(false);
+            passwordField.setStyle("-fx-border-color: #d1d5db; -fx-border-width: 1;");
+            return;
+        }
+
+        StringBuilder errors = new StringBuilder();
+        
+        if (password.length() <= 5) {
+            errors.append("• Must be at least 6 characters long\n");
+        }
+        
+        if (!password.matches(".*[A-Z].*")) {
+            errors.append("• Must contain at least 1 uppercase letter\n");
+        }
+        
+        if (!password.matches(".*[a-z].*")) {
+            errors.append("• Must contain at least 1 lowercase letter\n");
+        }
+        
+        if (!password.matches(".*\\d.*")) {
+            errors.append("• Must contain at least 1 digit\n");
+        }
+        
+        if (!password.matches(".*[@$!%*?&].*")) {
+            errors.append("• Must contain at least 1 special character (@$!%*?&)");
+        }
+
+        if (errors.length() > 0) {
+            passwordValidationLabel.setText(errors.toString().trim());
+            passwordValidationLabel.setVisible(true);
+            passwordField.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
+        } else {
+            passwordValidationLabel.setVisible(false);
+            passwordField.setStyle("-fx-border-color: #10b981; -fx-border-width: 2;");
+        }
+    }
+
+    private void validateConfirmPassword(String confirmPassword) {
+        if (confirmPassword == null || confirmPassword.isEmpty()) {
+            confirmPasswordValidationLabel.setVisible(false);
+            confirmPasswordField.setStyle("-fx-border-color: #d1d5db; -fx-border-width: 1;");
+            return;
+        }
+
+        if (!confirmPassword.equals(passwordField.getText())) {
+            confirmPasswordValidationLabel.setText("• Passwords do not match");
+            confirmPasswordValidationLabel.setVisible(true);
+            confirmPasswordField.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
+        } else {
+            confirmPasswordValidationLabel.setVisible(false);
+            confirmPasswordField.setStyle("-fx-border-color: #10b981; -fx-border-width: 2;");
+        }
     }
     
     private void setupErrorLabel() {
@@ -197,6 +260,64 @@ public class SignupController {
     }
     
     @FXML
+    private void togglePasswordVisibility() {
+        passwordVisible = !passwordVisible;
+        
+        if (passwordRow == null) return;
+        if (passwordVisible) {
+            passwordToggleIcon.setIconLiteral("fas-eye-slash");
+            if (passwordTextField == null) {
+                passwordTextField = new TextField();
+                passwordTextField.setPromptText(passwordField.getPromptText());
+                passwordTextField.setStyle(passwordField.getStyle());
+                passwordTextField.setPrefWidth(passwordField.getPrefWidth());
+                passwordTextField.setPrefHeight(passwordField.getPrefHeight());
+                passwordTextField.setFont(passwordField.getFont());
+                passwordTextField.textProperty().addListener((obs, o, n) -> passwordField.setText(n));
+            }
+            passwordTextField.setText(passwordField.getText());
+            passwordRow.getChildren().set(0, passwordTextField);
+            passwordTextField.requestFocus();
+            passwordTextField.positionCaret(passwordTextField.getText().length());
+        } else {
+            passwordToggleIcon.setIconLiteral("fas-eye");
+            passwordField.setText(passwordTextField != null ? passwordTextField.getText() : passwordField.getText());
+            passwordRow.getChildren().set(0, passwordField);
+            passwordField.requestFocus();
+            passwordField.positionCaret(passwordField.getText().length());
+        }
+    }
+
+    @FXML
+    private void toggleConfirmPasswordVisibility() {
+        confirmPasswordVisible = !confirmPasswordVisible;
+        
+        if (confirmPasswordRow == null) return;
+        if (confirmPasswordVisible) {
+            confirmPasswordToggleIcon.setIconLiteral("fas-eye-slash");
+            if (confirmPasswordTextField == null) {
+                confirmPasswordTextField = new TextField();
+                confirmPasswordTextField.setPromptText(confirmPasswordField.getPromptText());
+                confirmPasswordTextField.setStyle(confirmPasswordField.getStyle());
+                confirmPasswordTextField.setPrefWidth(confirmPasswordField.getPrefWidth());
+                confirmPasswordTextField.setPrefHeight(confirmPasswordField.getPrefHeight());
+                confirmPasswordTextField.setFont(confirmPasswordField.getFont());
+                confirmPasswordTextField.textProperty().addListener((obs, o, n) -> confirmPasswordField.setText(n));
+            }
+            confirmPasswordTextField.setText(confirmPasswordField.getText());
+            confirmPasswordRow.getChildren().set(0, confirmPasswordTextField);
+            confirmPasswordTextField.requestFocus();
+            confirmPasswordTextField.positionCaret(confirmPasswordTextField.getText().length());
+        } else {
+            confirmPasswordToggleIcon.setIconLiteral("fas-eye");
+            confirmPasswordField.setText(confirmPasswordTextField != null ? confirmPasswordTextField.getText() : confirmPasswordField.getText());
+            confirmPasswordRow.getChildren().set(0, confirmPasswordField);
+            confirmPasswordField.requestFocus();
+            confirmPasswordField.positionCaret(confirmPasswordField.getText().length());
+        }
+    }
+
+    @FXML
     private void handleClear() {
         emailField.clear();
         passwordField.clear();
@@ -204,6 +325,8 @@ public class SignupController {
         fullNameField.clear();
         userCategoryComboBox.setValue("Student");
         errorLabel.setVisible(false);
+        passwordValidationLabel.setVisible(false);
+        confirmPasswordValidationLabel.setVisible(false);
         
         // Reset field styles
         emailField.setStyle("-fx-border-color: #d1d5db; -fx-border-width: 1;");

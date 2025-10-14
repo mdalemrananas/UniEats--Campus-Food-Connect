@@ -11,8 +11,10 @@ public class CartQueryDao {
 
 	public List<CartItemView> listCartItems(int userId) {
 		String sql = """
-			SELECT fi.id as item_id, fi.shop_id, fi.name, fi.price, fi.points_multiplier, c.quantity
-			FROM cart c JOIN food_items fi ON c.item_id = fi.id
+			SELECT fi.id as item_id, fi.shop_id, fi.name, fi.price, fi.points_multiplier, c.quantity, s.shop_name
+			FROM cart c 
+			JOIN food_items fi ON c.item_id = fi.id
+			JOIN shops s ON fi.shop_id = s.id
 			WHERE c.user_id=?
 		""";
 		List<CartItemView> items = new ArrayList<>();
@@ -26,7 +28,8 @@ public class CartQueryDao {
 						rs.getString("name"),
 						rs.getDouble("price"),
 						rs.getDouble("points_multiplier"),
-						rs.getInt("quantity")
+						rs.getInt("quantity"),
+						rs.getString("shop_name")
 					));
 				}
 			}

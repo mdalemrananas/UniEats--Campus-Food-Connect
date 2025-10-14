@@ -78,7 +78,7 @@
                 </VBox>
 
                 <!-- Digital Wallet Details -->
-                <VBox fx:id="walletPaymentDetails" spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);" visible="false">
+                <VBox fx:id="walletPaymentDetails" spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);" visible="false" managed="false">
                     <Label text="Digital Wallet" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
                     
                     <VBox spacing="8">
@@ -91,7 +91,7 @@
                 </VBox>
 
                 <!-- Cash on Delivery Info -->
-                <VBox fx:id="cashPaymentDetails" spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);" visible="false">
+                <VBox fx:id="cashPaymentDetails" spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);" visible="false" managed="false">
                     <Label text="Cash on Delivery" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
                     <Label text="Please have the exact amount ready when the delivery arrives." style="-fx-font-size: 14px; -fx-text-fill: #6c757d; -fx-wrap-text: true;"/>
                 </VBox>
@@ -105,17 +105,53 @@
                     <Label text="Your payment information is encrypted and secure. We never store your card details." style="-fx-font-size: 12px; -fx-text-fill: #1976d2; -fx-wrap-text: true;"/>
                 </VBox>
 
+                <!-- Payment Button -->
+                <Button fx:id="processPaymentButton" text="PAY NOW" onAction="#handleProcessPayment"
+                        style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 12; -fx-padding: 12; -fx-cursor: hand; -fx-max-width: 200;"/>
+
             </VBox>
         </ScrollPane>
     </center>
 
     <!-- Bottom action buttons -->
     <bottom>
-        <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 16; -fx-border-color: #e9ecef; -fx-border-width: 1 0 0 0;">
-            <Button fx:id="processPaymentButton" text="Process Payment" 
-                    style="-fx-background-color: #ff6b35; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 16; -fx-cursor: hand;"
-                    onAction="#handleProcessPayment"/>
-        </VBox>
+        <HBox alignment="CENTER" spacing="0" style="-fx-background-color: #ffffff; -fx-padding: 12 0; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);">
+            <!-- Home -->
+            <VBox fx:id="navHome" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-home" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Home" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Orders -->
+            <VBox fx:id="navOrders" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-list-alt" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="My Orders" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Cart -->
+            <VBox fx:id="navCart" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Cart" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Favourite -->
+            <VBox fx:id="navFav" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-heart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Favourite" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Profile -->
+            <VBox fx:id="navProfile" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-user" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Profile" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+        </HBox>
     </bottom>
 
 </BorderPane>

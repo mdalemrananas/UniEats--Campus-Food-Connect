@@ -37,6 +37,7 @@ public class ShopDao {
 			ps.setString(2, LocalDateTime.now().toString());
 			ps.setInt(3, shopId);
 			ps.executeUpdate();
+            com.unieats.services.EventNotifier.notifyChange("shops");
 		} catch (SQLException e) {
 			throw new RuntimeException("Failed to update shop status", e);
 		}
@@ -92,33 +93,6 @@ public class ShopDao {
 		return findById(id);
 	}
 
-	public Shop getShopByOwnerId(int ownerId) {
-		String sql = "SELECT * FROM shops WHERE owner_id=?";
-		try (Connection conn = DriverManager.getConnection(DB_URL); PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setInt(1, ownerId);
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) return map(rs);
-			}
-			return null;
-		} catch (SQLException e) {
-			throw new RuntimeException("Failed to find shop by owner ID", e);
-		}
-	}
-
-	public void updateShop(Shop shop) {
-		String sql = "UPDATE shops SET shop_name=?, address=?, description=?, updated_at=? WHERE id=?";
-		try (Connection conn = DriverManager.getConnection(DB_URL); PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setString(1, shop.getShopName());
-			ps.setString(2, shop.getAddress());
-			ps.setString(3, shop.getDescription());
-			ps.setString(4, LocalDateTime.now().toString());
-			ps.setInt(5, shop.getId());
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			throw new RuntimeException("Failed to update shop", e);
-		}
-	}
-
 	private Shop map(ResultSet rs) throws SQLException {
 		Shop s = new Shop(rs.getInt("owner_id"), rs.getString("shop_name"), rs.getString("status"));
 		s.setId(rs.getInt("id"));
@@ -126,15 +100,6 @@ public class ShopDao {
 			s.setCreatedAt(LocalDateTime.parse(rs.getString("created_at")));
 			s.setUpdatedAt(LocalDateTime.parse(rs.getString("updated_at")));
 		} catch (Exception ignored) {}
-		
-		// Add additional fields if they exist in the database
-		try {
-			s.setAddress(rs.getString("address"));
-		} catch (SQLException ignored) {}
-		try {
-			s.setDescription(rs.getString("description"));
-		} catch (SQLException ignored) {}
-		
 		return s;
 	}
 }

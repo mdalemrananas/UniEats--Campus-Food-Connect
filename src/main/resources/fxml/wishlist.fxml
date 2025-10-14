@@ -5,16 +5,16 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.WishlistController"
-            prefWidth="360" prefHeight="800" style="-fx-background-color: #f8f9fa;">
+            prefWidth="360" prefHeight="800" stylesheets="@../css/modern-ui.css" styleClass="root">
 
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-background-color: white; -fx-padding: 16; -fx-border-color: #e9ecef; -fx-border-width: 0 0 1 0;">
-            <Button fx:id="backButton" onAction="#handleBack" style="-fx-background-color: transparent; -fx-padding: 8;">
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="modern-card">
+            <Button fx:id="backButton" onAction="#handleBack" styleClass="nav-item">
                 <graphic>
                     <FontIcon iconLiteral="fas-arrow-left" iconSize="18" iconColor="#6c757d"/>
                 </graphic>
             </Button>
-            <Label text="Favourites" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+            <Label text="Favourites" styleClass="title-medium"/>
         </HBox>
     </top>
 

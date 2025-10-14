@@ -5,6 +5,7 @@ import com.unieats.User;
 import com.unieats.util.PasswordUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -16,9 +17,14 @@ public class SigninController {
     
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
+    @FXML private HBox passwordRow;
     @FXML private Label errorLabel;
+    @FXML private Button passwordToggleButton;
+    @FXML private org.kordamp.ikonli.javafx.FontIcon passwordToggleIcon;
     
     private DatabaseManager dbManager;
+    private boolean passwordVisible = false;
+    private TextField passwordTextField; // cached visible field
     
     @FXML
     private void initialize() {
@@ -58,6 +64,24 @@ public class SigninController {
             return;
         }
         
+        // Enforce approval for non-admin users only
+        if (!"admin".equalsIgnoreCase(user.getUserCategory())) {
+            String uStatus = user.getStatus() == null ? "pending" : user.getStatus().toLowerCase();
+            switch (uStatus) {
+                case "approved":
+                    break; // continue
+                case "pending":
+                    showError("Your account is pending approval by admin.");
+                    return;
+                case "rejected":
+                    showError("Your account has been rejected. Please contact support.");
+                    return;
+                default:
+                    showError("Invalid account status. Please contact support.");
+                    return;
+            }
+        }
+
         // Check shop status if user is a seller
         if ("seller".equalsIgnoreCase(user.getUserCategory())) {
             String shopStatus = dbManager.getShopStatus(user.getId());
@@ -76,9 +100,7 @@ public class SigninController {
                     showError("Your shop approval has been rejected. Please contact support for more information.");
                     return;
                 }
-                case "approved" -> {
-                    // Continue with login
-                }
+                case "approved" -> {}
                 default -> {
                     showError("Invalid shop status. Please contact support.");
                     return;
@@ -258,6 +280,35 @@ public class SigninController {
         }
     }
     
+    @FXML
+    private void togglePasswordVisibility() {
+        passwordVisible = !passwordVisible;
+        
+        if (passwordRow == null) return;
+        if (passwordVisible) {
+            passwordToggleIcon.setIconLiteral("fas-eye-slash");
+            if (passwordTextField == null) {
+                passwordTextField = new TextField();
+                passwordTextField.setPromptText(passwordField.getPromptText());
+                passwordTextField.setStyle(passwordField.getStyle());
+                passwordTextField.setPrefWidth(passwordField.getPrefWidth());
+                passwordTextField.setPrefHeight(passwordField.getPrefHeight());
+                passwordTextField.setFont(passwordField.getFont());
+                passwordTextField.textProperty().addListener((obs, o, n) -> passwordField.setText(n));
+            }
+            passwordTextField.setText(passwordField.getText());
+            passwordRow.getChildren().set(0, passwordTextField);
+            passwordTextField.requestFocus();
+            passwordTextField.positionCaret(passwordTextField.getText().length());
+        } else {
+            passwordToggleIcon.setIconLiteral("fas-eye");
+            passwordField.setText(passwordTextField != null ? passwordTextField.getText() : passwordField.getText());
+            passwordRow.getChildren().set(0, passwordField);
+            passwordField.requestFocus();
+            passwordField.positionCaret(passwordField.getText().length());
+        }
+    }
+
     @FXML
     private void handleClear() {
         emailField.clear();

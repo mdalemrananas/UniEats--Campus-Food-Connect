@@ -31,12 +31,6 @@
       <Label fx:id="userCategoryLabel" styleClass="user-category" />
     </VBox>
     <Region HBox.hgrow="ALWAYS" />
-    <!-- Order Request Notification Button -->
-    <StackPane fx:id="orderNotificationContainer" styleClass="notification-container">
-      <Button fx:id="orderNotificationBtn" text="🔔" mnemonicParsing="false" styleClass="notification-btn" onAction="#handleOrderRequests" />
-      <Label fx:id="orderCountBadge" text="0" styleClass="notification-badge" visible="false" />
-    </StackPane>
-    <Button text="👤" mnemonicParsing="false" styleClass="icon-btn" onAction="#handleProfile" />
     <Button text="≡" mnemonicParsing="false" styleClass="icon-btn" onAction="#handleMenu" />
   </HBox>
 
@@ -100,36 +94,16 @@
 
   <Region VBox.vgrow="ALWAYS" />
 
-  <!-- Bottom Navigation Bar (Seller Buttons) -->
-<HBox spacing="8" alignment="CENTER" styleClass="bottom-nav">
-  
-    <VBox alignment="CENTER" spacing="4">
-        <Button text="🍔 Food Post" styleClass="nav-item" 
-                maxWidth="100" minWidth="100" wrapText="true" textAlignment="CENTER" 
-                onAction="#handlePostItem" />
+  <!-- Bottom Navigation Bar -->
+  <HBox spacing="24" alignment="CENTER" styleClass="bottom-nav">
+    <VBox alignment="CENTER" spacing="2">
+      <Button text="🏠" styleClass="nav-item nav-active" />
+      <Label text="Home" styleClass="subtitle-text" />
     </VBox>
-
-    <VBox alignment="CENTER" spacing="4">
-        <Button text="📋 Order Management" styleClass="nav-item" 
-                maxWidth="100" minWidth="100" wrapText="true" textAlignment="CENTER" 
-                onAction="#handleManageOrders" />
-    </VBox>
-
-    <VBox alignment="CENTER" spacing="4">
-        <Button text="📦 Inventory" styleClass="nav-item" 
-                maxWidth="100" minWidth="100" wrapText="true" textAlignment="CENTER" 
-                onAction="#handleInventory" />
-    </VBox>
-
-    <VBox alignment="CENTER" spacing="4">
-        <Button text="⭐ Food Reviews" styleClass="nav-item"
-        maxWidth="100" minWidth="100" wrapText="true" textAlignment="CENTER"
-        onAction="#handleFoodReview" />
-
-    </VBox>
-
-</HBox>
-
+    <Button text="🚚" styleClass="nav-item" />
+    <Button text="📊" styleClass="nav-item" />
+    <Button text="👤" styleClass="nav-item" />
+  </HBox>
 
 </VBox>
 

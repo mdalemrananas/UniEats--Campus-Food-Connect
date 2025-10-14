@@ -6,39 +6,84 @@
 <?import javafx.geometry.Insets?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" 
-      fx:controller="com.unieats.controllers.FoodItemsController" 
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.unieats.controllers.FoodItemsController"
       style="-fx-background-color: #fafafa;"
-      prefWidth="360" 
+      prefWidth="360"
       prefHeight="800"
       maxWidth="360"
-      maxHeight="800"
-      spacing="0">
+      maxHeight="800">
 
-    <!-- Header -->
-    <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
-        <Button fx:id="backButton" style="-fx-background-color: transparent; -fx-padding: 8;">
-            <graphic>
-                <FontIcon iconLiteral="fas-arrow-left" iconSize="20" iconColor="#2d3436"/>
-            </graphic>
-        </Button>
-        <Label text="Food Items" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 0 0 0 16;"/>
-    </HBox>
+    <top>
+        <VBox spacing="0">
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
+                <Button fx:id="backButton" style="-fx-background-color: transparent; -fx-padding: 8;">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-arrow-left" iconSize="20" iconColor="#2d3436"/>
+                    </graphic>
+                </Button>
+                <Label text="Food Items" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-padding: 0 0 0 16;"/>
+            </HBox>
 
-    <!-- Search Bar -->
-    <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
-        <HBox style="-fx-background-color: #f8f9fa; -fx-background-radius: 25; -fx-padding: 12 16; -fx-spacing: 8; -fx-pref-height: 48; -fx-alignment: center_left; -fx-pref-width: 240;">
-            <FontIcon iconLiteral="fas-search" iconSize="16" iconColor="#6c757d"/>
-            <TextField fx:id="searchField" promptText="Search food items..." 
-                     style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: #2d3436; -fx-prompt-text-fill: #6c757d; -fx-font-size: 14px; -fx-pref-height: 30; -fx-pref-width: 180;"/>
-        </HBox>
-        <Button fx:id="filterButton" text="Filter"/>
-    </HBox>
-
-    <!-- Food Items List -->
-    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
-        <VBox fx:id="foodItemsContainer" spacing="16" style="-fx-padding: 20;">
-            <!-- Food items will be dynamically loaded here -->
+            <!-- Search Bar -->
+            <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
+                <HBox style="-fx-background-color: #f8f9fa; -fx-background-radius: 25; -fx-padding: 12 16; -fx-spacing: 8; -fx-pref-height: 48; -fx-alignment: center_left; -fx-pref-width: 240;">
+                    <FontIcon iconLiteral="fas-search" iconSize="16" iconColor="#6c757d"/>
+                    <TextField fx:id="searchField" promptText="Search food items..."
+                         style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: #2d3436; -fx-prompt-text-fill: #6c757d; -fx-font-size: 14px; -fx-pref-height: 30; -fx-pref-width: 180;"/>
+                </HBox>
+                <Button fx:id="filterButton" text="Filter"/>
+            </HBox>
         </VBox>
-    </ScrollPane>
-</VBox>
+    </top>
+
+    <center>
+        <!-- Food Items List -->
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox fx:id="foodItemsContainer" spacing="16" style="-fx-padding: 20;">
+                <!-- Food items will be dynamically loaded here -->
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" spacing="0" style="-fx-background-color: #ffffff; -fx-padding: 12 0; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);">
+            <!-- Home -->
+            <VBox fx:id="navHome" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-home" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Home" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Orders -->
+            <VBox fx:id="navOrders" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-list-alt" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="My Orders" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Cart -->
+            <VBox fx:id="navCart" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Cart" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Favourite -->
+            <VBox fx:id="navFav" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-heart" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Favourite" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+            <!-- Profile -->
+            <VBox fx:id="navProfile" alignment="CENTER" spacing="4" style="-fx-cursor: hand; -fx-pref-width: 72;">
+                <StackPane style="-fx-background-radius: 12; -fx-padding: 8;">
+                    <FontIcon iconLiteral="fas-user" iconSize="20" iconColor="#6c757d"/>
+                </StackPane>
+                <Label text="Profile" style="-fx-font-size: 10px; -fx-text-fill: #6c757d;"/>
+            </VBox>
+        </HBox>
+    </bottom>
+</BorderPane>
