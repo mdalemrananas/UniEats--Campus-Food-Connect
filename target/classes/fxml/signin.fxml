@@ -61,9 +61,18 @@
                 <FontIcon iconLiteral="fas-lock" iconSize="13" iconColor="#374151"/>
                 <Label text="Password *" style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #374151;"/>
             </HBox>
-            <PasswordField fx:id="passwordField" 
-                           promptText="Enter your password"
-                           style="-fx-pref-width: 320; -fx-pref-height: 44; -fx-font-size: 15; -fx-padding: 10 14; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #d1d5db; -fx-border-width: 1;"/>
+            <HBox fx:id="passwordRow" alignment="CENTER_LEFT" spacing="0">
+                <PasswordField fx:id="passwordField" 
+                               promptText="Enter your password"
+                               style="-fx-pref-width: 280; -fx-pref-height: 44; -fx-font-size: 15; -fx-padding: 10 14 10 14; -fx-background-radius: 8 0 0 8; -fx-border-radius: 8 0 0 8; -fx-border-color: #d1d5db; -fx-border-width: 1 0 1 1;"/>
+                <Button fx:id="passwordToggleButton" 
+                        style="-fx-pref-width: 40; -fx-pref-height: 44; -fx-background-color: transparent; -fx-border-color: #d1d5db; -fx-border-width: 1 1 1 0; -fx-border-radius: 0 8 8 0; -fx-cursor: hand;"
+                        onAction="#togglePasswordVisibility">
+                    <graphic>
+                        <FontIcon fx:id="passwordToggleIcon" iconLiteral="fas-eye" iconSize="14" iconColor="#6B7280"/>
+                    </graphic>
+                </Button>
+            </HBox>
         </VBox>
         
     </VBox>

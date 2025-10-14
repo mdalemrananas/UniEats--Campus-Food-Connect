@@ -4,12 +4,149 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7e92108f-61e7-4822-a886-0ad50c123eec" name="Changes" comment="" />
+    <list default="true" id="7e92108f-61e7-4822-a886-0ad50c123eec" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/DatabaseTest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hs_err_pid1056.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hs_err_pid11312.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hs_err_pid11860.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hs_err_pid11964.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hs_err_pid12256.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hs_err_pid13384.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hs_err_pid15760.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hs_err_pid16232.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hs_err_pid1856.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hs_err_pid4132.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hs_err_pid6932.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/run.bat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/unieats/WishlistItemView.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/unieats/services/EventNotifier.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/unieats/services/RealTimeStockBroadcaster.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/unieats/services/RealtimeService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/unieats/services/StockUpdateService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/unieats/util/ThreadSafeUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/unieats/util/UIUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/css/modern-ui.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/images/cheeseburger.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/images/profile_9_a79a86eb-af8a-4823-8f33-83f03e75ab41.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/reports/attachments/report_10_20251013_135149/Screenshot 2025-09-28 162024_32d033dd.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_stock_update.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/CartItemView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/CartItemView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/DatabaseManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/DatabaseManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/AdminController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/CartController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/CartController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/CheckoutController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/CheckoutController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/FoodDetailsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/FoodDetailsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/FoodItemsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/FoodItemsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/MenuController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/MenuController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/MyOrdersController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/MyOrdersController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/OrderConfirmationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/OrderConfirmationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/OrderDetailsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/OrderDetailsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/PaymentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/PaymentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/ProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/ProfileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/ShopDetailsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/ShopDetailsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/ShopsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/ShopsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/SigninController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/SigninController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/SignupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/SignupController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/StallController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/StallController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/WishlistController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/controllers/WishlistController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/dao/CartDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/dao/CartDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/dao/CartQueryDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/dao/CartQueryDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/dao/FoodItemDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/dao/FoodItemDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/dao/OrderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/dao/OrderDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/dao/PaymentDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/dao/PaymentDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/dao/ReportDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/dao/ReportDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/dao/ShopDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/dao/ShopDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/unieats/dao/WishlistDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/unieats/dao/WishlistDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/admin.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/admin.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/cart.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/cart.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/checkout.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/checkout.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/food_details.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/food_details.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/food_items.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/food_items.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/my_orders.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/my_orders.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/order_confirmation.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/order_confirmation.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/order_details.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/order_details.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/payment.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/payment.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/profile.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/profile.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/report.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/report.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/shop_details.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/shop_details.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/shops.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/shops.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/signin.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/signin.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/signup.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/signup.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/wishlist.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/wishlist.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/CartItemView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/CartItemView.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/DatabaseManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/DatabaseManager.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/FoodItem.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/FoodItem.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/RewardService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/RewardService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/Shop.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/Shop.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/UniEatsApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/UniEatsApp.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminDashboardController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminDashboardController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminPaymentsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminPaymentsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminReportsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminReportsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminSellersController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminSellersController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminSettingsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminSettingsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminUsersController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/AdminUsersController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/CartController$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/CartController$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/CartController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/CartController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/FoodDetailsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/FoodDetailsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/FoodItemsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/FoodItemsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/HomeController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/HomeController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/MenuController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/MenuController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ProfileController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ProfileController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ReportController$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ReportController$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ReportController$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ReportController$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ReportController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ReportController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ShopsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/ShopsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/SigninController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/SigninController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/SignupController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/SignupController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/controllers/StallController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/controllers/StallController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/dao/CartDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/dao/CartDao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/dao/CartQueryDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/dao/CartQueryDao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/dao/FoodItemDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/dao/FoodItemDao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/dao/OrderDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/dao/OrderDao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/dao/ReportDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/dao/ReportDao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/dao/ShopDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/dao/ShopDao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/util/PasswordUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/util/PasswordUtil.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/unieats/util/ResponsiveSceneFactory.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/unieats/util/ResponsiveSceneFactory.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/fxml/admin.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/admin.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/fxml/cart.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/cart.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/fxml/food_details.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/food_details.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/fxml/food_items.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/food_items.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/fxml/profile.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/profile.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/fxml/report.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/report.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/fxml/shops.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/shops.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/fxml/signin.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/signin.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/fxml/signup.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/signup.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/module-info.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/module-info.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unieats.db" beforeDir="false" afterPath="$PROJECT_DIR$/unieats.db" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "The-RushCoder"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/mdalemrananas/UniEats--Campus-Food-Connect.git",
+    "accountId": "04a75b29-a6d5-47c7-8e10-5c06676e9a7e"
+  }
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -24,6 +161,7 @@
     "Application.UniEatsApp.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "Merging main",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",

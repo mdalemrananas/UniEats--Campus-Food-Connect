@@ -74,7 +74,10 @@ public class DatabaseManager {
                         password TEXT NOT NULL,
                         full_name TEXT NOT NULL,
                         profile_picture TEXT DEFAULT NULL,
+                        phone_no TEXT DEFAULT NULL,
+                        address TEXT DEFAULT NULL,
                         user_category TEXT NOT NULL CHECK(user_category IN ('student', 'seller')),
+                        status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('approved','pending','rejected')),
                         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
                     )
@@ -277,6 +280,15 @@ public class DatabaseManager {
             if (!columns.contains("profile_picture")) {
                 s.execute("ALTER TABLE users ADD COLUMN profile_picture TEXT DEFAULT NULL");
             }
+            if (!columns.contains("phone_no")) {
+                s.execute("ALTER TABLE users ADD COLUMN phone_no TEXT DEFAULT NULL");
+            }
+            if (!columns.contains("address")) {
+                s.execute("ALTER TABLE users ADD COLUMN address TEXT DEFAULT NULL");
+            }
+            if (!columns.contains("status")) {
+                s.execute("ALTER TABLE users ADD COLUMN status TEXT NOT NULL DEFAULT 'pending'");
+            }
         }
     }
 
@@ -284,41 +296,8 @@ public class DatabaseManager {
      * Updates the payments table constraint to allow digital_wallet_* payment methods
      */
     private void updatePaymentsTableConstraint(Connection conn) throws SQLException {
-        try {
-            // Check if the table exists and has the old constraint
-            try (Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery("PRAGMA table_info(payments)")) {
-                
-                boolean tableExists = false;
-                while (rs.next()) {
-                    tableExists = true;
-                    break;
-                }
-                
-                if (tableExists) {
-                    System.out.println("Updating payments table constraint...");
-                    // Drop and recreate the payments table with updated constraint
-                    stmt.execute("DROP TABLE payments");
-                    stmt.execute("""
-                        CREATE TABLE payments (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            order_id INTEGER NOT NULL,
-                            payment_method TEXT NOT NULL CHECK(payment_method IN ('card', 'cash', 'digital_wallet') OR payment_method LIKE 'digital_wallet_%'),
-                            amount REAL NOT NULL,
-                            status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'completed', 'failed', 'refunded')),
-                            transaction_id TEXT,
-                            payment_details TEXT,
-                            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                            FOREIGN KEY(order_id) REFERENCES orders(id)
-                        )
-                    """);
-                    System.out.println("Payments table constraint updated successfully");
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Warning: Could not update payments table constraint: " + e.getMessage());
-        }
+        // No-op migration: preserve existing payments table to avoid data loss across restarts/logouts.
+        // Legacy databases will continue working; new installs get the correct schema via CREATE TABLE IF NOT EXISTS above.
     }
 
     /**
@@ -416,17 +395,18 @@ public class DatabaseManager {
             conn.setAutoCommit(false); // Start transaction
             
             // Insert user
-            String userSql = "INSERT INTO users (email, password, full_name, user_category, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+            String userSql = "INSERT INTO users (email, password, full_name, user_category, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(userSql)) {
                 
                 pstmt.setString(1, user.getEmail());
                 pstmt.setString(2, user.getPassword());
                 pstmt.setString(3, user.getFullName());
                 pstmt.setString(4, user.getUserCategory());
+                pstmt.setString(5, user.getStatus() == null ? "pending" : user.getStatus());
                 
                 String timestamp = LocalDateTime.now().toString();
-                pstmt.setString(5, timestamp);
                 pstmt.setString(6, timestamp);
+                pstmt.setString(7, timestamp);
                 
                 int affectedRows = pstmt.executeUpdate();
                 
@@ -599,7 +579,7 @@ public class DatabaseManager {
     public boolean updateUser(User user) {
         String sql = """
             UPDATE users 
-            SET email = ?, password = ?, full_name = ?, user_category = ?, updated_at = ?
+            SET email = ?, password = ?, full_name = ?, user_category = ?, phone_no = ?, address = ?, status = ?, updated_at = ?
             WHERE id = ?
             """;
         
@@ -610,10 +590,16 @@ public class DatabaseManager {
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getFullName());
             pstmt.setString(4, user.getUserCategory());
-            pstmt.setString(5, LocalDateTime.now().toString());
-            pstmt.setInt(6, user.getId());
+            pstmt.setString(5, user.getPhoneNo());
+            pstmt.setString(6, user.getAddress());
+            pstmt.setString(7, user.getStatus() == null ? "pending" : user.getStatus());
+            pstmt.setString(8, LocalDateTime.now().toString());
+            pstmt.setInt(9, user.getId());
             
             int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                com.unieats.services.EventNotifier.notifyChange("users");
+            }
             return affectedRows > 0;
             
         } catch (SQLException e) {
@@ -686,6 +672,18 @@ public class DatabaseManager {
         try {
             String pic = rs.getString("profile_picture");
             user.setProfilePicture(pic);
+        } catch (SQLException ignored) {}
+        try {
+            String phone = rs.getString("phone_no");
+            user.setPhoneNo(phone);
+        } catch (SQLException ignored) {}
+        try {
+            String addr = rs.getString("address");
+            user.setAddress(addr);
+        } catch (SQLException ignored) {}
+        try {
+            String st = rs.getString("status");
+            user.setStatus(st);
         } catch (SQLException ignored) {}
         
         try {

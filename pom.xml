@@ -86,8 +86,12 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
+                    <release>17</release>
+                    <compilerArgs>
+                        <arg>--add-modules</arg>
+                        <arg>javafx.controls,javafx.fxml,javafx.web</arg>
+                        <arg>-Xlint:unchecked</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -95,6 +99,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
+<<<<<<< HEAD
                     <mainClass>com.unieats/com.unieats.UniEatsLauncher</mainClass>
                     <options>
                         <option>-Djavafx.verbose=false</option>
@@ -107,6 +112,14 @@
                         <option>-Xmx2g</option>
                         <option>-XX:+UnlockExperimentalVMOptions</option>
                         <option>-XX:+UseZGC</option>
+=======
+                    <mainClass>com.unieats/com.unieats.UniEatsApp</mainClass>
+                    <options>
+                        <option>--add-exports</option>
+                        <option>javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</option>
+                        <option>--add-opens</option>
+                        <option>javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</option>
+>>>>>>> User-Panel
                     </options>
                 </configuration>
             </plugin>

@@ -17,7 +17,11 @@
 					</Button>
                     <Label fx:id="titleLabel" text="Dashboard" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #111827;" />
 					<Region HBox.hgrow="ALWAYS" />
+<<<<<<< HEAD
                     <!-- Session and Logout removed per requirements -->
+=======
+                    <!-- top logout removed per request -->
+>>>>>>> User-Panel
 				</HBox>
 			</top>
 			<center>
@@ -42,7 +46,11 @@
                     <Button text="Payments" onAction="#showPayments" styleClass="drawer-button" style="-fx-background-color: linear-gradient(to right, #fee2e2, #fecaca); -fx-text-fill: #b91c1c; -fx-background-insets: 0; -fx-background-radius: 10;" />
                     <Button text="Settings" onAction="#showSettings" styleClass="drawer-button" style="-fx-background-color: linear-gradient(to right, #f3f4f6, #e5e7eb); -fx-text-fill: #111827; -fx-background-insets: 0; -fx-background-radius: 10;" />
 					<Region VBox.vgrow="ALWAYS" />
+<<<<<<< HEAD
                     <!-- Logout removed per requirements -->
+=======
+                    <Button text="Logout" onAction="#handleLogout" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 10;" />
+>>>>>>> User-Panel
 				</VBox>
 			</HBox>
 		</AnchorPane>

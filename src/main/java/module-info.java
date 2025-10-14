@@ -11,6 +11,7 @@ module com.unieats {
     requires org.kordamp.ikonli.material2;
     requires org.java_websocket;
 
+<<<<<<< HEAD
     opens com.unieats to javafx.fxml;
     opens com.unieats.util to javafx.base;
 
@@ -18,3 +19,11 @@ module com.unieats {
 
     opens com.unieats.controllers to javafx.fxml;
 }
+=======
+    exports com.unieats;
+    exports com.unieats.controllers;
+    
+    opens com.unieats to javafx.fxml, javafx.graphics;
+    opens com.unieats.controllers to javafx.fxml, javafx.graphics;
+}
+>>>>>>> User-Panel

@@ -37,6 +37,7 @@ public class ShopDao {
 			ps.setString(2, LocalDateTime.now().toString());
 			ps.setInt(3, shopId);
 			ps.executeUpdate();
+            com.unieats.services.EventNotifier.notifyChange("shops");
 		} catch (SQLException e) {
 			throw new RuntimeException("Failed to update shop status", e);
 		}

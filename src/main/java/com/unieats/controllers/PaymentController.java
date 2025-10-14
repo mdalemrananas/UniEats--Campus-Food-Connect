@@ -1,9 +1,15 @@
 package com.unieats.controllers;
 
 import com.unieats.User;
+import com.unieats.CartItemView;
+import com.unieats.Shop;
+import com.unieats.dao.CartDao;
 import com.unieats.dao.OrderDao;
 import com.unieats.dao.PaymentDao;
 import com.unieats.dao.RewardDao;
+import com.unieats.dao.FoodItemDao;
+import com.unieats.services.StockUpdateService;
+import com.unieats.services.RealTimeStockBroadcaster;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -32,13 +38,27 @@ public class PaymentController {
     @FXML private ComboBox<String> walletTypeCombo;
     @FXML private TextField walletIdField;
     @FXML private Button processPaymentButton;
+    
+    // Bottom navigation
+    @FXML private VBox navHome;
+    @FXML private VBox navOrders;
+    @FXML private VBox navCart;
+    @FXML private VBox navFav;
+    @FXML private VBox navProfile;
 
     private final OrderDao orderDao = new OrderDao();
     private final PaymentDao paymentDao = new PaymentDao();
     private final RewardDao rewardDao = new RewardDao();
+    private final CartDao cartDao = new CartDao();
+    private final FoodItemDao foodItemDao = new FoodItemDao();
     private int orderId;
     private double totalAmount;
     private User currentUser;
+    
+    // Cart data for order creation
+    private int currentUserId;
+    private java.util.List<CartItemView> cartItems;
+    private Shop currentShop;
 
     @FXML
     private void initialize() {
@@ -48,6 +68,9 @@ public class PaymentController {
         cashPayment.setToggleGroup(paymentGroup);
         walletPayment.setToggleGroup(paymentGroup);
         cardPayment.setSelected(true);
+        
+        // Wire bottom navigation
+        wireBottomNavigation();
 
         // Set up payment method change listeners
         cardPayment.setOnAction(e -> updatePaymentDetailsVisibility());
@@ -66,9 +89,29 @@ public class PaymentController {
         boolean isWallet = walletPayment.isSelected();
         boolean isCash = cashPayment.isSelected();
 
-        cardPaymentDetails.setVisible(isCard);
-        walletPaymentDetails.setVisible(isWallet);
-        cashPaymentDetails.setVisible(isCash);
+        // Fully replace the card input area with wallet input when digital wallet is selected
+        if (isWallet) {
+            cardPaymentDetails.setVisible(false);
+            cardPaymentDetails.setManaged(false);
+            walletPaymentDetails.setVisible(true);
+            walletPaymentDetails.setManaged(true);
+            cashPaymentDetails.setVisible(false);
+            cashPaymentDetails.setManaged(false);
+        } else if (isCard) {
+            cardPaymentDetails.setVisible(true);
+            cardPaymentDetails.setManaged(true);
+            walletPaymentDetails.setVisible(false);
+            walletPaymentDetails.setManaged(false);
+            cashPaymentDetails.setVisible(false);
+            cashPaymentDetails.setManaged(false);
+        } else if (isCash) {
+            cardPaymentDetails.setVisible(false);
+            cardPaymentDetails.setManaged(false);
+            walletPaymentDetails.setVisible(false);
+            walletPaymentDetails.setManaged(false);
+            cashPaymentDetails.setVisible(true);
+            cashPaymentDetails.setManaged(true);
+        }
     }
 
     public void setOrderId(int orderId) {
@@ -83,6 +126,16 @@ public class PaymentController {
 
     public void setCurrentUser(User user) {
         this.currentUser = user;
+    }
+
+    public void setCartData(int userId, java.util.List<CartItemView> cartItems, Shop shop, double totalAmount) {
+        this.currentUserId = userId;
+        this.cartItems = cartItems;
+        this.currentShop = shop;
+        this.totalAmount = totalAmount;
+        this.orderId = -1; // Order not created yet
+        orderIdLabel.setText("Pending");
+        totalAmountLabel.setText(String.format("$%.2f", totalAmount));
     }
 
     @FXML
@@ -114,24 +167,53 @@ public class PaymentController {
             String paymentMethod = getSelectedPaymentMethod();
             String transactionId = generateTransactionId();
 
-            System.out.println("Creating payment for order " + orderId + " with method: " + paymentMethod + ", amount: " + totalAmount);
-
-            // Create payment record
-            int paymentId = paymentDao.createPayment(orderId, paymentMethod, totalAmount, transactionId);
-            System.out.println("Payment created with ID: " + paymentId);
+            System.out.println("Processing payment with method: " + paymentMethod + ", amount: " + totalAmount);
 
             // Simulate payment processing
             boolean paymentSuccess = simulatePaymentProcessing(paymentMethod);
             System.out.println("Payment processing result: " + paymentSuccess);
 
             if (paymentSuccess) {
+                // Create order only after successful payment
+                int orderId = orderDao.createOrder(currentUserId, currentShop.getId(), totalAmount, "preparing");
+                System.out.println("Order created with ID: " + orderId);
+
+                // Add order items and update stock
+                for (CartItemView item : cartItems) {
+                    System.out.println("Processing item: " + item.itemId + ", quantity: " + item.quantity);
+                    orderDao.addOrderItem(orderId, item.itemId, item.quantity, item.price);
+                    
+                    // Get current stock before updating
+                    com.unieats.FoodItem currentItem = foodItemDao.getById(item.itemId);
+                    int oldStock = currentItem != null ? currentItem.getStock() : 0;
+                    
+                    // Update stock using the real-time service
+                    try {
+                        StockUpdateService.getInstance().updateStock(item.itemId, item.quantity);
+                        
+                        // Also notify the real-time broadcaster for immediate updates
+                        int newStock = oldStock - item.quantity;
+                        RealTimeStockBroadcaster.getInstance().notifyStockChange(item.itemId, oldStock, newStock);
+                        
+                        System.out.println("Real-time stock update: Item " + item.itemId + " stock changed from " + oldStock + " to " + newStock);
+                    } catch (Exception e) {
+                        System.err.println("Failed to update stock for item " + item.itemId + ": " + e.getMessage());
+                        // Continue with other items even if one fails
+                    }
+                }
+                System.out.println("Order items added and stock updated via real-time service with immediate broadcasting");
+
+                // Create payment record
+                int paymentId = paymentDao.createPayment(orderId, paymentMethod, totalAmount, transactionId);
+                System.out.println("Payment created with ID: " + paymentId);
+
                 // Update payment status
                 paymentDao.updatePaymentStatus(paymentId, "completed");
                 System.out.println("Payment status updated to completed");
-                
-                // Update order status
-                orderDao.updateOrderStatus(orderId, "preparing");
-                System.out.println("Order status updated to preparing");
+
+                // Clear cart after successful payment
+                cartDao.clearCart(currentUserId);
+                System.out.println("Cart cleared for user: " + currentUserId);
 
                 // Award reward points
                 awardRewardPoints(orderId);
@@ -139,9 +221,7 @@ public class PaymentController {
                 // Navigate to order confirmation
                 navigateToOrderConfirmation(orderId);
             } else {
-                // Update payment status
-                paymentDao.updatePaymentStatus(paymentId, "failed");
-                System.out.println("Payment status updated to failed");
+                System.out.println("Payment failed");
                 showAlert("Payment Failed", "Payment could not be processed. Please try again or use a different payment method.");
             }
 
@@ -261,5 +341,113 @@ public class PaymentController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private void wireBottomNavigation() {
+        if (navHome != null) {
+            navHome.setOnMouseClicked(e -> navigateToHome());
+        }
+        if (navOrders != null) {
+            navOrders.setOnMouseClicked(e -> navigateToOrders());
+        }
+        if (navCart != null) {
+            navCart.setOnMouseClicked(e -> navigateToCart());
+        }
+        if (navFav != null) {
+            navFav.setOnMouseClicked(e -> navigateToFavorites());
+        }
+        if (navProfile != null) {
+            navProfile.setOnMouseClicked(e -> navigateToProfile());
+        }
+    }
+
+    private void navigateToHome() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/menu.fxml"));
+            Parent root = loader.load();
+            MenuController controller = loader.getController();
+            if (controller != null && currentUser != null) {
+                controller.setCurrentUser(currentUser);
+            }
+            Stage stage = (Stage) navHome.getScene().getWindow();
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.setTitle("UniEats - Menu");
+            stage.show();
+        } catch (Exception e) {
+            showAlert("Navigation Error", "Failed to navigate to menu: " + e.getMessage());
+        }
+    }
+
+    private void navigateToOrders() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/my_orders.fxml"));
+            Parent root = loader.load();
+            MyOrdersController controller = loader.getController();
+            if (controller != null && currentUser != null) {
+                controller.setCurrentUser(currentUser);
+            }
+            Stage stage = (Stage) navOrders.getScene().getWindow();
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.setTitle("UniEats - My Orders");
+            stage.show();
+        } catch (Exception e) {
+            showAlert("Navigation Error", "Failed to navigate to orders: " + e.getMessage());
+        }
+    }
+
+    private void navigateToCart() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/cart.fxml"));
+            Parent root = loader.load();
+            CartController controller = loader.getController();
+            if (controller != null && currentUser != null) {
+                controller.setCurrentUserId(currentUser.getId());
+            }
+            Stage stage = (Stage) navCart.getScene().getWindow();
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.setTitle("UniEats - Cart");
+            stage.show();
+        } catch (Exception e) {
+            showAlert("Navigation Error", "Failed to navigate to cart: " + e.getMessage());
+        }
+    }
+
+    private void navigateToFavorites() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/wishlist.fxml"));
+            Parent root = loader.load();
+            WishlistController controller = loader.getController();
+            if (controller != null && currentUser != null) {
+                controller.setCurrentUser(currentUser);
+            }
+            Stage stage = (Stage) navFav.getScene().getWindow();
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.setTitle("UniEats - Favorites");
+            stage.show();
+        } catch (Exception e) {
+            showAlert("Navigation Error", "Failed to navigate to favorites: " + e.getMessage());
+        }
+    }
+
+    private void navigateToProfile() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/profile.fxml"));
+            Parent root = loader.load();
+            ProfileController controller = loader.getController();
+            if (controller != null && currentUser != null) {
+                controller.setCurrentUser(currentUser);
+            }
+            Stage stage = (Stage) navProfile.getScene().getWindow();
+            Scene scene = com.unieats.util.ResponsiveSceneFactory.createResponsiveScene(root, 360, 800);
+            stage.setScene(scene);
+            stage.setTitle("UniEats - Profile");
+            stage.show();
+        } catch (Exception e) {
+            showAlert("Navigation Error", "Failed to navigate to profile: " + e.getMessage());
+        }
     }
 }

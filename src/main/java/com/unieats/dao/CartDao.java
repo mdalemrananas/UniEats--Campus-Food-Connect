@@ -146,4 +146,17 @@ public class CartDao {
             ps.executeUpdate();
         } catch (SQLException e) { throw new RuntimeException(e); }
     }
+
+    /**
+     * Remove a specific item from the user's cart
+     */
+    public void removeFromCart(int userId, int itemId) {
+        String sql = "DELETE FROM cart WHERE user_id=? AND item_id=?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, itemId);
+            ps.executeUpdate();
+        } catch (SQLException e) { throw new RuntimeException(e); }
+    }
 }
