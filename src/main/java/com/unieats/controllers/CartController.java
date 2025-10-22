@@ -33,8 +33,6 @@ public class CartController {
 
     // New image-style UI
     @FXML private ListView<CartItemView> cartList;
-    @FXML private Label subtotalLabel;
-    @FXML private Label taxLabel;
     @FXML private Label totalLabel;
 
     // Bottom navigation (from cart.fxml)
@@ -83,13 +81,13 @@ public class CartController {
                     name.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;");
                     Label shopLabel = new Label("from " + item.shopName);
                     shopLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12px;");
-                    Label price = new Label(String.format("$ %.2f", item.price));
+                    Label price = new Label(String.format("৳%.2f", item.price));
                     price.setStyle("-fx-text-fill: #ff6b35; -fx-font-size: 14px; -fx-font-weight: bold;");
                     Label points = new Label("Points: " + String.format("%.1fx", item.pointsMultiplier));
                     points.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12px;");
-                    // Stock requires a join; if not available in CartItemView, leave as N/A
-                    Label stock = new Label("Stock: N/A");
-                    stock.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12px;");
+                    // Display real-time stock from CartItemView
+                    Label stock = new Label("Stock: " + (item.stock > 0 ? item.stock : "Out of stock"));
+                    stock.setStyle("-fx-text-fill: " + (item.stock > 0 ? "#6c757d" : "#dc3545") + "; -fx-font-size: 12px;");
                     VBox textBox = new VBox(2, name, shopLabel, price, points, stock);
                     textBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -261,17 +259,14 @@ public class CartController {
                 ObservableList<CartItemView> data = FXCollections.observableArrayList(items);
 
                 double subtotal = items.stream().mapToDouble(i -> i.price * i.quantity).sum();
-                double tax = Math.round(subtotal * 0.02 * 100.0) / 100.0; // 2%
-                double total = subtotal + tax;
+                double total = subtotal;
 
                 // Update UI on JavaFX thread
                 ThreadSafeUtils.runOnFXThread(() -> {
                     if (cartTable != null) cartTable.setItems(data);
                     if (cartList != null) cartList.setItems(data);
 
-                    if (subtotalLabel != null) subtotalLabel.setText(String.format("$%.2f", subtotal));
-                    if (taxLabel != null) taxLabel.setText(String.format("$%.2f", tax));
-                    if (totalLabel != null) totalLabel.setText(String.format("$%.2f", total));
+                    if (totalLabel != null) totalLabel.setText(String.format("৳%.2f", total));
                 });
             },
             () -> {

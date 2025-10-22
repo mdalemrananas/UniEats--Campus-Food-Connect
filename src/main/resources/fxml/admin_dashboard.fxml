@@ -3,54 +3,114 @@
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.AdminDashboardController" spacing="10" fillWidth="true" stylesheets="@../css/styles.css">
-    <!-- KPI cards laid out 2 per row -->
-    <GridPane hgap="8" vgap="8" styleClass="kpi-grid">
-        <columnConstraints>
-            <ColumnConstraints percentWidth="50" />
-            <ColumnConstraints percentWidth="50" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints />
-            <RowConstraints />
-        </rowConstraints>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.unieats.controllers.AdminDashboardController" spacing="20" fillWidth="true" stylesheets="@../css/styles.css">
+    
+    <!-- Overview Section -->
+    <VBox spacing="12">
+        <HBox alignment="CENTER_LEFT" spacing="8">
+            <FontIcon iconLiteral="fas-chart-line" iconSize="20" iconColor="#4f46e5"/>
+            <Label text="Overview" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+        </HBox>
+        
+        <!-- KPI cards laid out 2 per row -->
+        <GridPane hgap="12" vgap="12" styleClass="kpi-grid">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="50" />
+                <ColumnConstraints percentWidth="50" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints />
+                <RowConstraints />
+            </rowConstraints>
 
-        <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS" fillWidth="true" spacing="4" styleClass="kpi-card kpi-orange" prefHeight="84" style="-fx-background-color: #FFF3E0; -fx-border-color: #F59E0B; -fx-border-width: 1; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 16;">
-            <Label text="Total Users" />
-            <Label fx:id="totalUsersLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
-        </VBox>
-        <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS" fillWidth="true" spacing="4" styleClass="kpi-card kpi-orange" prefHeight="84" style="-fx-background-color: #FFF3E0; -fx-border-color: #F59E0B; -fx-border-width: 1; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 16;">
-            <Label text="Active Shops" />
-            <Label fx:id="activeSellersLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
-        </VBox>
-        <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" fillWidth="true" spacing="4" styleClass="kpi-card kpi-orange" prefHeight="84" style="-fx-background-color: #FFF3E0; -fx-border-color: #F59E0B; -fx-border-width: 1; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 16;">
-            <Label text="Total Reports" />
-            <Label fx:id="pendingSellersLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
-        </VBox>
-        <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" fillWidth="true" spacing="4" styleClass="kpi-card kpi-orange" prefHeight="84" style="-fx-background-color: #FFF3E0; -fx-border-color: #F59E0B; -fx-border-width: 1; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 16;">
-            <Label text="Total Payments" />
-            <Label fx:id="pendingReportsLabel" text="0" style="-fx-font-size: 20; -fx-font-weight: bold;" />
-        </VBox>
-    </GridPane>
-
-    <!-- Reports Distribution Pie Chart -->
-    <VBox spacing="6">
-        <Label text="Reports Distribution" />
-        <PieChart fx:id="complaintsPieChart" prefHeight="240" />
+            <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS" fillWidth="true" spacing="6" styleClass="kpi-card" prefHeight="90" style="-fx-background-color: #dbeafe; -fx-border-color: #3b82f6; -fx-border-width: 1; -fx-background-radius: 12; -fx-border-radius: 12; -fx-padding: 16;">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <FontIcon iconLiteral="fas-users" iconSize="16" iconColor="#3b82f6"/>
+                    <Label text="Total Users" style="-fx-text-fill: #1e40af; -fx-font-weight: bold;"/>
+                </HBox>
+                <Label fx:id="totalUsersLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e40af;" />
+            </VBox>
+            
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS" fillWidth="true" spacing="6" styleClass="kpi-card" prefHeight="90" style="-fx-background-color: #dcfce7; -fx-border-color: #22c55e; -fx-border-width: 1; -fx-background-radius: 12; -fx-border-radius: 12; -fx-padding: 16;">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <FontIcon iconLiteral="fas-store" iconSize="16" iconColor="#22c55e"/>
+                    <Label text="Active Shops" style="-fx-text-fill: #166534; -fx-font-weight: bold;"/>
+                </HBox>
+                <Label fx:id="activeSellersLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #166534;" />
+            </VBox>
+            
+            <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" fillWidth="true" spacing="6" styleClass="kpi-card" prefHeight="90" style="-fx-background-color: #fef3c7; -fx-border-color: #f59e0b; -fx-border-width: 1; -fx-background-radius: 12; -fx-border-radius: 12; -fx-padding: 16;">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <FontIcon iconLiteral="fas-exclamation-triangle" iconSize="16" iconColor="#f59e0b"/>
+                    <Label text="Total Reports" style="-fx-text-fill: #92400e; -fx-font-weight: bold;"/>
+                </HBox>
+                <Label fx:id="pendingSellersLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #92400e;" />
+            </VBox>
+            
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" fillWidth="true" spacing="6" styleClass="kpi-card" prefHeight="90" style="-fx-background-color: #fce7f3; -fx-border-color: #ec4899; -fx-border-width: 1; -fx-background-radius: 12; -fx-border-radius: 12; -fx-padding: 16;">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <FontIcon iconLiteral="fas-credit-card" iconSize="16" iconColor="#ec4899"/>
+                    <Label text="Total Payments" style="-fx-text-fill: #be185d; -fx-font-weight: bold;"/>
+                </HBox>
+                <Label fx:id="pendingReportsLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #be185d;" />
+            </VBox>
+        </GridPane>
     </VBox>
 
-    <!-- Growth chart for Users & Orders -->
-    <VBox spacing="6">
-        <Label text="User &amp; Order Growth Over Time" />
-        <LineChart fx:id="growthChart" prefHeight="260">
-            <xAxis>
-                <CategoryAxis label="Time" />
-            </xAxis>
-            <yAxis>
-                <NumberAxis label="Count" />
-            </yAxis>
-        </LineChart>
+    <!-- Analytics Section -->
+    <VBox spacing="12">
+        <HBox alignment="CENTER_LEFT" spacing="8">
+            <FontIcon iconLiteral="fas-chart-bar" iconSize="20" iconColor="#059669"/>
+            <Label text="Analytics" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+        </HBox>
+        
+        <!-- Top 5 Shops by Orders Bar Chart -->
+        <VBox spacing="8" style="-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-padding: 16; -fx-border-color: #e5e7eb; -fx-border-width: 1; -fx-border-radius: 12;">
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <FontIcon iconLiteral="fas-trophy" iconSize="16" iconColor="#f59e0b"/>
+                <Label text="Top 5 Shops by Orders" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #374151;"/>
+            </HBox>
+            <BarChart fx:id="topShopsChart" prefHeight="280">
+                <xAxis>
+                    <CategoryAxis label="Shops" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Orders" />
+                </yAxis>
+            </BarChart>
+        </VBox>
+    </VBox>
+
+    <!-- Recent Updates Section -->
+    <VBox spacing="12">
+        <HBox alignment="CENTER_LEFT" spacing="8">
+            <FontIcon iconLiteral="fas-clock" iconSize="20" iconColor="#dc2626"/>
+            <Label text="Recent Updates" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+        </HBox>
+        
+        <!-- Recent Activities Table -->
+        <VBox spacing="8" style="-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-padding: 16; -fx-border-color: #e5e7eb; -fx-border-width: 1; -fx-border-radius: 12;">
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <FontIcon iconLiteral="fas-history" iconSize="16" iconColor="#6b7280"/>
+                <Label text="Recent Activities" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #374151;"/>
+            </HBox>
+            <TableView fx:id="recentActivitiesTable" prefHeight="200">
+                <columns>
+                    <TableColumn fx:id="activityTimeColumn" text="Time" prefWidth="80">
+                        <cellValueFactory><PropertyValueFactory property="time"/></cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="activityTypeColumn" text="Type" prefWidth="100">
+                        <cellValueFactory><PropertyValueFactory property="type"/></cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="activityDescriptionColumn" text="Description" prefWidth="180">
+                        <cellValueFactory><PropertyValueFactory property="description"/></cellValueFactory>
+                    </TableColumn>
+                </columns>
+            </TableView>
+        </VBox>
     </VBox>
 </VBox>
 

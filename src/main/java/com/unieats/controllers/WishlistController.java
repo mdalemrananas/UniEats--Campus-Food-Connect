@@ -89,7 +89,7 @@ public class WishlistController {
 				priceContainer.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 				Region priceSpacer = new Region();
 				HBox.setHgrow(priceSpacer, Priority.ALWAYS);
-				Label price = new Label(String.format("$%.2f", item.getPrice()));
+				Label price = new Label(String.format("৳%.2f", item.getPrice()));
 				price.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;");
                 Label stock = new Label();
                 stock.setStyle("-fx-font-size: 12px; -fx-text-fill: #6c757d;");

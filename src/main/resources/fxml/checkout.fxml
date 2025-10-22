@@ -34,16 +34,6 @@
                     
                     <VBox spacing="8">
                         <HBox alignment="CENTER_LEFT">
-                            <Label text="Subtotal" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <Label fx:id="subtotalLabel" style="-fx-font-size: 14px; -fx-text-fill: #2d3436;"/>
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT">
-                            <Label text="Tax (2%)" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <Label fx:id="taxLabel" style="-fx-font-size: 14px; -fx-text-fill: #2d3436;"/>
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT">
                             <Label text="Total" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
                             <Region HBox.hgrow="ALWAYS"/>
                             <Label fx:id="totalLabel" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;"/>

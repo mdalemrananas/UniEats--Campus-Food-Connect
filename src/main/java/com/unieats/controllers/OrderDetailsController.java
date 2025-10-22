@@ -77,7 +77,7 @@ public class OrderDetailsController {
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
-                Label priceLabel = new Label(String.format("$%.2f", item.totalPrice));
+                Label priceLabel = new Label(String.format("৳%.2f", item.totalPrice));
                 priceLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;");
 
                 header.getChildren().addAll(nameLabel, spacer, priceLabel);
@@ -86,7 +86,7 @@ public class OrderDetailsController {
                 Label qtyLabel = new Label("Qty: " + item.quantity);
                 qtyLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6c757d;");
 
-                Label unitPriceLabel = new Label(String.format("$%.2f each", item.price));
+                Label unitPriceLabel = new Label(String.format("৳%.2f each", item.price));
                 unitPriceLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6c757d;");
 
                 details.getChildren().addAll(qtyLabel, unitPriceLabel);
@@ -118,7 +118,7 @@ public class OrderDetailsController {
             // Populate order details
             orderIdLabel.setText("#" + orderInfo.getId());
             shopNameLabel.setText(orderInfo.getShopName());
-            totalAmountLabel.setText(String.format("$%.2f", orderInfo.getTotalPrice()));
+            totalAmountLabel.setText(String.format("৳%.2f", orderInfo.getTotalPrice()));
             
             if (orderInfo.getCreatedAt() != null) {
                 orderTimeLabel.setText(orderInfo.getCreatedAt().format(DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' HH:mm")));

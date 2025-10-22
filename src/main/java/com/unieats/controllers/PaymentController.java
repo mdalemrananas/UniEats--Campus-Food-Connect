@@ -28,15 +28,20 @@ public class PaymentController {
     @FXML private RadioButton cardPayment;
     @FXML private RadioButton cashPayment;
     @FXML private RadioButton walletPayment;
+    @FXML private RadioButton pointsPayment;
     @FXML private VBox cardPaymentDetails;
     @FXML private VBox walletPaymentDetails;
     @FXML private VBox cashPaymentDetails;
+    @FXML private VBox pointsPaymentDetails;
     @FXML private TextField cardNumberField;
     @FXML private TextField expiryField;
     @FXML private TextField cvvField;
     @FXML private TextField cardholderNameField;
     @FXML private ComboBox<String> walletTypeCombo;
     @FXML private TextField walletIdField;
+    @FXML private Label pointsInfoLabel;
+    @FXML private Label userPointsLabel;
+    @FXML private Label pointsNeededLabel;
     @FXML private Button processPaymentButton;
     
     // Bottom navigation
@@ -67,6 +72,7 @@ public class PaymentController {
         cardPayment.setToggleGroup(paymentGroup);
         cashPayment.setToggleGroup(paymentGroup);
         walletPayment.setToggleGroup(paymentGroup);
+        pointsPayment.setToggleGroup(paymentGroup);
         cardPayment.setSelected(true);
         
         // Wire bottom navigation
@@ -76,9 +82,13 @@ public class PaymentController {
         cardPayment.setOnAction(e -> updatePaymentDetailsVisibility());
         cashPayment.setOnAction(e -> updatePaymentDetailsVisibility());
         walletPayment.setOnAction(e -> updatePaymentDetailsVisibility());
+        pointsPayment.setOnAction(e -> {
+            updatePaymentDetailsVisibility();
+            updatePointsInformation();
+        });
 
         // Populate wallet type ComboBox
-        walletTypeCombo.getItems().addAll("bKash", "Nagad", "Google Pay", "PayPal", "Apple Pay", "Venmo");
+        walletTypeCombo.getItems().addAll("bKash", "Nagad", "Rocket");
 
         // Initialize visibility
         updatePaymentDetailsVisibility();
@@ -88,6 +98,7 @@ public class PaymentController {
         boolean isCard = cardPayment.isSelected();
         boolean isWallet = walletPayment.isSelected();
         boolean isCash = cashPayment.isSelected();
+        boolean isPoints = pointsPayment.isSelected();
 
         // Fully replace the card input area with wallet input when digital wallet is selected
         if (isWallet) {
@@ -97,6 +108,8 @@ public class PaymentController {
             walletPaymentDetails.setManaged(true);
             cashPaymentDetails.setVisible(false);
             cashPaymentDetails.setManaged(false);
+            pointsPaymentDetails.setVisible(false);
+            pointsPaymentDetails.setManaged(false);
         } else if (isCard) {
             cardPaymentDetails.setVisible(true);
             cardPaymentDetails.setManaged(true);
@@ -104,6 +117,8 @@ public class PaymentController {
             walletPaymentDetails.setManaged(false);
             cashPaymentDetails.setVisible(false);
             cashPaymentDetails.setManaged(false);
+            pointsPaymentDetails.setVisible(false);
+            pointsPaymentDetails.setManaged(false);
         } else if (isCash) {
             cardPaymentDetails.setVisible(false);
             cardPaymentDetails.setManaged(false);
@@ -111,6 +126,17 @@ public class PaymentController {
             walletPaymentDetails.setManaged(false);
             cashPaymentDetails.setVisible(true);
             cashPaymentDetails.setManaged(true);
+            pointsPaymentDetails.setVisible(false);
+            pointsPaymentDetails.setManaged(false);
+        } else if (isPoints) {
+            cardPaymentDetails.setVisible(false);
+            cardPaymentDetails.setManaged(false);
+            walletPaymentDetails.setVisible(false);
+            walletPaymentDetails.setManaged(false);
+            cashPaymentDetails.setVisible(false);
+            cashPaymentDetails.setManaged(false);
+            pointsPaymentDetails.setVisible(true);
+            pointsPaymentDetails.setManaged(true);
         }
     }
 
@@ -121,7 +147,8 @@ public class PaymentController {
 
     public void setTotalAmount(double totalAmount) {
         this.totalAmount = totalAmount;
-        totalAmountLabel.setText(String.format("$%.2f", totalAmount));
+        totalAmountLabel.setText(String.format("৳%.2f", totalAmount));
+        updatePointsInformation(); // Update points info if points payment is selected
     }
 
     public void setCurrentUser(User user) {
@@ -135,7 +162,8 @@ public class PaymentController {
         this.totalAmount = totalAmount;
         this.orderId = -1; // Order not created yet
         orderIdLabel.setText("Pending");
-        totalAmountLabel.setText(String.format("$%.2f", totalAmount));
+        totalAmountLabel.setText(String.format("৳%.2f", totalAmount));
+        updatePointsInformation(); // Update points info if points payment is selected
     }
 
     @FXML
@@ -169,8 +197,14 @@ public class PaymentController {
 
             System.out.println("Processing payment with method: " + paymentMethod + ", amount: " + totalAmount);
 
-            // Simulate payment processing
-            boolean paymentSuccess = simulatePaymentProcessing(paymentMethod);
+            boolean paymentSuccess = false;
+            if ("points".equals(paymentMethod)) {
+                // Handle points payment
+                paymentSuccess = processPointsPayment();
+            } else {
+                // Simulate payment processing for other methods
+                paymentSuccess = simulatePaymentProcessing(paymentMethod);
+            }
             System.out.println("Payment processing result: " + paymentSuccess);
 
             if (paymentSuccess) {
@@ -211,6 +245,28 @@ public class PaymentController {
                 paymentDao.updatePaymentStatus(paymentId, "completed");
                 System.out.println("Payment status updated to completed");
 
+                // Broadcast order update to sellers in real-time via WebSocket hub (port 7071)
+                try {
+                    String orderUpdateJson = String.format(
+                        "{\"type\":\"order_update\",\"orderId\":%d,\"shopId\":%d,\"status\":\"%s\"}",
+                        orderId,
+                        currentShop != null ? currentShop.getId() : -1,
+                        "preparing"
+                    );
+                    com.unieats.util.SocketBus.broadcast(orderUpdateJson);
+                    System.out.println("Broadcasted order_update: " + orderUpdateJson);
+                    // Also broadcast a generic payments topic for admin dashboard
+                    try {
+                        String paymentsTopicJson = String.format(
+                            "{\"type\":\"topic\",\"topic\":\"payments\",\"orderId\":%d,\"paymentId\":%d,\"status\":\"completed\"}",
+                            orderId, paymentId
+                        );
+                        com.unieats.util.SocketBus.broadcast(paymentsTopicJson);
+                    } catch (Exception ignored) {}
+                } catch (Exception ex) {
+                    System.err.println("Failed to broadcast order_update: " + ex.getMessage());
+                }
+
                 // Clear cart after successful payment
                 cartDao.clearCart(currentUserId);
                 System.out.println("Cart cleared for user: " + currentUserId);
@@ -242,12 +298,56 @@ public class PaymentController {
             return "digital_wallet";
         }
         if (cashPayment.isSelected()) return "cash";
+        if (pointsPayment.isSelected()) return "points";
         return "card";
     }
 
     private String generateTransactionId() {
         Random random = new Random();
         return "TXN" + System.currentTimeMillis() + random.nextInt(1000);
+    }
+
+    private void updatePointsInformation() {
+        if (pointsPayment.isSelected() && currentUser != null && currentShop != null) {
+            try {
+                // Get user's points for this shop
+                double userPoints = rewardDao.getUserRewardPoints(currentUserId, currentShop.getId());
+                userPointsLabel.setText(String.format("%.0f", userPoints));
+                
+                // Points needed is the total amount
+                pointsNeededLabel.setText(String.format("%.0f", totalAmount));
+            } catch (Exception e) {
+                System.err.println("Error updating points information: " + e.getMessage());
+                userPointsLabel.setText("Error");
+                pointsNeededLabel.setText("Error");
+            }
+        }
+    }
+
+    private boolean processPointsPayment() {
+        try {
+            // Get user's points for this shop
+            double userPoints = rewardDao.getUserRewardPoints(currentUserId, currentShop.getId());
+            
+            if (userPoints >= totalAmount) {
+                // Deduct points
+                boolean deducted = rewardDao.redeemRewardPoints(currentUserId, currentShop.getId(), totalAmount);
+                if (deducted) {
+                    System.out.println("Deducted " + totalAmount + " points from user " + currentUserId + " for shop " + currentShop.getId());
+                    return true;
+                } else {
+                    showAlert("Payment Error", "Failed to deduct points. Please try again.");
+                    return false;
+                }
+            } else {
+                showAlert("Insufficient Points", "You don't have enough points. You have " + userPoints + " points, but need " + totalAmount + " points for this order.");
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Error processing points payment: " + e.getMessage());
+            showAlert("Payment Error", "Failed to process points payment: " + e.getMessage());
+            return false;
+        }
     }
 
     private boolean simulatePaymentProcessing(String paymentMethod) {

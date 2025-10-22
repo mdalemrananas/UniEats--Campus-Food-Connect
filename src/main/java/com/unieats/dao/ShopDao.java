@@ -124,8 +124,8 @@ public class ShopDao {
 		Shop s = new Shop(rs.getInt("owner_id"), rs.getString("shop_name"), rs.getString("status"));
 		s.setId(rs.getInt("id"));
 		try {
-			s.setCreatedAt(LocalDateTime.parse(rs.getString("created_at")));
-			s.setUpdatedAt(LocalDateTime.parse(rs.getString("updated_at")));
+			s.setCreatedAt(parseFlexibleDateTime(rs.getString("created_at")));
+			s.setUpdatedAt(parseFlexibleDateTime(rs.getString("updated_at")));
 		} catch (Exception ignored) {}
 		
 		// Add additional fields if they exist in the database
@@ -138,5 +138,51 @@ public class ShopDao {
 		
 		return s;
 	}
-}
 
+	/**
+	 * Parse datetime string flexibly - handles both ISO-8601 and SQL datetime formats
+	 */
+	private static LocalDateTime parseFlexibleDateTime(String dateTimeStr) {
+		if (dateTimeStr == null || dateTimeStr.isEmpty()) {
+			return LocalDateTime.now();
+		}
+		
+		try {
+			// Try ISO-8601 format first
+			return LocalDateTime.parse(dateTimeStr);
+		} catch (Exception e1) {
+			try {
+				// Try SQL datetime format
+				java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+				return LocalDateTime.parse(dateTimeStr, formatter);
+			} catch (Exception e2) {
+				try {
+					// Normalize: remove nanoseconds
+					String normalized = dateTimeStr.replace("T", " ");
+					if (normalized.contains(".")) {
+						normalized = normalized.substring(0, normalized.indexOf("."));
+					}
+					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+					return LocalDateTime.parse(normalized, formatter);
+				} catch (Exception e3) {
+					return LocalDateTime.now();
+				}
+			}
+		}
+	}
+
+	public List<Shop> searchShops(String searchTerm) {
+		String sql = "SELECT * FROM shops WHERE LOWER(shop_name) LIKE LOWER(?) AND status = 'approved' ORDER BY shop_name ASC";
+		List<Shop> shops = new ArrayList<>();
+		try (Connection conn = DriverManager.getConnection(DB_URL); 
+			 PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, "%" + searchTerm + "%");
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) shops.add(map(rs));
+			}
+			return shops;
+		} catch (SQLException e) {
+			throw new RuntimeException("Failed to search shops", e);
+		}
+	}
+}

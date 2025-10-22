@@ -40,6 +40,7 @@ public class FoodItemsController {
     private FoodItemDao foodItemDao;
     private ShopDao shopDao;
     private Integer shopFilterId = null;
+    private boolean isShowingSearchResults = false;
 
     public void setShopFilter(int shopId) {
         this.shopFilterId = shopId;
@@ -80,9 +81,12 @@ public class FoodItemsController {
             @Override
             public void onStockUpdated(int itemId, int quantityReduced) {
                 Platform.runLater(() -> {
-                    // Refresh the food items display
-                    foodItemsContainer.getChildren().clear();
-                    loadFoodItems();
+                    // Only refresh if we're not showing search results
+                    if (!isShowingSearchResults) {
+                        // Refresh the food items display
+                        foodItemsContainer.getChildren().clear();
+                        loadFoodItems();
+                    }
                 });
             }
             
@@ -96,11 +100,79 @@ public class FoodItemsController {
             @Override
             public void onAllItemsRefreshed() {
                 Platform.runLater(() -> {
-                    foodItemsContainer.getChildren().clear();
-                    loadFoodItems();
+                    // Only refresh if we're not showing search results
+                    if (!isShowingSearchResults) {
+                        foodItemsContainer.getChildren().clear();
+                        loadFoodItems();
+                    }
                 });
             }
         });
+        
+        // Listen for shop status changes (approval/rejection)
+        // Delay connection slightly to ensure server is ready
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000); // Wait 1 second for server to be ready
+                System.out.println("FoodItemsController: Initializing shop status WebSocket client...");
+                
+                com.unieats.websocket.ShopStatusWebSocketClient shopStatusClient = 
+                    com.unieats.websocket.ShopStatusWebSocketClient.getInstance();
+                
+                if (shopStatusClient != null) {
+                    shopStatusClient.addShopStatusListener(statusMsg -> {
+                        Platform.runLater(() -> {
+                            System.out.println("FoodItemsController: Shop status changed - " + statusMsg);
+                            // Refresh food items when a shop is approved/rejected
+                            // This will show/hide food items based on shop status
+                            if (!isShowingSearchResults) {
+                                foodItemsContainer.getChildren().clear();
+                                loadFoodItems();
+                            }
+                        });
+                    });
+                    System.out.println("FoodItemsController: Shop status listener registered");
+                } else {
+                    System.err.println("FoodItemsController: Failed to get WebSocket client instance");
+                }
+            } catch (Exception e) {
+                System.err.println("FoodItemsController: Failed to connect to shop status WebSocket: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
+        
+        // Listen for food items changes (e.g., when shops are approved)
+        // Delay connection slightly to ensure server is ready
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000); // Wait 1 second for server to be ready
+                System.out.println("FoodItemsController: Initializing food items real-time listener...");
+                
+                com.unieats.services.RealtimeService realtimeService = 
+                    com.unieats.services.RealtimeService.getInstance();
+                
+                if (realtimeService != null) {
+                    realtimeService.onEvent(topic -> {
+                        if ("foodItems".equals(topic)) {
+                            Platform.runLater(() -> {
+                                System.out.println("FoodItemsController: Food items changed - refreshing display");
+                                // Refresh food items when new items are available from approved shops
+                                if (!isShowingSearchResults) {
+                                    foodItemsContainer.getChildren().clear();
+                                    loadFoodItems();
+                                }
+                            });
+                        }
+                    });
+                    System.out.println("FoodItemsController: Food items listener registered");
+                } else {
+                    System.err.println("FoodItemsController: Failed to get RealtimeService instance");
+                }
+            } catch (Exception e) {
+                System.err.println("FoodItemsController: Failed to connect to real-time service: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
         
         // Default active tab: Food Items (no direct tab, but highlight orders as context)
         setActiveNav(navOrders);
@@ -303,7 +375,7 @@ public class FoodItemsController {
         HBox info = new HBox(16);
         info.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         
-        Label priceLabel = new Label("$" + String.format("%.2f", foodItem.getPrice()));
+        Label priceLabel = new Label("৳" + String.format("%.2f", foodItem.getPrice()));
         priceLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;");
         
         Label stockLabel = new Label("Stock: " + foodItem.getStock());
@@ -390,8 +462,9 @@ public class FoodItemsController {
         if (!searchTerm.isEmpty()) {
             searchFoodItems(searchTerm);
         } else {
-            // If search is empty, reload all items
+            // If search is empty, reload all items and clear search flag
             foodItemsContainer.getChildren().clear();
+            isShowingSearchResults = false; // Clear flag when going back to normal view
             loadFoodItems();
         }
     }
@@ -399,15 +472,29 @@ public class FoodItemsController {
     private void searchFoodItems(String searchTerm) {
         try {
             foodItemsContainer.getChildren().clear();
-            
-            // Search for food items
-            List<FoodItem> searchResults = foodItemDao.searchItems(searchTerm);
-            
+            isShowingSearchResults = true; // Set flag to indicate we're showing search results
+
+            List<FoodItem> searchResults;
+
+            // Check if search term matches a shop name exactly (case-insensitive)
+            Shop matchingShop = shopDao.getApprovedShops().stream()
+                .filter(shop -> shop.getShopName().toLowerCase().equals(searchTerm.toLowerCase()))
+                .findFirst()
+                .orElse(null);
+
+            if (matchingShop != null) {
+                // If search term exactly matches a shop name, show all items from that shop
+                searchResults = foodItemDao.listByShop(matchingShop.getId());
+            } else {
+                // Otherwise, use the regular search (food name or shop name partial match)
+                searchResults = foodItemDao.searchItems(searchTerm);
+            }
+
             if (searchResults.isEmpty()) {
                 showNoSearchResults(searchTerm);
                 return;
             }
-            
+
             // Display search results
             for (FoodItem foodItem : searchResults) {
                 Shop shop = shopDao.getShopById(foodItem.getShopId());
@@ -519,6 +606,7 @@ public class FoodItemsController {
     private void applyFilter(FilterOptions options) {
         try {
             foodItemsContainer.getChildren().clear();
+            isShowingSearchResults = false; // Clear search flag when applying filters
             
             // Get all food items
             List<FoodItem> allItems = new ArrayList<>();

@@ -50,6 +50,7 @@
                         <RadioButton fx:id="cardPayment" text="Credit/Debit Card" selected="true" style="-fx-font-size: 14px;"/>
                         <RadioButton fx:id="cashPayment" text="Cash on Delivery" style="-fx-font-size: 14px;"/>
                         <RadioButton fx:id="walletPayment" text="Digital Wallet" style="-fx-font-size: 14px;"/>
+                        <RadioButton fx:id="pointsPayment" text="Pay with Points" style="-fx-font-size: 14px;"/>
                     </VBox>
                 </VBox>
 
@@ -94,6 +95,24 @@
                 <VBox fx:id="cashPaymentDetails" spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);" visible="false" managed="false">
                     <Label text="Cash on Delivery" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
                     <Label text="Please have the exact amount ready when the delivery arrives." style="-fx-font-size: 14px; -fx-text-fill: #6c757d; -fx-wrap-text: true;"/>
+                </VBox>
+
+                <!-- Points Payment Details -->
+                <VBox fx:id="pointsPaymentDetails" spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);" visible="false" managed="false">
+                    <Label text="Pay with Points" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    <Label fx:id="pointsInfoLabel" text="You can use your reward points to pay for this order (1 point = 1 TK)." style="-fx-font-size: 14px; -fx-text-fill: #6c757d; -fx-wrap-text: true;"/>
+                    
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label text="Your Points:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="userPointsLabel" text="Loading..." style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    </HBox>
+                    
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label text="Points Needed:" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="pointsNeededLabel" text="Calculating..." style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;"/>
+                    </HBox>
                 </VBox>
 
                 <!-- Security Notice -->

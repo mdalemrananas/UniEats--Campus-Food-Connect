@@ -31,6 +31,8 @@ public class ShopsController {
     private User currentUser;
     private ShopDao shopDao;
     private FoodItemDao foodItemDao;
+    // Fallback generic topic client (listens to hub broadcasts on inventory WS)
+    private com.unieats.util.ReconnectingWebSocketClient topicClient;
     
     @FXML
     public void initialize() {
@@ -38,6 +40,63 @@ public class ShopsController {
         setupNavigationHandlers();
         shopDao = new ShopDao();
         foodItemDao = new FoodItemDao();
+        
+        // Listen for shop status changes (approval/rejection)
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000); // Wait for server to be ready
+                System.out.println("ShopsController: Initializing shop status WebSocket client...");
+                
+                com.unieats.websocket.ShopStatusWebSocketClient shopStatusClient = 
+                    com.unieats.websocket.ShopStatusWebSocketClient.getInstance();
+                
+                if (shopStatusClient != null) {
+                    shopStatusClient.addShopStatusListener(statusMsg -> {
+                        javafx.application.Platform.runLater(() -> {
+                            System.out.println("━━━ ShopsController: RECEIVED shop status change ━━━");
+                            System.out.println("Shop ID: " + statusMsg.getShopId());
+                            System.out.println("Shop Name: " + statusMsg.getShopName());
+                            System.out.println("New Status: " + statusMsg.getStatus());
+                            System.out.println("Action: " + statusMsg.getAction());
+                            // Always refresh the shops list so newly pending/rejected shops disappear immediately
+                            System.out.println("Clearing and reloading shops...");
+                            shopsContainer.getChildren().clear();
+                            loadShops();
+                            System.out.println("Shops reload complete!");
+                            System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                        });
+                    });
+                    System.out.println("ShopsController: Shop status listener registered");
+                    
+                    // Debug client connection status
+                    com.unieats.websocket.ShopStatusWebSocketClient client = 
+                        com.unieats.websocket.ShopStatusWebSocketClient.getInstance();
+                    if (client != null) {
+                        client.debugConnectionStatus();
+                    }
+                } else {
+                    System.err.println("ShopsController: Failed to get WebSocket client instance");
+                }
+            } catch (Exception e) {
+                System.err.println("ShopsController: Failed to connect to shop status WebSocket: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
+
+        // Also listen to generic topic broadcasts ("shops") via Inventory WS hub (port 7071)
+        try {
+            topicClient = new com.unieats.util.ReconnectingWebSocketClient("ws://localhost:7071", message -> {
+                if (message == null || !message.contains("\"type\":\"topic\"")) return;
+                if (!message.contains("\"topic\":\"shops\"")) return;
+                javafx.application.Platform.runLater(() -> {
+                    shopsContainer.getChildren().clear();
+                    loadShops();
+                });
+            });
+            topicClient.start();
+        } catch (Exception ignored) {
+        }
+        
         // Default active tab: Shops (no direct tab, but highlight orders as context)
         if (navOrders != null) setActiveNav(navOrders);
     }
@@ -171,6 +230,11 @@ public class ShopsController {
     private void loadShops() {
         try {
             List<Shop> shops = shopDao.getApprovedShops();
+            System.out.println("ShopsController: Loading " + shops.size() + " approved shops");
+            
+            for (Shop shop : shops) {
+                System.out.println("  - " + shop.getShopName() + " (ID: " + shop.getId() + ", Status: " + shop.getStatus() + ")");
+            }
             
             if (shops.isEmpty()) {
                 showNoShopsMessage();
@@ -182,6 +246,7 @@ public class ShopsController {
             
         } catch (Exception e) {
             System.err.println("Error loading shops: " + e.getMessage());
+            e.printStackTrace();
             showAlert("Error", "Failed to load shops: " + e.getMessage());
         }
     }
@@ -274,9 +339,55 @@ public class ShopsController {
     private void handleSearch() {
         String searchTerm = searchField.getText().trim();
         if (!searchTerm.isEmpty()) {
-            // TODO: Implement search functionality
-            showAlert("Search", "Searching for: " + searchTerm);
+            searchShops(searchTerm);
+        } else {
+            // If search is empty, reload all shops
+            shopsContainer.getChildren().clear();
+            loadShops();
         }
+    }
+    
+    private void searchShops(String searchTerm) {
+        try {
+            shopsContainer.getChildren().clear();
+            
+            // Search for shops
+            List<Shop> searchResults = shopDao.searchShops(searchTerm);
+            
+            if (searchResults.isEmpty()) {
+                showNoSearchResults(searchTerm);
+                return;
+            }
+            
+            // Display search results
+            for (Shop shop : searchResults) {
+                createShopCard(shop);
+            }
+        } catch (Exception e) {
+            showAlert("Search Error", "Failed to search shops: " + e.getMessage());
+        }
+    }
+    
+    private void showNoSearchResults(String searchTerm) {
+        VBox noResultsBox = new VBox(16);
+        noResultsBox.setAlignment(javafx.geometry.Pos.CENTER);
+        noResultsBox.setStyle("-fx-padding: 40;");
+        
+        FontIcon searchIcon = new FontIcon("fas-search");
+        searchIcon.setIconSize(48);
+        searchIcon.setIconColor(javafx.scene.paint.Color.web("#adb5bd"));
+        
+        Label noResultsLabel = new Label("No shops found");
+        noResultsLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #6c757d;");
+        
+        Label searchTermLabel = new Label("for \"" + searchTerm + "\"");
+        searchTermLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6c757d;");
+        
+        Label suggestionLabel = new Label("Try searching for different shop names");
+        suggestionLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #adb5bd;");
+        
+        noResultsBox.getChildren().addAll(searchIcon, noResultsLabel, searchTermLabel, suggestionLabel);
+        shopsContainer.getChildren().add(noResultsBox);
     }
     
     @FXML

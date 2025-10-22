@@ -10,6 +10,10 @@ import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
+// Threaded TCP broadcast server for admin events
+import com.unieats.network.AdminEventSocketServer;
+import com.unieats.realtime.RealtimeBroadcastHub;
+
 /**
  * Polls the database and watches the attachments directory to emit lightweight
  * change events to listeners so the admin UI can refresh in near real-time
@@ -26,12 +30,14 @@ public class RealtimeService {
     private final List<Consumer<String>> listeners;
     private DatagramSocketReceiver udpReceiver;
     private volatile boolean started = false;
+    private AdminEventSocketServer tcpServer;
 
     // State snapshots for change detection
     private volatile String usersSig = "";
     private volatile String shopsSig = "";
     private volatile String reportsSig = "";
     private volatile String paymentsSig = "";
+    private volatile String foodItemsSig = "";
 
     private RealtimeService() {
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -65,7 +71,7 @@ public class RealtimeService {
         started = true;
 
         // Poll DB every 3 seconds
-        scheduler.scheduleAtFixedRate(this::pollDatabase, 0, 3, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::pollDatabase, 0, 1, TimeUnit.SECONDS);
 
         // Start filesystem watcher in background
         worker.submit(this::watchAttachments);
@@ -73,12 +79,23 @@ public class RealtimeService {
         // Start UDP listener for cross-process notifications
         udpReceiver = new DatagramSocketReceiver(this::emit);
         worker.submit(udpReceiver);
+
+        // Start threaded TCP server for streaming topics to external clients
+        // Bind localhost only for safety; choose an app-specific port
+        try {
+            tcpServer = new AdminEventSocketServer(46878);
+            tcpServer.start();
+            // Register with hub for synchronized broadcasting
+            RealtimeBroadcastHub.getInstance().setAdminTcpServer(tcpServer);
+        } catch (Exception ignored) {}
     }
 
     public synchronized void stop() {
         scheduler.shutdownNow();
         worker.shutdownNow();
         if (udpReceiver != null) udpReceiver.close();
+        if (tcpServer != null) tcpServer.stop();
+        RealtimeBroadcastHub.getInstance().clearAdminTcpServer();
         started = false;
     }
 
@@ -88,16 +105,30 @@ public class RealtimeService {
             String s = signature(conn, "shops");
             String r = signature(conn, "reports");
             String p = signature(conn, "payments");
+            String f = foodItemsSignature(conn);
 
             if (!Objects.equals(u, usersSig)) { usersSig = u; emit("users"); }
             if (!Objects.equals(s, shopsSig)) { shopsSig = s; emit("shops"); }
             if (!Objects.equals(r, reportsSig)) { reportsSig = r; emit("reports"); }
             if (!Objects.equals(p, paymentsSig)) { paymentsSig = p; emit("payments"); }
+            if (!Objects.equals(f, foodItemsSig)) { foodItemsSig = f; emit("foodItems"); }
         } catch (SQLException ignored) {}
     }
 
     private String signature(Connection conn, String table) {
         String sql = "SELECT COUNT(*) c, COALESCE(MAX(updated_at), '') m FROM " + table;
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("c") + "|" + rs.getString("m");
+            }
+        } catch (SQLException ignored) {}
+        return "";
+    }
+
+    private String foodItemsSignature(Connection conn) {
+        // Poll food items for approved shops only to avoid unnecessary updates
+        String sql = "SELECT COUNT(*) c, COALESCE(MAX(updated_at), '') m FROM food_items fi " +
+                     "INNER JOIN shops s ON fi.shop_id = s.id WHERE s.status = 'approved'";
         try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt("c") + "|" + rs.getString("m");
@@ -125,9 +156,12 @@ public class RealtimeService {
     }
 
     private void emit(String topic) {
+        // Broadcast to in-app listeners
         for (Consumer<String> l : new ArrayList<>(listeners)) {
             try { l.accept(topic); } catch (Exception ignored) {}
         }
+        // Synchronized cross-channel broadcast (admin TCP + user/seller websockets)
+        RealtimeBroadcastHub.getInstance().broadcastTopic(topic);
     }
 }
 

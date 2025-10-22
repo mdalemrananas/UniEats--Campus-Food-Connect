@@ -77,6 +77,12 @@
             <artifactId>Java-WebSocket</artifactId>
             <version>1.5.6</version>
         </dependency>
+        <!-- Gson for JSON serialization -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -99,8 +105,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-<<<<<<< HEAD
-                    <mainClass>com.unieats/com.unieats.UniEatsLauncher</mainClass>
+                    <mainClass>com.unieats/com.unieats.UniEatsApp</mainClass>
                     <options>
                         <option>-Djavafx.verbose=false</option>
                         <option>-Dprism.verbose=false</option>
@@ -112,14 +117,10 @@
                         <option>-Xmx2g</option>
                         <option>-XX:+UnlockExperimentalVMOptions</option>
                         <option>-XX:+UseZGC</option>
-=======
-                    <mainClass>com.unieats/com.unieats.UniEatsApp</mainClass>
-                    <options>
                         <option>--add-exports</option>
                         <option>javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</option>
                         <option>--add-opens</option>
                         <option>javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</option>
->>>>>>> User-Panel
                     </options>
                 </configuration>
             </plugin>

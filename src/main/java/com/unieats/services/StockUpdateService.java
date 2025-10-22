@@ -6,7 +6,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
@@ -53,17 +52,15 @@ public class StockUpdateService {
     }
     
     /**
-     * Start the real-time stock monitoring
+     * Start the real-time stock monitoring using WebSocket
+     * No polling - updates are pushed via WebSocket immediately
      */
     public void start() {
         if (isRunning) return;
         
         isRunning = true;
-        // Check for stock updates every 1 second for real-time feel
-        scheduler.scheduleAtFixedRate(this::checkForStockUpdates, 0, 1, TimeUnit.SECONDS);
-        // Also refresh all items every 5 seconds to catch any missed updates
-        scheduler.scheduleAtFixedRate(this::refreshAllItems, 5, 5, TimeUnit.SECONDS);
-        System.out.println("Real-time stock update service started");
+        System.out.println("Real-time stock update service started (WebSocket mode)");
+        System.out.println("Stock updates via WebSocket - no polling");
     }
     
     /**

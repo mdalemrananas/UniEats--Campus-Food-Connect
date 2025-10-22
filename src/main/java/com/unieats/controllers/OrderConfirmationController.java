@@ -77,7 +77,7 @@ public class OrderConfirmationController {
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
-                Label priceLabel = new Label(String.format("$%.2f", item.totalPrice));
+                Label priceLabel = new Label(String.format("৳%.2f", item.totalPrice));
                 priceLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;");
 
                 header.getChildren().addAll(nameLabel, spacer, priceLabel);
@@ -86,7 +86,7 @@ public class OrderConfirmationController {
                 Label qtyLabel = new Label("Qty: " + item.quantity);
                 qtyLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6c757d;");
 
-                Label unitPriceLabel = new Label(String.format("$%.2f each", item.price));
+                Label unitPriceLabel = new Label(String.format("৳%.2f each", item.price));
                 unitPriceLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6c757d;");
 
                 details.getChildren().addAll(qtyLabel, unitPriceLabel);
@@ -118,7 +118,7 @@ public class OrderConfirmationController {
             // Populate order details
             orderIdLabel.setText("#" + orderInfo.getId());
             shopNameLabel.setText(orderInfo.getShopName());
-            totalAmountLabel.setText(String.format("$%.2f", orderInfo.getTotalPrice()));
+            totalAmountLabel.setText(String.format("৳%.2f", orderInfo.getTotalPrice()));
             statusLabel.setText(capitalizeFirst(orderInfo.getStatus()));
             
             if (orderInfo.getCreatedAt() != null) {
@@ -321,7 +321,7 @@ public class OrderConfirmationController {
             invoice.append("Shop: ").append(orderInfo.getShopName()).append("\n");
             invoice.append("Status: ").append(capitalizeFirst(orderInfo.getStatus())).append("\n");
             invoice.append("Order Time: ").append(orderInfo.getCreatedAt().format(DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' HH:mm"))).append("\n");
-            invoice.append("Total Amount: $").append(String.format("%.2f", orderInfo.getTotalPrice())).append("\n\n");
+            invoice.append("Total Amount: ৳").append(String.format("%.2f", orderInfo.getTotalPrice())).append("\n\n");
             
             // Order items
             invoice.append("Order Items:\n");
@@ -330,7 +330,7 @@ public class OrderConfirmationController {
             invoice.append("--------------------------------------------------------\n");
             
             for (OrderInfo.OrderItemInfo item : orderInfo.getItems()) {
-                invoice.append(String.format("%-20s %-8d $%-9.2f $%-9.2f\n", 
+                invoice.append(String.format("%-20s %-8d ৳%-9.2f ৳%-9.2f\n", 
                     item.itemName, 
                     item.quantity, 
                     item.price, 

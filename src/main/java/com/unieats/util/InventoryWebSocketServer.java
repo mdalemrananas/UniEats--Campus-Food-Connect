@@ -28,8 +28,21 @@ public class InventoryWebSocketServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        // Echo and no-op for now; clients in this app only receive broadcasts
-        conn.send("ok");
+        // Act as a simple pub-sub hub: rebroadcast any received message to all clients
+        try {
+            synchronized (clients) {
+                for (WebSocket ws : clients) {
+                    try {
+                        if (ws.isOpen()) {
+                            ws.send(message);
+                        }
+                    } catch (Exception ignored) {}
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            try { conn.send("error"); } catch (Exception ignored) {}
+        }
     }
 
     @Override

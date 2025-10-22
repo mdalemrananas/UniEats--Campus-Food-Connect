@@ -8,6 +8,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import java.util.Objects;
+import java.net.Socket;
+import java.net.InetSocketAddress;
 
 public class UniEatsApp extends Application {
 
@@ -21,6 +23,15 @@ public class UniEatsApp extends Application {
             // Initialize database and run migrations
             DatabaseManager.getInstance();
 
+            // Start the real-time service for database polling and event broadcasting
+            try {
+                com.unieats.services.RealtimeService.getInstance().start();
+                System.out.println("✓ RealtimeService started for real-time updates");
+            } catch (Exception e) {
+                System.err.println("❌ Failed to start RealtimeService: " + e.getMessage());
+                e.printStackTrace();
+            }
+
             // Start lightweight WebSocket server for inventory broadcasts
             try {
                 com.unieats.util.InventoryWebSocketServer wsServer = new com.unieats.util.InventoryWebSocketServer(
@@ -29,6 +40,22 @@ public class UniEatsApp extends Application {
                 // Store in a singleton for access from controllers
                 com.unieats.util.SocketBus.setServer(wsServer);
             } catch (Exception ignored) {
+            }
+            
+            // Start Shop Status WebSocket Server for real-time shop approval/rejection updates
+            try {
+                // Only start server if not already running (check if port is available)
+                if (!isPortInUse(8082)) {
+                    com.unieats.websocket.ShopStatusWebSocketServer.getInstance();
+                    System.out.println("✓ Shop Status WebSocket Server initialized on port 8082");
+                } else {
+                    System.out.println("✓ Shop Status WebSocket Server already running on port 8082");
+                }
+                // Give server time to fully start before loading UI
+                Thread.sleep(500);
+            } catch (Exception e) {
+                System.err.println("❌ Failed to start Shop Status WebSocket Server: " + e.getMessage());
+                e.printStackTrace();
             }
 
             // Load the main FXML file
@@ -71,5 +98,19 @@ public class UniEatsApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    /**
+     * Check if a port is already in use
+     * @param port The port number to check
+     * @return true if port is in use, false otherwise
+     */
+    private static boolean isPortInUse(int port) {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress("localhost", port), 1000);
+            return true; // Port is in use
+        } catch (Exception e) {
+            return false; // Port is available
+        }
     }
 }

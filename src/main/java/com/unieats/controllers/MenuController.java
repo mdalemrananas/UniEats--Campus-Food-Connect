@@ -63,6 +63,7 @@ public class MenuController {
     private Timeline carouselTimeline;
     private int currentPage = 0;
     private int totalPages = 0;
+    private boolean isShowingSearchResults = false;
     private List<FoodItem> allFoodItems = new ArrayList<>();
 
     // Food item buttons
@@ -116,8 +117,11 @@ public class MenuController {
             @Override
             public void onStockUpdated(int itemId, int quantityReduced) {
                 Platform.runLater(() -> {
-                    // Refresh the food items display
-                    loadRandomFoodItems();
+                    // Only refresh if we're not showing search results
+                    if (!isShowingSearchResults) {
+                        // Refresh the food items display
+                        loadRandomFoodItems();
+                    }
                 });
             }
             
@@ -131,10 +135,76 @@ public class MenuController {
             @Override
             public void onAllItemsRefreshed() {
                 Platform.runLater(() -> {
-                    loadRandomFoodItems();
+                    // Only refresh if we're not showing search results
+                    if (!isShowingSearchResults) {
+                        loadRandomFoodItems();
+                    }
                 });
             }
         });
+        
+        // Listen for shop status changes (approval/rejection)
+        // Delay connection slightly to ensure server is ready
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000); // Wait 1 second for server to be ready
+                System.out.println("MenuController: Initializing shop status WebSocket client...");
+                
+                com.unieats.websocket.ShopStatusWebSocketClient shopStatusClient = 
+                    com.unieats.websocket.ShopStatusWebSocketClient.getInstance();
+                
+                if (shopStatusClient != null) {
+                    shopStatusClient.addShopStatusListener(statusMsg -> {
+                        Platform.runLater(() -> {
+                            System.out.println("MenuController: Shop status changed - " + statusMsg);
+                            // Refresh food items when a shop is approved/rejected
+                            // This will show/hide food items based on shop status
+                            if (!isShowingSearchResults) {
+                                loadRandomFoodItems();
+                            }
+                        });
+                    });
+                    System.out.println("MenuController: Shop status listener registered");
+                } else {
+                    System.err.println("MenuController: Failed to get WebSocket client instance");
+                }
+            } catch (Exception e) {
+                System.err.println("MenuController: Failed to connect to shop status WebSocket: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
+        
+        // Listen for food items changes (e.g., when shops are approved)
+        // Delay connection slightly to ensure server is ready
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000); // Wait 1 second for server to be ready
+                System.out.println("MenuController: Initializing food items real-time listener...");
+                
+                com.unieats.services.RealtimeService realtimeService = 
+                    com.unieats.services.RealtimeService.getInstance();
+                
+                if (realtimeService != null) {
+                    realtimeService.onEvent(topic -> {
+                        if ("foodItems".equals(topic)) {
+                            Platform.runLater(() -> {
+                                System.out.println("MenuController: Food items changed - refreshing display");
+                                // Refresh food items when new items are available from approved shops
+                                if (!isShowingSearchResults) {
+                                    loadRandomFoodItems();
+                                }
+                            });
+                        }
+                    });
+                    System.out.println("MenuController: Food items listener registered");
+                } else {
+                    System.err.println("MenuController: Failed to get RealtimeService instance");
+                }
+            } catch (Exception e) {
+                System.err.println("MenuController: Failed to connect to real-time service: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
         
         // Load random food items
         loadRandomFoodItems();
@@ -300,7 +370,8 @@ public class MenuController {
             System.out.println("Searching for: " + searchTerm);
             searchFoodItems(searchTerm);
         } else {
-            // If search is empty, reload random items
+            // If search is empty, reload random items and clear search flag
+            isShowingSearchResults = false; // Clear flag when going back to normal view
             loadRandomFoodItems();
         }
     }
@@ -310,23 +381,40 @@ public class MenuController {
             // Show loading indicator
             loadingIndicator.setVisible(true);
             foodItemsContainer.setVisible(false);
-            
+
             // Search in a background thread
             new Thread(() -> {
                 try {
-                    // Search for food items
-                    allFoodItems = foodItemDao.searchItems(searchTerm);
-                    totalPages = (int) Math.ceil((double) allFoodItems.size() / ITEMS_PER_PAGE);
-                    
+                    List<FoodItem> searchResults;
+
+                    // Check if search term matches a shop name exactly (case-insensitive)
+                    Shop matchingShop = shopDao.getApprovedShops().stream()
+                        .filter(shop -> shop.getShopName().toLowerCase().equals(searchTerm.toLowerCase()))
+                        .findFirst()
+                        .orElse(null);
+
+                    if (matchingShop != null) {
+                        // If search term exactly matches a shop name, show all items from that shop
+                        searchResults = foodItemDao.listByShop(matchingShop.getId());
+                    } else {
+                        // Otherwise, use the regular search (food name or shop name partial match)
+                        searchResults = foodItemDao.searchItems(searchTerm);
+                    }
+
                     // Update UI on JavaFX Application Thread
                     Platform.runLater(() -> {
                         loadingIndicator.setVisible(false);
                         foodItemsContainer.setVisible(true);
-                        if (allFoodItems.isEmpty()) {
+
+                        if (searchResults.isEmpty()) {
                             showNoResultsMessage(searchTerm);
                         } else {
+                            allFoodItems = searchResults;
+                            totalPages = (int) Math.ceil((double) allFoodItems.size() / ITEMS_PER_PAGE);
+                            isShowingSearchResults = true; // Set flag to indicate we're showing search results
                             showPage(0);
-                            startCarousel();
+                            // Don't start carousel for search results - keep them static
+                            updatePageIndicators();
                         }
                     });
                 } catch (Exception e) {
@@ -341,7 +429,7 @@ public class MenuController {
             showAlert("Search Error", "Failed to search food items: " + e.getMessage());
         }
     }
-    
+
     private void showNoResultsMessage(String searchTerm) {
         foodItemsContainer.getChildren().clear();
         
@@ -365,10 +453,7 @@ public class MenuController {
         noResultsBox.getChildren().addAll(searchIcon, noResultsLabel, searchTermLabel, suggestionLabel);
         foodItemsContainer.getChildren().add(noResultsBox);
     }
-    
-    /**
-     * Update stock display for a specific food item in real-time
-     */
+
     private void updateFoodItemStock(int itemId, int newStock) {
         // Update the allFoodItems list
         for (int i = 0; i < allFoodItems.size(); i++) {
@@ -886,7 +971,7 @@ public class MenuController {
         infoRow.setStyle("-fx-padding: 4 0 12 0;");
         
         // Price
-        Label priceLabel = new Label(String.format("$%.2f", item.getPrice()));
+        Label priceLabel = new Label(String.format("৳%.2f", item.getPrice()));
         priceLabel.setStyle(
             "-fx-font-size: 18px; " +
             "-fx-font-weight: bold; " +

@@ -407,7 +407,7 @@ public class MyOrdersController {
             }
             timeLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6c757d;");
 
-            Label totalLabel = new Label("$" + String.format("%.2f", order.getTotalPrice()));
+            Label totalLabel = new Label("৳" + String.format("%.2f", order.getTotalPrice()));
             totalLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ff6b35;");
 
             details.getChildren().addAll(timeLabel, spacer, totalLabel);

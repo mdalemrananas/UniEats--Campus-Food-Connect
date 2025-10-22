@@ -96,81 +96,110 @@ public class FoodItemDao {
 		try { fi.setImages(rs.getString("images")); } catch (SQLException ignored) {}
 		try { fi.setDiscount(rs.getObject("discount") != null ? rs.getDouble("discount") : null); } catch (SQLException ignored) {}
 		try {
-			fi.setCreatedAt(LocalDateTime.parse(rs.getString("created_at")));
-			fi.setUpdatedAt(LocalDateTime.parse(rs.getString("updated_at")));
+			fi.setCreatedAt(parseFlexibleDateTime(rs.getString("created_at")));
+			fi.setUpdatedAt(parseFlexibleDateTime(rs.getString("updated_at")));
 		} catch (Exception ignored) {}
 		return fi;
 	}
-    
-    public List<FoodItem> getRandomItems(int limit) {
-        String sql = "SELECT * FROM food_items ORDER BY RANDOM() LIMIT ?";
-        List<FoodItem> items = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(DB_URL); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, limit);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    items.add(map(rs));
-                }
-            }
-            return items;
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to fetch random food items", e);
-        }
-    }
-    
-    /**
-     * Update stock quantity for a food item by reducing the ordered quantity
-     */
-    public void updateStock(int itemId, int quantityToReduce) {
-        String sql = "UPDATE food_items SET stock = stock - ?, updated_at = ? WHERE id = ? AND stock >= ?";
-        try (Connection conn = DriverManager.getConnection(DB_URL); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, quantityToReduce);
-            ps.setString(2, LocalDateTime.now().toString());
-            ps.setInt(3, itemId);
-            ps.setInt(4, quantityToReduce); // Ensure we have enough stock
-            int rowsAffected = ps.executeUpdate();
-            if (rowsAffected == 0) {
-                // Check if item exists and has enough stock
-                FoodItem item = getById(itemId);
-                if (item == null) {
-                    throw new RuntimeException("Food item with ID " + itemId + " not found");
-                } else if (item.getStock() < quantityToReduce) {
-                    throw new RuntimeException("Insufficient stock for item " + item.getName() + ". Available: " + item.getStock() + ", Required: " + quantityToReduce);
-                } else {
-                    throw new RuntimeException("Failed to update stock for food item " + itemId);
-                }
-            }
-            System.out.println("Stock updated for item " + itemId + ": reduced by " + quantityToReduce);
-        } catch (SQLException e) {
-            System.err.println("SQL Error updating stock for item " + itemId + ": " + e.getMessage());
-            throw new RuntimeException("Failed to update stock for food item " + itemId, e);
-        }
-    }
-    
-    /**
-     * Search food items by name or shop name
-     */
-    public List<FoodItem> searchItems(String searchTerm) {
-        String sql = "SELECT fi.* FROM food_items fi " +
-                    "JOIN shops s ON fi.shop_id = s.id " +
-                    "WHERE LOWER(fi.name) LIKE LOWER(?) OR LOWER(s.shop_name) LIKE LOWER(?) " +
-                    "ORDER BY fi.updated_at DESC";
-        List<FoodItem> items = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(DB_URL); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            String searchPattern = "%" + searchTerm + "%";
-            ps.setString(1, searchPattern);
-            ps.setString(2, searchPattern);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    items.add(map(rs));
-                }
-            }
-            return items;
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to search food items", e);
-        }
-    }
+
+	private static LocalDateTime parseFlexibleDateTime(String dateTimeStr) {
+		if (dateTimeStr == null || dateTimeStr.isEmpty()) {
+			return LocalDateTime.now();
+		}
+		try {
+			return LocalDateTime.parse(dateTimeStr);
+		} catch (Exception e1) {
+			try {
+				java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+				return LocalDateTime.parse(dateTimeStr, formatter);
+			} catch (Exception e2) {
+				try {
+					String normalized = dateTimeStr.replace("T", " ");
+					if (normalized.contains(".")) {
+						normalized = normalized.substring(0, normalized.indexOf("."));
+					}
+					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+					return LocalDateTime.parse(normalized, formatter);
+				} catch (Exception e3) {
+					return LocalDateTime.now();
+				}
+			}
+		}
+	}
+
+	public List<FoodItem> getRandomItems(int limit) {
+		String sql = "SELECT fi.* FROM food_items fi " +
+					"JOIN shops s ON fi.shop_id = s.id " +
+					"WHERE s.status = 'approved' " +
+					"ORDER BY RANDOM() LIMIT ?";
+		List<FoodItem> items = new ArrayList<>();
+		try (Connection conn = DriverManager.getConnection(DB_URL); 
+			 PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, limit);
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					items.add(map(rs));
+				}
+			}
+			return items;
+		} catch (SQLException e) {
+			throw new RuntimeException("Failed to fetch random food items", e);
+		}
+	}
+
+	/**
+	 * Update stock quantity for a food item by reducing the ordered quantity
+	 */
+	public void updateStock(int itemId, int quantityToReduce) {
+		String sql = "UPDATE food_items SET stock = stock - ?, updated_at = ? WHERE id = ? AND stock >= ?";
+		try (Connection conn = DriverManager.getConnection(DB_URL); 
+			 PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, quantityToReduce);
+			ps.setString(2, LocalDateTime.now().toString());
+			ps.setInt(3, itemId);
+			ps.setInt(4, quantityToReduce); // Ensure we have enough stock
+			int rowsAffected = ps.executeUpdate();
+			if (rowsAffected == 0) {
+				// Check if item exists and has enough stock
+				FoodItem item = getById(itemId);
+				if (item == null) {
+					throw new RuntimeException("Food item with ID " + itemId + " not found");
+				} else if (item.getStock() < quantityToReduce) {
+					throw new RuntimeException("Insufficient stock for item " + item.getName() + ". Available: " + item.getStock() + ", Required: " + quantityToReduce);
+				} else {
+					throw new RuntimeException("Failed to update stock for food item " + itemId);
+				}
+			}
+			System.out.println("Stock updated for item " + itemId + ": reduced by " + quantityToReduce);
+		} catch (SQLException e) {
+			System.err.println("SQL Error updating stock for item " + itemId + ": " + e.getMessage());
+			throw new RuntimeException("Failed to update stock for food item " + itemId, e);
+		}
+	}
+
+	/**
+	 * Search food items by name or shop name
+	 */
+	public List<FoodItem> searchItems(String searchTerm) {
+		String sql = "SELECT fi.* FROM food_items fi " +
+					"JOIN shops s ON fi.shop_id = s.id " +
+					"WHERE (LOWER(fi.name) LIKE LOWER(?) OR LOWER(s.shop_name) LIKE LOWER(?)) " +
+					"AND s.status = 'approved' " +
+					"ORDER BY fi.updated_at DESC";
+		List<FoodItem> items = new ArrayList<>();
+		try (Connection conn = DriverManager.getConnection(DB_URL); 
+			 PreparedStatement ps = conn.prepareStatement(sql)) {
+			String searchPattern = "%" + searchTerm + "%";
+			ps.setString(1, searchPattern);
+			ps.setString(2, searchPattern);
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					items.add(map(rs));
+				}
+			}
+			return items;
+		} catch (SQLException e) {
+			throw new RuntimeException("Failed to search food items", e);
+		}
+	}
 }

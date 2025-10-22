@@ -48,15 +48,16 @@ public class RealTimeStockBroadcaster {
     }
     
     /**
-     * Start the real-time stock broadcasting
+     * Start the real-time stock broadcasting using WebSocket
+     * Note: This service now works with WebSocket for true real-time updates
+     * No polling - updates are pushed immediately when stock changes
      */
     public void start() {
         if (isRunning) return;
         
         isRunning = true;
-        // Check for stock changes every 500ms for near real-time updates
-        broadcaster.scheduleAtFixedRate(this::broadcastStockChanges, 0, 500, TimeUnit.MILLISECONDS);
-        System.out.println("Real-time stock broadcaster started");
+        System.out.println("Real-time stock broadcaster started (WebSocket mode)");
+        System.out.println("Stock updates will be broadcast via WebSocket immediately on change");
     }
     
     /**

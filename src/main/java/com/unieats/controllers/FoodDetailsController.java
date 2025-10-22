@@ -262,7 +262,7 @@ public class FoodDetailsController {
         shopLabel.setText("from " + shop.getShopName());
 
         double price = foodItem.getPrice();
-        priceLabel.setText("$" + String.format("%.2f", price));
+        priceLabel.setText("৳" + String.format("%.2f", price));
 
         if (foodItem.getDiscount() != null && foodItem.getDiscount() > 0) {
             discountLabel.setText("-" + String.format("%.0f", foodItem.getDiscount()) + "% off");

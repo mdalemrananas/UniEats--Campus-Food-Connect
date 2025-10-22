@@ -20,16 +20,6 @@
 
             <VBox spacing="6">
                 <HBox>
-                    <Label text="Subtotal" />
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Label fx:id="subtotalLabel" />
-                </HBox>
-                <HBox>
-                    <Label text="TAX (2%)" />
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Label fx:id="taxLabel" />
-                </HBox>
-                <HBox>
                     <Label text="Total" style="-fx-font-weight: bold; -fx-font-size: 14;" />
                     <Region HBox.hgrow="ALWAYS" />
                     <Label fx:id="totalLabel" style="-fx-font-weight: bold; -fx-font-size: 14;" />
