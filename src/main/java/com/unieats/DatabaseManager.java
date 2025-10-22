@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +19,6 @@ public class DatabaseManager {
     private static User currentUser;
     
     private DatabaseManager() {
-        initializeDatabase();
     }
 
     /**
@@ -38,10 +38,115 @@ public class DatabaseManager {
             return false;
         }
     }
-    
+
+    /**
+     * Update both user and shop status in a single transaction
+     * @param userId The ID of the user (seller)
+     * @param newStatus The new status to set ('pending', 'approved', 'rejected')
+     * @return true if both updates were successful, false otherwise
+     */
+    public boolean updateSellerAndShopStatus(int userId, String newStatus) {
+        if (userId <= 0 || newStatus == null || !List.of("pending", "approved", "rejected").contains(newStatus.toLowerCase())) {
+            return false;
+        }
+
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(DB_URL);
+            conn.setAutoCommit(false); // Start transaction
+
+            // 1. Update user status
+            String userSql = "UPDATE users SET status = ?, updated_at = ? WHERE id = ?";
+            try (PreparedStatement userStmt = conn.prepareStatement(userSql)) {
+                String timestamp = LocalDateTime.now().toString();
+                userStmt.setString(1, newStatus);
+                userStmt.setString(2, timestamp);
+                userStmt.setInt(3, userId);
+
+                int userRows = userStmt.executeUpdate();
+                if (userRows == 0) {
+                    conn.rollback();
+                    return false; // User not found
+                }
+            }
+
+            // 2. Update shop status (if exists)
+            String shopSql = "UPDATE shops SET status = ?, updated_at = ? WHERE owner_id = ?";
+            int shopId = -1;
+            String shopName = null;
+            
+            // First, get the shop details
+            String getShopSql = "SELECT id, shop_name FROM shops WHERE owner_id = ?";
+            try (PreparedStatement getShopStmt = conn.prepareStatement(getShopSql)) {
+                getShopStmt.setInt(1, userId);
+                try (ResultSet rs = getShopStmt.executeQuery()) {
+                    if (rs.next()) {
+                        shopId = rs.getInt("id");
+                        shopName = rs.getString("shop_name");
+                    }
+                }
+            }
+            
+            // Update shop status
+            try (PreparedStatement shopStmt = conn.prepareStatement(shopSql)) {
+                String timestamp = LocalDateTime.now().toString();
+                shopStmt.setString(1, newStatus);
+                shopStmt.setString(2, timestamp);
+                shopStmt.setInt(3, userId);
+
+                int shopRows = shopStmt.executeUpdate();
+                if (shopRows == 0) {
+                    // No shop found for this user, but still commit the user status update
+                    // as the user might be a seller without a shop yet
+                    System.out.println("No shop found for user " + userId + ", updating user status only");
+                }
+            }
+
+            conn.commit(); // Commit the transaction
+            
+            // Broadcast shop status change via dedicated ShopStatus WS and topic hub (after commit)
+            if (shopId != -1 && shopName != null) {
+                try {
+                    // Small delay to ensure all clients are ready and registered
+                    Thread.sleep(200);
+                    com.unieats.websocket.ShopStatusWebSocketServer.getInstance()
+                        .broadcastShopStatusChange(shopId, userId, shopName, newStatus);
+                    // Also broadcast generic topic for socket hub consumers (admin dashboards, lists)
+                    try {
+                        String shopsTopicJson = String.format("{\"type\":\"topic\",\"topic\":\"shops\",\"shopId\":%d,\"ownerId\":%d,\"status\":\"%s\"}", shopId, userId, newStatus);
+                        com.unieats.util.SocketBus.broadcast(shopsTopicJson);
+                    } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    System.err.println("Failed to broadcast shop status change: " + e.getMessage());
+                }
+            }          
+            return true;
+
+        } catch (SQLException e) {
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException ex) {
+                System.err.println("Error rolling back transaction: " + ex.getMessage());
+            }
+            System.err.println("Error updating seller and shop status: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing connection: " + e.getMessage());
+            }
+        }
+    }
+
     public static DatabaseManager getInstance() {
         if (instance == null) {
-            instance = new DatabaseManager();
+            synchronized (DatabaseManager.class) {
+                if (instance == null) {
+                    instance = new DatabaseManager();
+                    instance.initializeDatabase();
+                }
+            }
         }
         return instance;
     }
@@ -339,8 +444,11 @@ public class DatabaseManager {
             if (!shopColumnNames.contains("address")) {
                 s.execute("ALTER TABLE shops ADD COLUMN address TEXT DEFAULT ''");
             }
-            if (!shopColumnNames.contains("description")) {
-                s.execute("ALTER TABLE shops ADD COLUMN description TEXT DEFAULT ''");
+            // Add updated_at to food_items if missing
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute("ALTER TABLE food_items ADD COLUMN updated_at TEXT DEFAULT CURRENT_TIMESTAMP");
+            } catch (SQLException ignored) {
+                // Column already exists
             }
             
             // Create order_requests table if it doesn't exist
@@ -687,8 +795,8 @@ public class DatabaseManager {
         } catch (SQLException ignored) {}
         
         try {
-            user.setCreatedAt(LocalDateTime.parse(rs.getString("created_at")));
-            user.setUpdatedAt(LocalDateTime.parse(rs.getString("updated_at")));
+            user.setCreatedAt(parseFlexibleDateTime(rs.getString("created_at")));
+            user.setUpdatedAt(parseFlexibleDateTime(rs.getString("updated_at")));
         } catch (Exception e) {
             System.err.println("Error parsing timestamps: " + e.getMessage());
             LocalDateTime now = LocalDateTime.now();
@@ -699,14 +807,37 @@ public class DatabaseManager {
         return user;
     }
     
-    public void closeConnection() {
-        // SQLite automatically manages connections, but this method is provided for future extensibility
-        try (Connection conn = DriverManager.getConnection(DB_URL)) {
-            if (conn != null && !conn.isClosed()) {
-                conn.close();
+    /**
+     * Parse datetime string flexibly - handles both ISO-8601 and SQL datetime formats
+     */
+    private static LocalDateTime parseFlexibleDateTime(String dateTimeStr) {
+        if (dateTimeStr == null || dateTimeStr.isEmpty()) {
+            return LocalDateTime.now();
+        }
+        
+        try {
+            // Try ISO-8601 format first (with or without nanoseconds)
+            return LocalDateTime.parse(dateTimeStr);
+        } catch (Exception e1) {
+            try {
+                // Try SQL datetime format
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                return LocalDateTime.parse(dateTimeStr, formatter);
+            } catch (Exception e2) {
+                try {
+                    // Try with 'T' replaced by space
+                    String normalized = dateTimeStr.replace("T", " ");
+                    // Remove nanoseconds if present
+                    if (normalized.contains(".")) {
+                        normalized = normalized.substring(0, normalized.indexOf("."));
+                    }
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    return LocalDateTime.parse(normalized, formatter);
+                } catch (Exception e3) {
+                    System.err.println("Failed to parse datetime: " + dateTimeStr);
+                    return LocalDateTime.now();
+                }
             }
-        } catch (SQLException e) {
-            System.err.println("Error closing connection: " + e.getMessage());
         }
     }
 }

@@ -9,12 +9,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.chart.AreaChart;
+import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
@@ -35,16 +37,16 @@ import java.sql.ResultSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.LinkedList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import com.unieats.util.ReportFileManager;
 import java.io.File;
 import java.util.List;
-<<<<<<< HEAD
-=======
 import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import com.unieats.services.RealtimeService;
->>>>>>> User-Panel
 
 public class AdminController {
 	// Root content stack (we will add child panes at runtime)
@@ -63,6 +65,8 @@ public class AdminController {
 	@FXML private PieChart salesPieChart;
 	@FXML private PieChart complaintsPieChart;
 	@FXML private javafx.scene.chart.LineChart<String, Number> growthChart;
+	@FXML private BarChart<String, Number> topShopsChart;
+	@FXML private TableView<RecentActivity> recentActivitiesTable;
 
 	// Panes for navigation
     @FXML private Node dashboardPane;
@@ -95,6 +99,10 @@ public class AdminController {
 
 	private final ObservableList<User> allUsers = FXCollections.observableArrayList();
 	private final ObservableList<Shop> allSellers = FXCollections.observableArrayList();
+	
+	// Recent activities data
+	private ObservableList<RecentActivity> recentActivities;
+	private LinkedList<RecentActivity> recentActivitiesHistory;
 
 	@FXML
 	private void initialize() {
@@ -113,8 +121,8 @@ public class AdminController {
 		populateDashboard();
 		renderReportsAndPayments();
 		populateCharts();
-		startAutoRefresh();
-		startRealtime();
+        // Switch to socket-driven realtime; remove timer auto-refresh
+        startRealtime();
 		wireSearchFields();
 	}
 
@@ -133,6 +141,8 @@ public class AdminController {
 				userGrowthChart = dCtrl.getUserGrowthChart();
 				complaintsPieChart = dCtrl.getComplaintsPieChart();
 				growthChart = dCtrl.getGrowthChart();
+				topShopsChart = dCtrl.getTopShopsChart();
+				recentActivitiesTable = dCtrl.getRecentActivitiesTable();
 			}
 
 			// Users
@@ -223,16 +233,12 @@ public class AdminController {
 	private void loadDummyData() {
 		allUsers.clear();
 		// Load real users from DB
-<<<<<<< HEAD
-		allUsers.addAll(com.unieats.DatabaseManager.getInstance().getAllUsers());
-=======
         // Only students shown in Manage Users (sellers are handled in Manage Shops)
         for (User u : com.unieats.DatabaseManager.getInstance().getAllUsers()) {
             if ("student".equalsIgnoreCase(u.getUserCategory())) {
                 allUsers.add(u);
             }
         }
->>>>>>> User-Panel
 		renderUserCards(allUsers);
 
 		allSellers.clear();
@@ -287,10 +293,7 @@ public class AdminController {
                     VBox attachmentsContainer = new VBox();
                     attachmentsContainer.setSpacing(4);
                     
-<<<<<<< HEAD
-=======
                     // Only show buttons that point to existing files
->>>>>>> User-Panel
                     if (!attachments.isEmpty()) {
                         Text attachmentsLabel = new Text("Attachments:");
                         attachmentsLabel.setStyle("-fx-font-size: 12; -fx-font-weight: 600; -fx-fill: #374151;");
@@ -300,18 +303,6 @@ public class AdminController {
                         buttonsContainer.setSpacing(6);
                         buttonsContainer.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
                         
-<<<<<<< HEAD
-                        for (int i = 0; i < attachments.size(); i++) {
-                            String attachmentPath = attachments.get(i);
-                            Button downloadBtn = new Button("📎 Download " + (i + 1));
-                            downloadBtn.getStyleClass().addAll("download-btn", "download-btn-" + ((i % 4) + 1));
-                            downloadBtn.setStyle("-fx-font-size: 10px; -fx-padding: 4 8 4 8; -fx-cursor: hand;");
-                            
-                            // Add download functionality
-                            downloadBtn.setOnAction(e -> downloadAttachment(attachmentPath));
-                            
-                            buttonsContainer.getChildren().add(downloadBtn);
-=======
                         int shown = 0;
                         for (int i = 0; i < attachments.size(); i++) {
                             String attachmentPath = attachments.get(i);
@@ -328,7 +319,6 @@ public class AdminController {
                             // no existing attachments -> don't show container
                             buttonsContainer.setManaged(false);
                             buttonsContainer.setVisible(false);
->>>>>>> User-Panel
                         }
                         
                         attachmentsContainer.getChildren().add(buttonsContainer);
@@ -342,25 +332,6 @@ public class AdminController {
         // Payments
         if (this.paymentsFlow != null) {
                 this.paymentsFlow.getChildren().clear();
-<<<<<<< HEAD
-                ResultSet pr = new com.unieats.dao.PaymentDao().listLatest(conn, 50);
-                while (pr.next()) {
-                    VBox card = new VBox();
-                    card.setSpacing(6);
-                    card.setPadding(new Insets(10));
-                    card.getStyleClass().add("card");
-                    card.setPrefWidth(300);
-                    Text method = new Text("Method: " + pr.getString("payment_method"));
-                    method.setStyle("-fx-font-size: 14; -fx-font-weight: 600;");
-                    Text amount = new Text("Amount: $" + pr.getDouble("amount"));
-                    amount.setStyle("-fx-fill: #6b7280;");
-                Text statusText = new Text("Status: " + pr.getString("status"));
-                    statusText.getStyleClass().add("tag");
-                    Text details = new Text(pr.getString("payment_details") == null ? "" : pr.getString("payment_details"));
-                    details.setStyle("-fx-fill: #6b7280;");
-                    card.getChildren().addAll(method, amount, statusText, details);
-                    this.paymentsFlow.getChildren().add(card);
-=======
                 // Join orders, users, shops, order_items, food_items, payments to show rich card for completed payments
                 String sql = """
                     SELECT p.id as payment_id, p.amount, p.payment_method, p.status as payment_status,
@@ -399,83 +370,163 @@ public class AdminController {
                         card.getChildren().addAll(header, user, shop, method, statusText, itemsText);
                         this.paymentsFlow.getChildren().add(card);
                     }
->>>>>>> User-Panel
                 }
             }
         } catch (Exception ignored) {}
     }
 
     private void populateCharts() {
-        if (growthChart != null) {
-            growthChart.getData().clear();
-            XYChart.Series<String, Number> usersSeries = new XYChart.Series<>();
-            usersSeries.setName("New Users");
-            XYChart.Series<String, Number> ordersSeries = new XYChart.Series<>();
-            ordersSeries.setName("Orders");
+        // Populate Top 5 Shops by Orders Bar Chart
+        if (topShopsChart != null) {
+            topShopsChart.getData().clear();
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName("Orders");
 
             try (Connection conn = DriverManager.getConnection("jdbc:sqlite:unieats.db")) {
-                String usersSql = "SELECT strftime('%Y-%m', created_at) AS ym, COUNT(*) c FROM users WHERE created_at IS NOT NULL AND created_at>=date('now','-6 months') GROUP BY ym ORDER BY ym";
-                try (PreparedStatement ps = conn.prepareStatement(usersSql); ResultSet rs = ps.executeQuery()) {
+                String sql = """
+                    SELECT s.shop_name, COUNT(o.id) as order_count
+                    FROM shops s
+                    LEFT JOIN orders o ON s.id = o.shop_id
+                    WHERE s.status = 'approved'
+                    GROUP BY s.id, s.shop_name
+                    ORDER BY order_count DESC
+                    LIMIT 5
+                """;
+                try (PreparedStatement ps = conn.prepareStatement(sql); 
+                     ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        usersSeries.getData().add(new XYChart.Data<>(rs.getString("ym"), rs.getInt("c")));
+                        String shopName = rs.getString("shop_name");
+                        int orderCount = rs.getInt("order_count");
+                        series.getData().add(new XYChart.Data<>(shopName.length() > 15 ? 
+                            shopName.substring(0, 12) + "..." : shopName, orderCount));
                     }
                 }
+            } catch (Exception e) {
+                System.err.println("Error loading top shops data: " + e.getMessage());
+            }
 
-                String ordersSql = "SELECT strftime('%Y-%m', created_at) AS ym, COUNT(*) c FROM orders WHERE created_at IS NOT NULL AND created_at>=date('now','-6 months') GROUP BY ym ORDER BY ym";
-                try (PreparedStatement ps = conn.prepareStatement(ordersSql); ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        ordersSeries.getData().add(new XYChart.Data<>(rs.getString("ym"), rs.getInt("c")));
-                    }
-                }
-            } catch (Exception ignored) {}
-
-            growthChart.getData().addAll(usersSeries, ordersSeries);
+            topShopsChart.getData().add(series);
         }
 
-        // Pie chart: reports status distribution
-        if (complaintsPieChart != null) {
-            complaintsPieChart.getData().clear();
-            try (Connection conn = DriverManager.getConnection("jdbc:sqlite:unieats.db");
-                 PreparedStatement ps = conn.prepareStatement("SELECT status, COUNT(*) c FROM reports GROUP BY status");
-                 ResultSet rs = ps.executeQuery()) {
+        // Load recent activities
+        loadRecentActivities();
+    }
+
+    private void loadRecentActivities() {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:unieats.db")) {
+            // Get recent users
+            String userSql = "SELECT full_name, created_at FROM users WHERE created_at >= datetime('now', '-24 hours') ORDER BY created_at DESC LIMIT 3";
+            try (PreparedStatement ps = conn.prepareStatement(userSql); ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    complaintsPieChart.getData().add(new PieChart.Data(rs.getString("status"), rs.getInt("c")));
+                    try {
+                        String time = LocalDateTime.parse(rs.getString("created_at").replace(" ", "T"))
+                            .format(DateTimeFormatter.ofPattern("HH:mm"));
+                        addRecentActivity("New User", rs.getString("full_name") + " registered");
+                    } catch (Exception e) {
+                        // Skip invalid date entries
+                        System.err.println("Skipping user with invalid date: " + e.getMessage());
+                    }
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                System.err.println("Error loading recent users: " + e.getMessage());
+            }
+
+            // Get recent shops
+            String shopSql = "SELECT s.shop_name, s.created_at FROM shops s WHERE s.created_at >= datetime('now', '-24 hours') ORDER BY s.created_at DESC LIMIT 2";
+            try (PreparedStatement ps = conn.prepareStatement(shopSql); ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    try {
+                        String time = LocalDateTime.parse(rs.getString("created_at").replace(" ", "T"))
+                            .format(DateTimeFormatter.ofPattern("HH:mm"));
+                        addRecentActivity("New Shop", rs.getString("shop_name") + " opened");
+                    } catch (Exception e) {
+                        // Skip invalid date entries
+                        System.err.println("Skipping shop with invalid date: " + e.getMessage());
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading recent shops: " + e.getMessage());
+            }
+
+            // Get recent reports
+            String reportSql = "SELECT r.title, r.created_at FROM reports r WHERE r.created_at >= datetime('now', '-24 hours') ORDER BY r.created_at DESC LIMIT 2";
+            try (PreparedStatement ps = conn.prepareStatement(reportSql); ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    try {
+                        String time = LocalDateTime.parse(rs.getString("created_at").replace(" ", "T"))
+                            .format(DateTimeFormatter.ofPattern("HH:mm"));
+                        addRecentActivity("New Report", rs.getString("title"));
+                    } catch (Exception e) {
+                        // Skip invalid date entries
+                        System.err.println("Skipping report with invalid date: " + e.getMessage());
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading recent reports: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            System.err.println("Error connecting to database for recent activities: " + e.getMessage());
+            // Add some default activities if database is not available
+            addRecentActivity("System", "Dashboard initialized");
         }
     }
 
-	private void startAutoRefresh() {
-		scheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
-		populateDashboard();
-		renderReportsAndPayments();
-			populateCharts();
-		}), 60, 60, TimeUnit.SECONDS);
-	}
+    private void addRecentActivity(String type, String description) {
+        RecentActivity activity = new RecentActivity(type, description);
+        
+        // Add to history
+        if (recentActivitiesHistory == null) {
+            recentActivitiesHistory = new LinkedList<>();
+        }
+        recentActivitiesHistory.addLast(activity);
+        
+        // Keep only last 3 activities
+        if (recentActivitiesHistory.size() > 3) {
+            recentActivitiesHistory.removeFirst();
+        }
+        
+        // Update observable list
+        if (recentActivities == null) {
+            recentActivities = FXCollections.observableArrayList();
+        }
+        recentActivities.clear();
+        recentActivities.addAll(recentActivitiesHistory);
+        
+        // Update table if available
+        if (recentActivitiesTable != null) {
+            recentActivitiesTable.setItems(recentActivities);
+        }
+    }
+
+    private void startAutoRefresh() {}
 
     private void startRealtime() {
-        RealtimeService rt = RealtimeService.getInstance();
-        rt.onEvent(topic -> Platform.runLater(() -> {
-            switch (topic) {
-                case "users" -> {
-                    allUsers.clear();
-                    for (User u : com.unieats.DatabaseManager.getInstance().getAllUsers()) {
-                        if ("student".equalsIgnoreCase(u.getUserCategory())) allUsers.add(u);
+        // Listen to socket hub topics from InventoryWebSocketServer (ws://localhost:7071)
+        try {
+            com.unieats.util.ReconnectingWebSocketClient topicClient = new com.unieats.util.ReconnectingWebSocketClient("ws://localhost:7071", message -> {
+                if (message == null || !message.contains("\"type\":\"topic\"")) return;
+                Platform.runLater(() -> {
+                    if (message.contains("\"topic\":\"shops\"")) {
+                        allSellers.clear();
+                        allSellers.addAll(new com.unieats.dao.ShopDao().listAll());
+                        renderShopCards(allSellers);
+                        populateDashboard();
+                    } else if (message.contains("\"topic\":\"users\"")) {
+                        allUsers.clear();
+                        for (User u : com.unieats.DatabaseManager.getInstance().getAllUsers()) {
+                            if ("student".equalsIgnoreCase(u.getUserCategory())) allUsers.add(u);
+                        }
+                        renderUserCards(allUsers);
+                        populateDashboard();
+                    } else if (message.contains("\"topic\":\"reports\"")) {
+                        renderReportsAndPayments();
+                    } else if (message.contains("\"topic\":\"payments\"")) {
+                        renderReportsAndPayments();
                     }
-                    renderUserCards(allUsers);
-                    populateDashboard();
-                }
-                case "shops" -> {
-                    allSellers.clear();
-                    allSellers.addAll(new com.unieats.dao.ShopDao().listAll());
-                    renderShopCards(allSellers);
-                    populateDashboard();
-                }
-                case "reports" -> renderReportsAndPayments();
-                case "payments" -> renderReportsAndPayments();
-            }
-        }));
-        rt.start();
+                });
+            });
+            topicClient.start();
+        } catch (Exception ignored) {}
     }
 
 	@FXML private void showDashboard() { showOnly(dashboardPane); }
@@ -502,34 +553,6 @@ public class AdminController {
         if (titleLabel != null) titleLabel.setText(title);
 	}
 	
-<<<<<<< HEAD
-	private void downloadAttachment(String attachmentPath) {
-		try {
-			String fullPath = ReportFileManager.getAttachmentPath(attachmentPath);
-			if (fullPath != null && ReportFileManager.attachmentExists(attachmentPath)) {
-				File file = new File(fullPath);
-				
-				// Show file location dialog with copy option
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Attachment Location");
-				alert.setHeaderText("Attachment Found");
-				alert.setContentText("File location: " + file.getAbsolutePath() + 
-									"\n\nClick OK to copy the path to clipboard, then navigate to this location in your file explorer.");
-				
-				// Add copy to clipboard functionality
-				alert.setOnHidden(e -> {
-					try {
-						javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
-						javafx.scene.input.ClipboardContent content = new javafx.scene.input.ClipboardContent();
-						content.putString(file.getAbsolutePath());
-						clipboard.setContent(content);
-					} catch (Exception ex) {
-						System.err.println("Failed to copy to clipboard: " + ex.getMessage());
-					}
-				});
-				
-				alert.showAndWait();
-=======
     private void downloadAttachment(String attachmentPath) {
 		try {
 			String fullPath = ReportFileManager.getAttachmentPath(attachmentPath);
@@ -547,7 +570,6 @@ public class AdminController {
                     ok.setContentText("Saved to: " + target.getAbsolutePath());
                     ok.showAndWait();
                 }
->>>>>>> User-Panel
 			} else {
 				Alert alert = new Alert(Alert.AlertType.ERROR);
 				alert.setTitle("File Not Found");
@@ -593,8 +615,6 @@ public class AdminController {
 		drawerContainer.setManaged(false);
 	}
 
-<<<<<<< HEAD
-=======
 	@FXML private void handleLogout() {
 		try {
 			Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
@@ -630,7 +650,6 @@ public class AdminController {
 		}
 	}
 
->>>>>>> User-Panel
 	@FXML private void handleManageUsers() { showUsers(); }
 
 	private void info(String msg) {
@@ -669,14 +688,6 @@ public class AdminController {
 		HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
         Button viewBtn = new Button("View");
         viewBtn.getStyleClass().add("btn-primary");
-<<<<<<< HEAD
-        Button deleteBtn = new Button("Delete");
-        deleteBtn.getStyleClass().add("btn-danger");
-		actions.getChildren().addAll(spacer, viewBtn, deleteBtn);
-
-		viewBtn.setOnAction(e -> showUserDetails(user));
-		deleteBtn.setOnAction(e -> confirmAndDeleteUser(user));
-=======
         javafx.scene.control.ComboBox<String> status = new javafx.scene.control.ComboBox<>();
         status.getItems().addAll("approved", "pending", "rejected");
         String currentStatus = user.getStatus() == null ? "pending" : user.getStatus();
@@ -697,37 +708,11 @@ public class AdminController {
                 }
             }
         });
->>>>>>> User-Panel
 
 		card.getChildren().addAll(name, email, category, actions);
 		return card;
 	}
 
-<<<<<<< HEAD
-	private void showUserDetails(User user) {
-		Alert dialog = new Alert(AlertType.INFORMATION);
-		dialog.setHeaderText("User Details");
-		dialog.setContentText("Name: " + user.getFullName() + "\nCategory: " + user.getUserCategory() + "\nEmail: " + user.getEmail());
-		dialog.showAndWait();
-	}
-
-	private void confirmAndDeleteUser(User user) {
-		Alert confirm = new Alert(AlertType.CONFIRMATION);
-		confirm.setHeaderText("Delete user?");
-		confirm.setContentText("Are you sure you want to delete " + user.getFullName() + "?");
-		confirm.showAndWait().ifPresent(btn -> {
-			if (btn == ButtonType.OK) {
-				boolean ok = com.unieats.DatabaseManager.getInstance().deleteUser(user.getId());
-				if (ok) {
-					allUsers.removeIf(u -> u.getId() == user.getId());
-					renderUserCards(allUsers);
-				} else {
-					info("Failed to delete user");
-				}
-			}
-		});
-	}
-=======
     private void showUserDetails(User user) {
         Alert dialog = new Alert(AlertType.INFORMATION);
         dialog.setHeaderText("User Details");
@@ -744,7 +729,6 @@ public class AdminController {
         );
         dialog.showAndWait();
     }
->>>>>>> User-Panel
 
 	private void renderShopCards(ObservableList<Shop> shops) {
 		if (shopCardsFlow == null) return;
@@ -773,11 +757,19 @@ public class AdminController {
             status.valueProperty().addListener((obs, oldV, newV) -> {
                 if (oldV != null && !oldV.equals(newV)) { // Only update if actually changed
                     try {
-                        new com.unieats.dao.ShopDao().updateStatus(s.getId(), newV);
-                        s.setStatus(newV);
+                        // Update both user and shop status in a single transaction
+                        boolean success = com.unieats.DatabaseManager.getInstance()
+                            .updateSellerAndShopStatus(s.getOwnerId(), newV);
                         
-                        // Immediately refresh the dashboard and shop data
-                        refreshDashboardData();
+                        if (success) {
+                            s.setStatus(newV);
+                            // Immediately refresh the dashboard and shop data
+                            refreshDashboardData();
+                        } else {
+                            // Revert the selection if update fails
+                            status.getSelectionModel().select(oldV);
+                            info("Failed to update seller status");
+                        }
                         
                         // Show success feedback
                         info("Shop status updated to: " + newV.toUpperCase());

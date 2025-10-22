@@ -145,24 +145,37 @@ public class SignupController {
             return;
         }
         
-        // Check if email already exists
         if (dbManager.isEmailExists(emailField.getText().trim())) {
             showError("Email already exists. Please use a different email address.");
             return;
         }
         
         // Create new user with hashed password and user category
+        String userCategory = userCategoryComboBox.getValue().toLowerCase();
         User newUser = new User(
             emailField.getText().trim(),
             PasswordUtil.hashPassword(passwordField.getText()),
             fullNameField.getText().trim(),
-            userCategoryComboBox.getValue().toLowerCase()
+            userCategory
         );
+        
+        // Set status based on user type
+        if ("student".equalsIgnoreCase(userCategory)) {
+            newUser.setStatus("approved"); // Auto-approve students
+        } else {
+            newUser.setStatus("pending");   // Sellers need admin approval
+        }
         
         // Save to database
         if (dbManager.createUser(newUser)) {
-            showSuccess("Account created successfully! Welcome to UniEats!");
-            // Navigate back to home page after a short delay
+            String message = "Account created successfully! " + 
+                ("student".equalsIgnoreCase(userCategory) 
+                    ? "You can now log in." 
+                    : "Your account is pending admin approval. You will be notified once approved.");
+            
+            showSuccess(message);
+            
+            // Navigate to home after a delay
             new Thread(() -> {
                 try {
                     Thread.sleep(2000);
